@@ -27,6 +27,7 @@
 		218B780C2E15C69D00F8B129 /* WoodworkingCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WoodworkingCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78192E15C69E00F8B129 /* WoodworkingCalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WoodworkingCalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78232E15C69E00F8B129 /* WoodworkingCalculatorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WoodworkingCalculatorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = WoodworkingCalculator.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -95,6 +96,7 @@
 		218B78032E15C69D00F8B129 = {
 			isa = PBXGroup;
 			children = (
+				219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */,
 				218B780E2E15C69D00F8B129 /* WoodworkingCalculator */,
 				218B781C2E15C69E00F8B129 /* WoodworkingCalculatorTests */,
 				218B78262E15C69E00F8B129 /* WoodworkingCalculatorUITests */,
