@@ -88,6 +88,9 @@ extension Evaluatable: CustomStringConvertible {
 
 let parser = WoodworkingCalculatorGrammar()
 
+// n.b. this is type-parameterized with a pair because the lexer has to be able to forward the
+// token code (type), along with the payload, to the parser. The token code is controlled by
+// citron, so we can't modify it.
 typealias Lexer = CitronLexer<(WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode)>
 
 func parseFraction(_ input: String) -> Token? {
