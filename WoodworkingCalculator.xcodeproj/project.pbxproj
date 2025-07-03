@@ -35,10 +35,8 @@
 			membershipExceptions = (
 				Headless/.gitignore,
 				Headless/calculate.sh,
-				Headless/main,
 				Headless/main.swift,
 				Parser/.gitignore,
-				Parser/citron,
 				Parser/WoodworkingCalculatorGrammar.y,
 			);
 			target = 218B780B2E15C69D00F8B129 /* WoodworkingCalculator */;
@@ -198,7 +196,6 @@
 					};
 					218B78182E15C69E00F8B129 = {
 						CreatedOnToolsVersion = 16.4;
-						TestTargetID = 218B780B2E15C69D00F8B129;
 					};
 					218B78222E15C69E00F8B129 = {
 						CreatedOnToolsVersion = 16.4;
@@ -468,7 +465,6 @@
 		218B78312E15C69E00F8B129 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -479,14 +475,12 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WoodworkingCalculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WoodworkingCalculator";
 			};
 			name = Debug;
 		};
 		218B78322E15C69E00F8B129 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -497,7 +491,6 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WoodworkingCalculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WoodworkingCalculator";
 			};
 			name = Release;
 		};
