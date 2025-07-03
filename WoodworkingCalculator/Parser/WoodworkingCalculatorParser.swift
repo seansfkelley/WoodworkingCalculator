@@ -102,28 +102,28 @@ class WoodworkingCalculatorParser: CitronParser {
 /*  10 */  (15, .RD( 7)), (16, .SH( 7)), (17, .SH(11)), (12, .SH(15)), (13, .SH(10)),
 /*  15 */  (14, .SH( 9)), (15, .RD( 7)), (16, .SH( 7)), (17, .SH(11)), (12, .RD( 1)),
 /*  20 */  (13, .SH(10)), (14, .SH( 9)), (15, .RD( 7)), (16, .SH( 7)), (17, .SH(11)),
-/*  25 */  (14, .RD( 5)), (15, .RD( 7)), (16, .SH( 7)), (17, .SH(11)), (14, .RD( 4)),
-/*  30 */  (15, .RD( 7)), (16, .SH( 7)), (17, .SH(11)), ( 5, .SH( 2)), ( 9, .SR(22)),
-/*  35 */  (10, .SR(23)), (17, .SH(12)), ( 9, .SR(22)), (10, .SR(23)), ( 7, .SH( 6)),
-/*  40 */  ( 8, .SR(18)), (17, .SH(14)), (10, .SR(23)), (16, .SH( 8)), (17, .SH(13)),
-/*  45 */  ( 8, .SR(20)), ( 8, .SR(11)), ( 8, .SR(16)), (10, .SR(23)), ( 8, .SR(13)),
-/*  50 */  ( 3, .SH( 5)), ( 4, .SH( 4)), ( 1, .SH( 3)), ( 2, .SH( 1)), ( 8, .SR( 9)),
-/*  55 */  ( 6, .SR( 8)), ( 0, .RD( 0)),
+/*  25 */  (13, .RD( 5)), (14, .SH( 9)), (15, .RD( 7)), (16, .SH( 7)), (17, .SH(11)),
+/*  30 */  (13, .RD( 4)), (14, .SH( 9)), (15, .RD( 7)), (16, .SH( 7)), (17, .SH(11)),
+/*  35 */  ( 5, .SH( 2)), ( 9, .SR(22)), (10, .SR(23)), (17, .SH(12)), ( 9, .SR(22)),
+/*  40 */  (10, .SR(23)), ( 7, .SH( 6)), ( 8, .SR(18)), (17, .SH(14)), (10, .SR(23)),
+/*  45 */  (16, .SH( 8)), (17, .SH(13)), ( 8, .SR(20)), ( 8, .SR(11)), ( 8, .SR(16)),
+/*  50 */  (10, .SR(23)), ( 8, .SR(13)), ( 3, .SH( 5)), ( 4, .SH( 4)), ( 1, .SH( 3)),
+/*  55 */  ( 2, .SH( 1)), ( 8, .SR( 9)), ( 6, .SR( 8)), ( 0, .RD( 0)),
     ]
 
-    let yyShiftUseDefault: Int = 57
+    let yyShiftUseDefault: Int = 59
     let yyShiftOffsetMin: Int = 0
-    let yyShiftOffsetMax: Int = 56
+    let yyShiftOffsetMax: Int = 58
     let yyShiftOffset: [Int] = [
-        /*     0 */    28,   28,   28,   28,   28,   28,   25,   32,   38,   47,
-        /*    10 */    51,   37,   39,   41,   46,   49,   56,
+        /*     0 */    30,   30,   30,   30,   30,   30,   27,   34,   40,   49,
+        /*    10 */    53,   39,   41,   43,   48,   51,   58,
     ]
 
     let yyReduceUseDefault: Int = -12
     let yyReduceOffsetMin: Int =   -11
-    let yyReduceOffsetMax: Int =   27
+    let yyReduceOffsetMax: Int =   29
     let yyReduceOffset: [Int] = [
-        /*     0 */   -11,   -5,    1,    7,   11,   15,   27,   19,   24,
+        /*     0 */   -11,   -5,    1,    7,   12,   17,   29,   21,   26,
     ]
 
     let yyDefaultAction: [CitronParsingAction] = [
@@ -209,8 +209,8 @@ class WoodworkingCalculatorParser: CitronParser {
         /*   1 */ "expression ::= multiplicative(left) Add expression(right)",
         /*   2 */ "expression ::= multiplicative(left) Subtract expression(right)",
         /*   3 */ "expression ::= multiplicative(x)",
-        /*   4 */ "multiplicative ::= atom(left) Multiply atom(right)",
-        /*   5 */ "multiplicative ::= atom(left) Divide atom(right)",
+        /*   4 */ "multiplicative ::= atom(left) Multiply multiplicative(right)",
+        /*   5 */ "multiplicative ::= atom(left) Divide multiplicative(right)",
         /*   6 */ "multiplicative ::= atom(x)",
         /*   7 */ "atom ::= quantity(x)",
         /*   8 */ "atom ::= LeftParen expression(x) RightParen",
@@ -285,7 +285,7 @@ class WoodworkingCalculatorParser: CitronParser {
             if case .yy19(let x) = yySymbolOnStack(distanceFromTop: 0) {
                 return .yy19(try codeBlockForRule03(x: x))
             }
-        case 4: /* multiplicative ::= atom(left) Multiply atom(right) */
+        case 4: /* multiplicative ::= atom(left) Multiply multiplicative(right) */
             func codeBlockForRule04(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
 #sourceLocation(file: "WoodworkingCalculatorParser.y", line: 20)
 
@@ -297,7 +297,7 @@ class WoodworkingCalculatorParser: CitronParser {
                case .yy19(let right) = yySymbolOnStack(distanceFromTop: 0) {
                 return .yy19(try codeBlockForRule04(left: left, right: right))
             }
-        case 5: /* multiplicative ::= atom(left) Divide atom(right) */
+        case 5: /* multiplicative ::= atom(left) Divide multiplicative(right) */
             func codeBlockForRule05(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
 #sourceLocation(file: "WoodworkingCalculatorParser.y", line: 23)
 

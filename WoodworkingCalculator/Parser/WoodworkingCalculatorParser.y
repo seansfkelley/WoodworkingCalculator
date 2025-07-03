@@ -17,10 +17,10 @@ expression ::= multiplicative(x). {
     return x
 }
 
-multiplicative ::= atom(left) Multiply atom(right). {
+multiplicative ::= atom(left) Multiply multiplicative(right). {
     return .multiply(left, right)
 }
-multiplicative ::= atom(left) Divide atom(right). {
+multiplicative ::= atom(left) Divide multiplicative(right). {
     return .divide(left, right)
 }
 multiplicative ::= atom(x). {

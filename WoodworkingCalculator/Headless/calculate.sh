@@ -2,6 +2,6 @@
 
 set -euo pipefail
 
-make -q build
+make build
 
 ./main "$@"
