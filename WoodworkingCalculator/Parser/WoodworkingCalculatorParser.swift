@@ -5,7 +5,7 @@ enum Token {
     case real(Double)
 }
 
-struct Fraction {
+struct Fraction: Equatable {
     var num: Int
     var den: Int
     
@@ -31,6 +31,12 @@ struct Fraction {
         } else {
             return Double(self).toNearestFraction(withPrecision: precision)
         }
+    }
+    
+    static func == (left: Fraction, right: Fraction) -> Bool {
+        let lreduced = left.reduced()
+        let rreduced = right.reduced()
+        return lreduced.num == rreduced.num && lreduced.den == rreduced.den
     }
     
     static func + (left: Fraction, right: Fraction) -> Fraction {
@@ -81,7 +87,7 @@ enum Evaluatable {
     indirect case divide(Evaluatable, Evaluatable)
 }
 
-enum EvaluatedResult {
+enum EvaluatedResult: Equatable {
     case rational(Fraction)
     case real(Double)
 }
