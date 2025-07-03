@@ -91,8 +91,8 @@ let parser = WoodworkingCalculatorGrammar()
 typealias Lexer = CitronLexer<(WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode)>
 
 func parseFraction(_ input: String) -> Token? {
-    if let result = try? #/(?<int>[0-9]+) +(?<num>[0-9]+)/(?<den>[0-9]+)/#.wholeMatch(in: input) {
-        let int = Int(result.int).unsafelyUnwrapped
+    if let result = try? #/((?<int>[0-9]+) +)?(?<num>[0-9]+)/(?<den>[0-9]+)/#.wholeMatch(in: input) {
+        let int = if let i = result.int { Int(i).unsafelyUnwrapped } else { 0 }
         let num = Int(result.num).unsafelyUnwrapped
         let den = Int(result.den).unsafelyUnwrapped
         return .fraction(int * den + num, den)
@@ -101,7 +101,7 @@ func parseFraction(_ input: String) -> Token? {
 }
 
 let lexer = Lexer(rules: [
-        .regexPattern("[0-9]+ +[0-9]+/[0-9]+", { str in
+        .regexPattern("([0-9]+ +)?[0-9]+/[0-9]+", { str in
             if let parsed = parseFraction(str) {
                 return (parsed, .Fraction)
             }
