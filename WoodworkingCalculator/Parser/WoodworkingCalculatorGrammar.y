@@ -65,6 +65,9 @@ quantity ::= integer(f) Feet real(i). {
 quantity ::= integer(f) Feet. {
     return .rational(Fraction(f * 12, 1))
 }
+quantity ::= fraction(f) Feet. {
+    return .rational(Fraction(f.num * 12, f.den))
+}
 quantity ::= real(f) Feet. {
     return .real(f * 12)
 }
