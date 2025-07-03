@@ -24,6 +24,15 @@ struct Fraction {
         return Fraction(n, d)
     }
     
+    func roundedToPrecision(_ precision: Int) -> (Fraction, Double?) {
+        // TODO: make sure precision is a power of 2
+        if self.den <= precision {
+            return (self, nil)
+        } else {
+            return Double(self).toNearestFraction(withPrecision: precision)
+        }
+    }
+    
     static func + (left: Fraction, right: Fraction) -> Fraction {
         return Fraction(left.num * right.den + right.num * left.den, left.den * right.den).reduced()
     }
@@ -95,9 +104,10 @@ extension Double {
         }
     }
     
-    func nearestFraction() -> (Fraction, Double?) {
-        let upperFraction = Fraction(Int((self * Double(HIGHEST_PRECISION)).rounded(.up)), HIGHEST_PRECISION).reduced()
-        let lowerFraction = Fraction(Int((self * Double(HIGHEST_PRECISION)).rounded(.down)), HIGHEST_PRECISION).reduced()
+    func toNearestFraction(withPrecision: Int) -> (Fraction, Double?) {
+        // TODO: make sure precision is a power of 2
+        let upperFraction = Fraction(Int((self * Double(withPrecision)).rounded(.up)), withPrecision).reduced()
+        let lowerFraction = Fraction(Int((self * Double(withPrecision)).rounded(.down)), withPrecision).reduced()
         
         let upperError = Double(upperFraction) - self
         let lowerError = self - Double(lowerFraction)
@@ -178,8 +188,6 @@ extension Evaluatable: CustomStringConvertible {
     }
 }
 
-let parser = WoodworkingCalculatorGrammar()
-
 // n.b. this is a pair because the lexer has to be able to forward the token code (type),
 // along with the payload, to the parser. The token code is controlled by citron, so we can't
 // modify it.
@@ -199,7 +207,7 @@ func parseFraction(_ input: String) -> LexedTokenData? {
 func parseReal(_ input: String) -> LexedTokenData? {
     if let _ = try? #/([0-9]+)?\.[0-9]+/#.wholeMatch(in: input) {
         let real = Double(input).unsafelyUnwrapped
-        let (fraction, error) = real.nearestFraction()
+        let (fraction, error) = real.toNearestFraction(withPrecision: HIGHEST_PRECISION)
         if error == nil {
             return (.fraction(fraction), .Fraction)
         } else {
@@ -236,6 +244,7 @@ let lexer = CitronLexer<LexedTokenData>(rules: [
     ])
 
 func parse(_ input: String) throws -> Evaluatable {
+    let parser = WoodworkingCalculatorGrammar()
     try lexer.tokenize(input) { (t, c) in
         try parser.consume(token: t, code: c)
     }

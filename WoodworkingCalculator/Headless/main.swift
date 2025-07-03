@@ -4,16 +4,16 @@ if CommandLine.argc != 2 {
     do {
         let tree = try parse(CommandLine.arguments[1])
         let result = tree.evaluate()
-        switch result {
+        let (fraction, error) = switch result {
         case .rational(let r):
-            print("\(tree) -> \(r)")
+            r.roundedToPrecision(HIGHEST_PRECISION)
         case .real(let r):
-            let (fraction, error) = r.nearestFraction()
-            if error == nil {
-                print("\(tree) -> \(fraction)")
-            } else {
-                print("\(tree) -> aprx. \(fraction) (error: \(String(format: "%+.3f", error!))\")")
-            }
+            r.toNearestFraction(withPrecision: HIGHEST_PRECISION)
+        }
+        if error == nil {
+            print("\(tree) -> \(fraction)")
+        } else {
+            print("\(tree) -> aprx. \(fraction) (error: \(String(format: "%+.3f", error!))\")")
         }
     } catch (let error) {
         print("Error during parsing: \(error)")
