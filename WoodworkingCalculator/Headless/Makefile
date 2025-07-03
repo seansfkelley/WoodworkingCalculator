@@ -1,8 +1,11 @@
+PARSER_PATH = ../Parser
+GRAMMAR = WoodworkingCalculatorGrammar
+
 build: main
 
-../Parser/WoodworkingCalculatorParser.swift: ../Parser/WoodworkingCalculatorParser.y
-	cd ../Parser && make WoodworkingCalculatorParser.swift
+${PARSER_PATH}/${GRAMMAR}.swift: ${PARSER_PATH}/${GRAMMAR}.y
+	cd ${PARSER_PATH} && make ${GRAMMAR}.swift
 
-main: ../Parser/CitronLexer.swift ../Parser/CitronParser.swift ../Parser/WoodworkingCalculatorParser.swift ./main.swift
-	swiftc ../Parser/CitronLexer.swift ../Parser/CitronParser.swift ../Parser/WoodworkingCalculatorParser.swift ./main.swift -o main
+main: ${PARSER_PATH}/CitronLexer.swift ${PARSER_PATH}/CitronParser.swift ${PARSER_PATH}/${GRAMMAR}.swift ./main.swift
+	swiftc ${PARSER_PATH}/CitronLexer.swift ${PARSER_PATH}/CitronParser.swift ${PARSER_PATH}/${GRAMMAR}.swift ./main.swift -o main
 

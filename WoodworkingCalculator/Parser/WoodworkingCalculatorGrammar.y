@@ -1,4 +1,4 @@
-%class_name WoodworkingCalculatorParser
+%class_name WoodworkingCalculatorGrammar
 
 %token_type Token
 %default_nonterminal_type Evaluatable

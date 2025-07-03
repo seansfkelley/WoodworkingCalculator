@@ -82,9 +82,9 @@ extension Evaluatable: CustomStringConvertible {
     }
 }
 
-let parser = WoodworkingCalculatorParser()
+let parser = WoodworkingCalculatorGrammar()
 
-typealias Lexer = CitronLexer<(WoodworkingCalculatorParser.CitronToken, WoodworkingCalculatorParser.CitronTokenCode)>
+typealias Lexer = CitronLexer<(WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode)>
 
 func parseFraction(_ input: String) -> Token? {
     if let result = try? #/(?<int>[0-9]+) +(?<num>[0-9]+)/(?<den>[0-9]+)/#.wholeMatch(in: input) {

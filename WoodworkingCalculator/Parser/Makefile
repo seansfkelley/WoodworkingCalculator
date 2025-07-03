@@ -1,4 +1,4 @@
-GRAMMAR = WoodworkingCalculatorParser
+GRAMMAR = WoodworkingCalculatorGrammar
 CITRON_SRC = citron.c
 CITRON = citron
 

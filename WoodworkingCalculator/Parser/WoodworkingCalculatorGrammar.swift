@@ -7,7 +7,7 @@
 
 // Parser class
 
-class WoodworkingCalculatorParser: CitronParser {
+class WoodworkingCalculatorGrammar: CitronParser {
 
     // Types
 
@@ -241,7 +241,7 @@ class WoodworkingCalculatorParser: CitronParser {
         switch (ruleNumber) {
         case 0: /* equation ::= expression(e) */
             func codeBlockForRule00(e: Evaluatable) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 6)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 6)
 
     return e
 
@@ -252,7 +252,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 1: /* expression ::= multiplicative(left) Add expression(right) */
             func codeBlockForRule01(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 10)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 10)
 
     return .add(left, right)
 
@@ -264,7 +264,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 2: /* expression ::= multiplicative(left) Subtract expression(right) */
             func codeBlockForRule02(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 13)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 13)
 
     return .subtract(left, right)
 
@@ -276,7 +276,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 3: /* expression ::= multiplicative(x) */
             func codeBlockForRule03(x: Evaluatable) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 16)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 16)
 
     return x
 
@@ -287,7 +287,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 4: /* multiplicative ::= atom(left) Multiply multiplicative(right) */
             func codeBlockForRule04(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 20)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 20)
 
     return .multiply(left, right)
 
@@ -299,7 +299,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 5: /* multiplicative ::= atom(left) Divide multiplicative(right) */
             func codeBlockForRule05(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 23)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 23)
 
     return .divide(left, right)
 
@@ -311,7 +311,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 6: /* multiplicative ::= atom(x) */
             func codeBlockForRule06(x: Evaluatable) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 26)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 26)
 
     return x
 
@@ -322,7 +322,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 7: /* atom ::= quantity(x) */
             func codeBlockForRule07(x: Evaluatable) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 30)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 30)
 
     return x
 
@@ -333,7 +333,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 8: /* atom ::= LeftParen expression(x) RightParen */
             func codeBlockForRule08(x: Evaluatable) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 33)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 33)
 
     return x
 
@@ -344,7 +344,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 9: /* quantity ::= integer(f) Feet integer(i_int) fraction(i_frac) Inches */
             func codeBlockForRule09(f: Int, i_int: Int, i_frac: Fraction) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 37)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 37)
 
     return .quantity((f * 12 + i_int) * i_frac.1 + i_frac.0, i_frac.1)
 
@@ -357,7 +357,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 10: /* quantity ::= integer(f) Feet integer(i_int) fraction(i_frac) */
             func codeBlockForRule10(f: Int, i_int: Int, i_frac: Fraction) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 40)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 40)
 
     return .quantity((f * 12 + i_int) * i_frac.1 + i_frac.0, i_frac.1)
 
@@ -370,7 +370,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 11: /* quantity ::= integer(f) Feet integer(i_int) Inches */
             func codeBlockForRule11(f: Int, i_int: Int) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 43)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 43)
 
     return .quantity(f * 12 + i_int, 1)
 
@@ -382,7 +382,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 12: /* quantity ::= integer(f) Feet integer(i_int) */
             func codeBlockForRule12(f: Int, i_int: Int) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 46)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 46)
 
     return .quantity(f * 12 + i_int, 1)
 
@@ -394,7 +394,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 13: /* quantity ::= integer(f) Feet fraction(i_frac) Inches */
             func codeBlockForRule13(f: Int, i_frac: Fraction) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 49)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 49)
 
     return .quantity(f * 12 * i_frac.1 + i_frac.0, i_frac.1)
 
@@ -406,7 +406,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 14: /* quantity ::= integer(f) Feet fraction(i_frac) */
             func codeBlockForRule14(f: Int, i_frac: Fraction) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 52)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 52)
 
     return .quantity(f * 12 * i_frac.1 + i_frac.0, i_frac.1)
 
@@ -418,7 +418,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 15: /* quantity ::= integer(f) Feet */
             func codeBlockForRule15(f: Int) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 55)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 55)
 
     return .quantity(f * 12, 1)
 
@@ -429,7 +429,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 16: /* quantity ::= integer(i_int) fraction(i_frac) Inches */
             func codeBlockForRule16(i_int: Int, i_frac: Fraction) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 58)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 58)
 
     return .quantity(i_int * i_frac.1 + i_frac.0, i_frac.1)
 
@@ -441,7 +441,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 17: /* quantity ::= integer(i_int) fraction(i_frac) */
             func codeBlockForRule17(i_int: Int, i_frac: Fraction) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 61)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 61)
 
     return .quantity(i_int * i_frac.1 + i_frac.0, i_frac.1)
 
@@ -453,7 +453,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 18: /* quantity ::= integer(i_int) Inches */
             func codeBlockForRule18(i_int: Int) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 64)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 64)
 
     return .quantity(i_int, 1)
 
@@ -464,7 +464,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 19: /* quantity ::= integer(i_int) */
             func codeBlockForRule19(i_int: Int) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 67)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 67)
 
     return .quantity(i_int, 1)
 
@@ -475,7 +475,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 20: /* quantity ::= fraction(i_frac) Inches */
             func codeBlockForRule20(i_frac: Fraction) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 70)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 70)
 
     return .quantity(i_frac.0, i_frac.1)
 
@@ -486,7 +486,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 21: /* quantity ::= fraction(i_frac) */
             func codeBlockForRule21(i_frac: Fraction) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 73)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 73)
 
     return .quantity(i_frac.0, i_frac.1)
 
@@ -497,7 +497,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 22: /* integer ::= Integer(x) */
             func codeBlockForRule22(x: Token) throws -> Int {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 78)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 78)
 
     switch(x) {
     case .integer(let int):
@@ -513,7 +513,7 @@ class WoodworkingCalculatorParser: CitronParser {
             }
         case 23: /* fraction ::= Fraction(x) */
             func codeBlockForRule23(x: Token) throws -> Fraction {
-#sourceLocation(file: "WoodworkingCalculatorParser.y", line: 88)
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 88)
 
     switch(x) {
     case .fraction(let n, let d):
@@ -548,7 +548,7 @@ class WoodworkingCalculatorParser: CitronParser {
 
     // Error capturing
 
-    typealias CitronErrorCaptureDelegate = _WoodworkingCalculatorParserCitronErrorCaptureDelegate
+    typealias CitronErrorCaptureDelegate = _WoodworkingCalculatorGrammarCitronErrorCaptureDelegate
 
     weak var errorCaptureDelegate: CitronErrorCaptureDelegate? = nil
 
@@ -580,11 +580,11 @@ class WoodworkingCalculatorParser: CitronParser {
     var numberOfCapturedErrors: Int = 0
 }
 
-protocol _WoodworkingCalculatorParserCitronErrorCaptureDelegate : AnyObject {
+protocol _WoodworkingCalculatorGrammarCitronErrorCaptureDelegate : AnyObject {
     func shouldSaveErrorForCapturing(error: Error) -> Bool
 }
 
-extension _WoodworkingCalculatorParserCitronErrorCaptureDelegate {
+extension _WoodworkingCalculatorGrammarCitronErrorCaptureDelegate {
     func shouldSaveErrorForCapturing(error: Error) -> Bool {
         return true
     }
@@ -592,20 +592,20 @@ extension _WoodworkingCalculatorParserCitronErrorCaptureDelegate {
 
 // Ability to use == to compare CitronSymbolCode with CitronTokenCode / CitronNonTerminalCode
 
-extension WoodworkingCalculatorParser.CitronSymbolCode {
-    static func == (a: WoodworkingCalculatorParser.CitronSymbolCode, b: WoodworkingCalculatorParser.CitronTokenCode) -> Bool {
+extension WoodworkingCalculatorGrammar.CitronSymbolCode {
+    static func == (a: WoodworkingCalculatorGrammar.CitronSymbolCode, b: WoodworkingCalculatorGrammar.CitronTokenCode) -> Bool {
         guard case let .token(code) = a else { return false }
         return (code == b)
     }
-    static func == (a: WoodworkingCalculatorParser.CitronTokenCode, b: WoodworkingCalculatorParser.CitronSymbolCode) -> Bool {
+    static func == (a: WoodworkingCalculatorGrammar.CitronTokenCode, b: WoodworkingCalculatorGrammar.CitronSymbolCode) -> Bool {
         guard case let .token(code) = b else { return false }
         return (code == a)
     }
-    static func == (a: WoodworkingCalculatorParser.CitronSymbolCode, b: WoodworkingCalculatorParser.CitronNonTerminalCode) -> Bool {
+    static func == (a: WoodworkingCalculatorGrammar.CitronSymbolCode, b: WoodworkingCalculatorGrammar.CitronNonTerminalCode) -> Bool {
         guard case let .nonterminal(code) = a else { return false }
         return (code == b)
     }
-    static func == (a: WoodworkingCalculatorParser.CitronNonTerminalCode, b: WoodworkingCalculatorParser.CitronSymbolCode) -> Bool {
+    static func == (a: WoodworkingCalculatorGrammar.CitronNonTerminalCode, b: WoodworkingCalculatorGrammar.CitronSymbolCode) -> Bool {
         guard case let .nonterminal(code) = b else { return false }
         return (code == a)
     }
@@ -613,11 +613,11 @@ extension WoodworkingCalculatorParser.CitronSymbolCode {
 
 // Ability to use switch (symbolCode) { case .tokenCode: ...; case .nonterminalCode: ... }
 
-extension WoodworkingCalculatorParser.CitronSymbolCode {
-    static func ~= (pattern: WoodworkingCalculatorParser.CitronTokenCode, value: WoodworkingCalculatorParser.CitronSymbolCode) -> Bool {
+extension WoodworkingCalculatorGrammar.CitronSymbolCode {
+    static func ~= (pattern: WoodworkingCalculatorGrammar.CitronTokenCode, value: WoodworkingCalculatorGrammar.CitronSymbolCode) -> Bool {
         return (pattern == value)
     }
-    static func ~= (pattern: WoodworkingCalculatorParser.CitronNonTerminalCode, value: WoodworkingCalculatorParser.CitronSymbolCode) -> Bool {
+    static func ~= (pattern: WoodworkingCalculatorGrammar.CitronNonTerminalCode, value: WoodworkingCalculatorGrammar.CitronSymbolCode) -> Bool {
         return (pattern == value)
     }
 }
