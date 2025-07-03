@@ -6,10 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		218B78392E15C8B000F8B129 /* grammar.y in Sources */ = {isa = PBXBuildFile; fileRef = 218B78382E15C8AB00F8B129 /* grammar.y */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		218B781A2E15C69E00F8B129 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -31,7 +27,6 @@
 		218B780C2E15C69D00F8B129 /* WoodworkingCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WoodworkingCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78192E15C69E00F8B129 /* WoodworkingCalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WoodworkingCalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78232E15C69E00F8B129 /* WoodworkingCalculatorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WoodworkingCalculatorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		218B78382E15C8AB00F8B129 /* grammar.y */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.yacc; path = grammar.y; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -84,7 +79,6 @@
 				218B781C2E15C69E00F8B129 /* WoodworkingCalculatorTests */,
 				218B78262E15C69E00F8B129 /* WoodworkingCalculatorUITests */,
 				218B780D2E15C69D00F8B129 /* Products */,
-				218B78382E15C8AB00F8B129 /* grammar.y */,
 			);
 			sourceTree = "<group>";
 		};
@@ -181,6 +175,7 @@
 				TargetAttributes = {
 					218B780B2E15C69D00F8B129 = {
 						CreatedOnToolsVersion = 16.4;
+						LastSwiftMigration = 1640;
 					};
 					218B78182E15C69E00F8B129 = {
 						CreatedOnToolsVersion = 16.4;
@@ -242,7 +237,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				218B78392E15C8B000F8B129 /* grammar.y in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -400,6 +394,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -417,6 +412,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.WoodworkingCalculator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -427,6 +423,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;

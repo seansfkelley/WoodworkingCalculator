@@ -37,7 +37,19 @@ atom ::= LeftParen expression(x) RightParen. {
 quantity ::= integer(f) Feet integer(i_int) fraction(i_frac) Inches. {
     return .quantity((f * 12 + i_int) * i_frac.1 + i_frac.0, i_frac.1)
 }
+quantity ::= integer(f) Feet integer(i_int) fraction(i_frac). {
+    return .quantity((f * 12 + i_int) * i_frac.1 + i_frac.0, i_frac.1)
+}
+quantity ::= integer(f) Feet integer(i_int) Inches. {
+    return .quantity(f * 12 + i_int, 1)
+}
+quantity ::= integer(f) Feet integer(i_int). {
+    return .quantity(f * 12 + i_int, 1)
+}
 quantity ::= integer(f) Feet fraction(i_frac) Inches. {
+    return .quantity(f * 12 * i_frac.1 + i_frac.0, i_frac.1)
+}
+quantity ::= integer(f) Feet fraction(i_frac). {
     return .quantity(f * 12 * i_frac.1 + i_frac.0, i_frac.1)
 }
 quantity ::= integer(f) Feet. {
@@ -45,6 +57,12 @@ quantity ::= integer(f) Feet. {
 }
 quantity ::= integer(i_int) fraction(i_frac) Inches. {
     return .quantity(i_int * i_frac.1 + i_frac.0, i_frac.1)
+}
+quantity ::= integer(i_int) fraction(i_frac). {
+    return .quantity(i_int * i_frac.1 + i_frac.0, i_frac.1)
+}
+quantity ::= integer(i_int) Inches. {
+    return .quantity(i_int, 1)
 }
 quantity ::= integer(i_int). {
     return .quantity(i_int, 1)
