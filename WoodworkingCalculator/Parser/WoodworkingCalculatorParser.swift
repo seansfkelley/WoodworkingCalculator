@@ -151,7 +151,12 @@ extension Evaluatable: CustomStringConvertible {
         case .rational(let r):
             return .rational(r.reduced())
         case .real(let r):
-            return .real(r)
+            let (fraction, error) = r.toNearestFraction(withPrecision: HIGHEST_PRECISION)
+            if error == nil {
+                return .rational(fraction)
+            } else {
+                return .real(r)
+            }
         case .add(let left, let right):
             let l = left.evaluate()
             let r = right.evaluate()
@@ -207,12 +212,7 @@ func parseFraction(_ input: String) -> LexedTokenData? {
 func parseReal(_ input: String) -> LexedTokenData? {
     if let _ = try? #/([0-9]+)?\.[0-9]+/#.wholeMatch(in: input) {
         let real = Double(input).unsafelyUnwrapped
-        let (fraction, error) = real.toNearestFraction(withPrecision: HIGHEST_PRECISION)
-        if error == nil {
-            return (.fraction(fraction), .Fraction)
-        } else {
-            return (.real(real), .Real)
-        }
+        return (.real(real), .Real)
     } else {
         return nil
     }
