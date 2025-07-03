@@ -36,7 +36,10 @@
 				Headless/.gitignore,
 				Headless/calculate.sh,
 				Headless/main.swift,
+				Headless/Makefile,
 				Parser/.gitignore,
+				Parser/citron.c,
+				Parser/Makefile,
 				Parser/WoodworkingCalculatorGrammar.y,
 			);
 			target = 218B780B2E15C69D00F8B129 /* WoodworkingCalculator */;
