@@ -39,43 +39,58 @@ atom ::= LeftParen expression(x) RightParen. {
 
 %nonterminal_type quantity Evaluatable
 quantity ::= integer(f) Feet integer(i_int) fraction(i_frac) Inches. {
-    return .quantity((f * 12 + i_int) * i_frac.1 + i_frac.0, i_frac.1)
+    return .rational(Fraction((f * 12 + i_int) * i_frac.den + i_frac.num, i_frac.den))
 }
 quantity ::= integer(f) Feet integer(i_int) fraction(i_frac). {
-    return .quantity((f * 12 + i_int) * i_frac.1 + i_frac.0, i_frac.1)
+    return .rational(Fraction((f * 12 + i_int) * i_frac.den + i_frac.num, i_frac.den))
 }
 quantity ::= integer(f) Feet integer(i_int) Inches. {
-    return .quantity(f * 12 + i_int, 1)
+    return .rational(Fraction(f * 12 + i_int, 1))
 }
 quantity ::= integer(f) Feet integer(i_int). {
-    return .quantity(f * 12 + i_int, 1)
+    return .rational(Fraction(f * 12 + i_int, 1))
 }
 quantity ::= integer(f) Feet fraction(i_frac) Inches. {
-    return .quantity(f * 12 * i_frac.1 + i_frac.0, i_frac.1)
+    return .rational(Fraction(f * 12 * i_frac.den + i_frac.num, i_frac.den))
 }
 quantity ::= integer(f) Feet fraction(i_frac). {
-    return .quantity(f * 12 * i_frac.1 + i_frac.0, i_frac.1)
+    return .rational(Fraction(f * 12 * i_frac.den + i_frac.num, i_frac.den))
+}
+quantity ::= integer(f) Feet real(i) Inches. {
+    return .real(Double(f * 12) + i)
+}
+quantity ::= integer(f) Feet real(i). {
+    return .real(Double(f * 12) + i)
 }
 quantity ::= integer(f) Feet. {
-    return .quantity(f * 12, 1)
+    return .rational(Fraction(f * 12, 1))
+}
+quantity ::= real(f) Feet. {
+    return .real(f * 12)
 }
 quantity ::= integer(i_int) fraction(i_frac) Inches. {
-    return .quantity(i_int * i_frac.1 + i_frac.0, i_frac.1)
+    return .rational(Fraction(i_int * i_frac.den + i_frac.num, i_frac.den))
 }
 quantity ::= integer(i_int) fraction(i_frac). {
-    return .quantity(i_int * i_frac.1 + i_frac.0, i_frac.1)
+    return .rational(Fraction(i_int * i_frac.den + i_frac.num, i_frac.den))
 }
 quantity ::= integer(i_int) Inches. {
-    return .quantity(i_int, 1)
+    return .rational(Fraction(i_int, 1))
 }
 quantity ::= integer(i_int). {
-    return .quantity(i_int, 1)
+    return .rational(Fraction(i_int, 1))
 }
 quantity ::= fraction(i_frac) Inches. {
-    return .quantity(i_frac.0, i_frac.1)
+    return .rational(Fraction(i_frac.num, i_frac.den))
 }
 quantity ::= fraction(i_frac). {
-    return .quantity(i_frac.0, i_frac.1)
+    return .rational(Fraction(i_frac.num, i_frac.den))
+}
+quantity ::= real(i) Inches. {
+    return .real(i)
+}
+quantity ::= real(i). {
+    return .real(i)
 }
 
 %nonterminal_type integer Int
@@ -89,10 +104,19 @@ integer ::= Integer(x). {
 
 %nonterminal_type fraction Fraction
 fraction ::= Fraction(x). {
-    if case .fraction(let num, let den) = x {
-        return (num, den)
+    if case .fraction(let fraction) = x {
+        return fraction
     } else {
         preconditionFailure("lexer did not return Token.fraction for the Fraction token")
+    }
+}
+
+%nonterminal_type real Double
+real ::= Real(x). {
+    if case .real(let real) = x {
+        return real
+    } else {
+        preconditionFailure("lexer did not return Token.real for the Real token")
     }
 }
 
