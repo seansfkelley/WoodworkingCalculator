@@ -7,20 +7,20 @@ equation ::= expression(e). {
     return e
 }
 
-expression ::= multiplicative(left) Add expression(right). {
+expression ::= expression(left) Add multiplicative(right). {
     return .add(left, right)
 }
-expression ::= multiplicative(left) Subtract expression(right). {
+expression ::= expression(left) Subtract multiplicative(right). {
     return .subtract(left, right)
 }
 expression ::= multiplicative(x). {
     return x
 }
 
-multiplicative ::= atom(left) Multiply multiplicative(right). {
+multiplicative ::= multiplicative(left) Multiply atom(right). {
     return .multiply(left, right)
 }
-multiplicative ::= atom(left) Divide multiplicative(right). {
+multiplicative ::= multiplicative(left) Divide atom(right). {
     return .divide(left, right)
 }
 multiplicative ::= atom(x). {

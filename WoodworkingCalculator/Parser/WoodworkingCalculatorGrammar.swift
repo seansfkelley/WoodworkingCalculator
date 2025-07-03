@@ -92,45 +92,45 @@ class WoodworkingCalculatorGrammar: CitronParser {
     // Counts
 
     let yyNumberOfSymbols: Int = 18
-    let yyNumberOfStates: Int = 17
+    let yyNumberOfStates: Int = 18
 
     // Action tables
 
     let yyLookaheadAction: [(CitronSymbolNumber, CitronParsingAction)] = [
-/*   0 */  (11, .ACCEPT),   (12, .SH(16)), (13, .SH(10)), (14, .SH( 9)), (15, .RD( 7)),
-/*   5 */  (16, .SH( 7)), (17, .SH(11)), (12, .RD( 2)), (13, .SH(10)), (14, .SH( 9)),
-/*  10 */  (15, .RD( 7)), (16, .SH( 7)), (17, .SH(11)), (12, .SH(15)), (13, .SH(10)),
-/*  15 */  (14, .SH( 9)), (15, .RD( 7)), (16, .SH( 7)), (17, .SH(11)), (12, .RD( 1)),
-/*  20 */  (13, .SH(10)), (14, .SH( 9)), (15, .RD( 7)), (16, .SH( 7)), (17, .SH(11)),
-/*  25 */  (13, .RD( 5)), (14, .SH( 9)), (15, .RD( 7)), (16, .SH( 7)), (17, .SH(11)),
-/*  30 */  (13, .RD( 4)), (14, .SH( 9)), (15, .RD( 7)), (16, .SH( 7)), (17, .SH(11)),
-/*  35 */  ( 5, .SH( 2)), ( 9, .SR(22)), (10, .SR(23)), (17, .SH(12)), ( 9, .SR(22)),
-/*  40 */  (10, .SR(23)), ( 7, .SH( 6)), ( 8, .SR(18)), (17, .SH(14)), (10, .SR(23)),
-/*  45 */  (16, .SH( 8)), (17, .SH(13)), ( 8, .SR(20)), ( 8, .SR(11)), ( 8, .SR(16)),
-/*  50 */  (10, .SR(23)), ( 8, .SR(13)), ( 3, .SH( 5)), ( 4, .SH( 4)), ( 1, .SH( 3)),
-/*  55 */  ( 2, .SH( 1)), ( 8, .SR( 9)), ( 6, .SR( 8)), ( 0, .RD( 0)),
+/*   0 */  (11, .ACCEPT),   (12, .SH(10)), (13, .SH(11)), (14, .RD( 6)), (15, .RD( 7)),
+/*   5 */  (16, .SH( 7)), (17, .SH(14)), (12, .SH( 9)), (13, .SH(11)), (14, .RD( 6)),
+/*  10 */  (15, .RD( 7)), (16, .SH( 7)), (17, .SH(14)), (13, .SH(12)), (14, .RD( 6)),
+/*  15 */  (15, .RD( 7)), (16, .SH( 7)), (17, .SH(14)), (13, .SH(13)), (14, .RD( 6)),
+/*  20 */  (15, .RD( 7)), (16, .SH( 7)), (17, .SH(14)), (14, .RD( 5)), (15, .RD( 7)),
+/*  25 */  (16, .SH( 7)), (17, .SH(14)), (14, .RD( 4)), (15, .RD( 7)), (16, .SH( 7)),
+/*  30 */  (17, .SH(14)), ( 5, .SH( 1)), ( 0, .RD( 0)), ( 1, .SH( 3)), ( 2, .SH( 2)),
+/*  35 */  ( 9, .SR(22)), (10, .SR(23)), ( 7, .SH( 6)), ( 8, .SR(18)), ( 8, .SR(11)),
+/*  40 */  (10, .SR(23)), (10, .SR(23)), ( 1, .SH( 3)), ( 2, .SH( 2)), ( 9, .SR(22)),
+/*  45 */  (10, .SR(23)), (17, .SH(15)), ( 6, .SR( 8)), ( 8, .SR(20)), (16, .SH( 8)),
+/*  50 */  (17, .SH(16)), ( 3, .SH( 5)), ( 4, .SH( 4)), (17, .SH(17)), ( 8, .SR(16)),
+/*  55 */  ( 8, .SR(13)), (18, .RD( 2)), ( 8, .SR( 9)),
     ]
 
-    let yyShiftUseDefault: Int = 59
+    let yyShiftUseDefault: Int = 58
     let yyShiftOffsetMin: Int = 0
-    let yyShiftOffsetMax: Int = 58
+    let yyShiftOffsetMax: Int = 49
     let yyShiftOffset: [Int] = [
-        /*     0 */    30,   30,   30,   30,   30,   30,   27,   34,   40,   49,
-        /*    10 */    53,   39,   41,   43,   48,   51,   58,
+        /*     0 */    26,   26,   26,   26,   26,   26,   35,   30,   31,   41,
+        /*    10 */    32,   48,   48,   48,   40,   46,   47,   49,
     ]
 
     let yyReduceUseDefault: Int = -12
     let yyReduceOffsetMin: Int =   -11
-    let yyReduceOffsetMax: Int =   29
+    let yyReduceOffsetMax: Int =   36
     let yyReduceOffset: [Int] = [
-        /*     0 */   -11,   -5,    1,    7,   12,   17,   29,   21,   26,
+        /*     0 */   -11,   -5,    0,    5,    9,   13,   33,   29,   36,
     ]
 
     let yyDefaultAction: [CitronParsingAction] = [
   /*     0 */  .ERROR , .ERROR , .ERROR , .ERROR , .ERROR ,
-  /*     5 */  .ERROR , .RD(15), .RD(19), .RD(12), .RD( 6),
-  /*    10 */  .RD( 3), .RD(21), .RD(17), .RD(14), .RD(10),
-  /*    15 */  .ERROR , .ERROR ,
+  /*     5 */  .ERROR , .RD(15), .RD(19), .RD(12), .ERROR ,
+  /*    10 */  .ERROR , .RD( 3), .RD( 2), .RD( 1), .RD(21),
+  /*    15 */  .RD(17), .RD(14), .RD(10),
     ]
 
     // Fallback
@@ -206,11 +206,11 @@ class WoodworkingCalculatorGrammar: CitronParser {
     ]
     let yyRuleText: [String] = [
         /*   0 */ "equation ::= expression(e)",
-        /*   1 */ "expression ::= multiplicative(left) Add expression(right)",
-        /*   2 */ "expression ::= multiplicative(left) Subtract expression(right)",
+        /*   1 */ "expression ::= expression(left) Add multiplicative(right)",
+        /*   2 */ "expression ::= expression(left) Subtract multiplicative(right)",
         /*   3 */ "expression ::= multiplicative(x)",
-        /*   4 */ "multiplicative ::= atom(left) Multiply multiplicative(right)",
-        /*   5 */ "multiplicative ::= atom(left) Divide multiplicative(right)",
+        /*   4 */ "multiplicative ::= multiplicative(left) Multiply atom(right)",
+        /*   5 */ "multiplicative ::= multiplicative(left) Divide atom(right)",
         /*   6 */ "multiplicative ::= atom(x)",
         /*   7 */ "atom ::= quantity(x)",
         /*   8 */ "atom ::= LeftParen expression(x) RightParen",
@@ -250,7 +250,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
             if case .yy19(let e) = yySymbolOnStack(distanceFromTop: 0) {
                 return .yy19(try codeBlockForRule00(e: e))
             }
-        case 1: /* expression ::= multiplicative(left) Add expression(right) */
+        case 1: /* expression ::= expression(left) Add multiplicative(right) */
             func codeBlockForRule01(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
 #sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 10)
 
@@ -262,7 +262,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
                case .yy19(let right) = yySymbolOnStack(distanceFromTop: 0) {
                 return .yy19(try codeBlockForRule01(left: left, right: right))
             }
-        case 2: /* expression ::= multiplicative(left) Subtract expression(right) */
+        case 2: /* expression ::= expression(left) Subtract multiplicative(right) */
             func codeBlockForRule02(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
 #sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 13)
 
@@ -285,7 +285,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
             if case .yy19(let x) = yySymbolOnStack(distanceFromTop: 0) {
                 return .yy19(try codeBlockForRule03(x: x))
             }
-        case 4: /* multiplicative ::= atom(left) Multiply multiplicative(right) */
+        case 4: /* multiplicative ::= multiplicative(left) Multiply atom(right) */
             func codeBlockForRule04(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
 #sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 20)
 
@@ -297,7 +297,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
                case .yy19(let right) = yySymbolOnStack(distanceFromTop: 0) {
                 return .yy19(try codeBlockForRule04(left: left, right: right))
             }
-        case 5: /* multiplicative ::= atom(left) Divide multiplicative(right) */
+        case 5: /* multiplicative ::= multiplicative(left) Divide atom(right) */
             func codeBlockForRule05(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
 #sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 23)
 
@@ -570,7 +570,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
     func yySymbolContent(_ symbol: CitronSymbol) -> Any { return symbol.typeErasedContent() }
 
     let yyStartSymbolNumber: CitronSymbolNumber = 11
-    let yyEndStateNumber: CitronStateNumber = 16
+    let yyEndStateNumber: CitronStateNumber = 10
 
     var yyErrorCaptureSavedError: (error: Error, isLexerError: Bool)? = nil
     var yyErrorCaptureTokensSinceError: [(token: CitronToken, tokenCode: CitronTokenCode)] = []

@@ -46,15 +46,19 @@ extension Evaluatable: CustomStringConvertible {
     var description: String {
         switch (self) {
         case .quantity(let n, let d):
-            return "\(n)/\(d)"
+            if d == 1 {
+                return "\(n)"
+            } else {
+                return "\(n)/\(d)"
+            }
         case .add(let left, let right):
-            return "(+ \(left) \(right))"
+            return "(\(left) + \(right))"
         case .subtract(let left, let right):
-            return "(- \(left) \(right))"
+            return "(\(left) - \(right))"
         case .multiply(let left, let right):
-            return "(* \(left) \(right))"
+            return "(\(left) * \(right))"
         case .divide(let left, let right):
-            return "(/ \(left) \(right))"
+            return "(\(left) / \(right))"
         }
     }
     
