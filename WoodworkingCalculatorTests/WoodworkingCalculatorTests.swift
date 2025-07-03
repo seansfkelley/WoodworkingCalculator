@@ -1,17 +1,10 @@
-//
-//  WoodworkingCalculatorTests.swift
-//  WoodworkingCalculatorTests
-//
-//  Created by Sean Kelley on 2025-07-02.
-//
-
 import Testing
 @testable import WoodworkingCalculator
 
 struct WoodworkingCalculatorTests {
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+    @Test(arguments: [("1/2", (1, 2))]) func example(_ input: (String, Fraction)) async throws {
+        #expect(try parse(input.0).evaluate() == input.1)
     }
 
 }

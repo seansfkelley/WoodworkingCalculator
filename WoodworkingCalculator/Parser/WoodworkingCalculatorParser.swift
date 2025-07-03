@@ -120,3 +120,10 @@ let lexer = Lexer(rules: [
         .string(")", (.void, .RightParen)),
         .regexPattern("\\s", { _ in nil })
     ])
+
+func parse(_ input: String) throws -> Evaluatable {
+    try lexer.tokenize(input) { (t, c) in
+        try parser.consume(token: t, code: c)
+    }
+    return try parser.endParsing()
+}

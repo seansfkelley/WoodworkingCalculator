@@ -29,9 +29,28 @@
 		218B78232E15C69E00F8B129 /* WoodworkingCalculatorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WoodworkingCalculatorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		218B78742E1611BF00F8B129 /* Exceptions for "WoodworkingCalculator" folder in "WoodworkingCalculator" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Headless/.gitignore,
+				Headless/calculate.sh,
+				Headless/main,
+				Headless/main.swift,
+				Parser/.gitignore,
+				Parser/citron,
+				Parser/WoodworkingCalculatorGrammar.y,
+			);
+			target = 218B780B2E15C69D00F8B129 /* WoodworkingCalculator */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		218B780E2E15C69D00F8B129 /* WoodworkingCalculator */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				218B78742E1611BF00F8B129 /* Exceptions for "WoodworkingCalculator" folder in "WoodworkingCalculator" target */,
+			);
 			path = WoodworkingCalculator;
 			sourceTree = "<group>";
 		};
