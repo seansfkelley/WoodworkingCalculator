@@ -106,7 +106,7 @@ extension Evaluatable: CustomStringConvertible {
 typealias LexedTokenData = (WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode)
 
 func parseFraction(_ input: String) -> LexedTokenData? {
-    if let result = try? #/((?<int>[0-9]+) +)?(?<num>[0-9]+)/(?<den>[0-9]+)/#.wholeMatch(in: input) {
+    if let result = try? #/((?<int>[0-9]+) *[- ] *)?(?<num>[0-9]+)/(?<den>[0-9]+)/#.wholeMatch(in: input) {
         let int = if let i = result.int { Int(i).unsafelyUnwrapped } else { 0 }
         let num = Int(result.num).unsafelyUnwrapped
         let den = Int(result.den).unsafelyUnwrapped
