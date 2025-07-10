@@ -2,7 +2,7 @@
 let EPSILON = 0.001;
 let HIGHEST_PRECISION: Int = 64;
 
-struct Fraction: Equatable {
+struct Fraction: Equatable, Hashable, CustomStringConvertible {
     let num: Int
     let den: Int
     
@@ -17,12 +17,15 @@ struct Fraction: Equatable {
     }
     
     func roundedToPrecision(_ precision: Int) -> (Fraction, Double?) {
-        // TODO: make sure precision is a power of 2
-        if self.den <= precision {
+        if self.den <= precision && self.den % precision == 0 {
             return (self, nil)
         } else {
             return Double(self).toNearestFraction(withPrecision: precision)
         }
+    }
+    
+    var description: String {
+        return "\(self.num)/\(self.den)"
     }
     
     static func == (left: Fraction, right: Fraction) -> Bool {
@@ -57,35 +60,12 @@ private func gcd(_ a: Int, _ b: Int) -> Int {
   }
 }
 
-extension Fraction: CustomStringConvertible {
-    var description: String {
-        let n = self.num
-        let d = self.den
-        if d == 1 {
-            if n > 12 {
-                return "\(n / 12)' \(n % 12)\""
-            } else {
-                return "\(n)\""
-            }
-        } else {
-            if n > 12 * d {
-                return "\(n / (12 * d))' \(Fraction(n % (12 * d), d))"
-            } else if n > d {
-                return "\(n / d)-\(n % d)/\(d)\""
-            } else {
-                return "\(n)/\(d)\""
-            }
-        }
-    }
-}
-
 extension Double {
     init(_ fraction: Fraction) {
         self = Double(fraction.num) / Double(fraction.den)
     }
     
     func toNearestFraction(withPrecision: Int) -> (Fraction, Double?) {
-        // TODO: make sure precision is a power of 2
         let upperFraction = Fraction(Int((self * Double(withPrecision)).rounded(.up)), withPrecision).reduced
         let lowerFraction = Fraction(Int((self * Double(withPrecision)).rounded(.down)), withPrecision).reduced
         

@@ -6,6 +6,7 @@ enum Token {
 }
 
 enum Evaluatable {
+    // n.b. all quantities are in inches (or fractions thereof)
     case rational(Fraction)
     case real(Double)
     indirect case add(Evaluatable, Evaluatable)
@@ -155,4 +156,29 @@ func parse(_ input: String) throws -> Evaluatable {
         try parser.consume(token: t, code: c)
     }
     return try parser.endParsing()
+}
+
+enum UsCustomaryPrecision: Equatable {
+    case feet
+    case inches
+}
+
+func formatAsUsCustomary(_ fraction: Fraction, _ precision: UsCustomaryPrecision = .feet) -> String {
+    let n = fraction.reduced.num
+    let d = fraction.reduced.den
+    if d == 1 {
+        if n > 12 && precision == .feet {
+            return "\(n / 12)' \(n % 12)\""
+        } else {
+            return "\(n)\""
+        }
+    } else {
+        if n > 12 * d && precision == .feet {
+            return "\(n / (12 * d))' \(formatAsUsCustomary(Fraction(n % (12 * d), d)))"
+        } else if n > d {
+            return "\(n / d)-\(n % d)/\(d)\""
+        } else {
+            return "\(n)/\(d)\""
+        }
+    }
 }

@@ -11,9 +11,9 @@ if CommandLine.argc != 2 {
             r.toNearestFraction(withPrecision: HIGHEST_PRECISION)
         }
         if error == nil {
-            print("\(tree) -> \(fraction)")
+            print("\(tree) -> \(formatAsUsCustomary(fraction, .feet))")
         } else {
-            print("\(tree) -> aprx. \(fraction) (error: \(String(format: "%+.3f", error!))\")")
+            print("\(tree) -> aprx. \(formatAsUsCustomary(fraction, .feet)) (error: \(String(format: "%+.3f", error!))\")")
         }
     } catch (let error) {
         print("Error during parsing: \(error)")

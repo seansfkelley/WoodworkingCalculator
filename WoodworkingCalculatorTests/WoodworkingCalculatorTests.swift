@@ -2,7 +2,7 @@ import Testing
 @testable import WoodworkingCalculator
 
 struct WoodworkingCalculatorTests {
-    @Test(arguments: [
+    @Test("simple parsing", arguments: [
         ("1/2", Fraction(1, 2)),
         ("3.5", Fraction(7, 2)),
     ]) func test(_ input: (String, Fraction)) throws {
