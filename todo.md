@@ -1,0 +1,9 @@
+- pretty up the buttons and the input text
+    - stacked fractions, nicer arithmetic symbols
+- pretty up the error display and make sure the sign makes sense
+- add more unit tests
+- add UI tests
+- prevent input if it doesn't make sense in that place (a la the regular Calculator app)
+- color palette and then test dark mode
+- how does it behave on other interfaces?
+- what to do about negative values?
