@@ -51,6 +51,13 @@ struct FractionTests {
     }
 }
 
+let cases: [(input: Double, precision: Int, expected: Fraction, expectedRemainder: Double?)] = [
+    (31 / 32, 4, Fraction(1, 1), 1 / 32),
+    (33 / 32, 4, Fraction(1, 1), -1 / 32),
+    // Hmm, might want to turn the precision up here? This seems a bit weird that there's 0 error, though it _is_ less than a thou.
+    (1 / 65, 64, Fraction(1, 64), nil),
+]
+
 struct DoubleTests {
     @Test("init", arguments: [
         (Fraction(1, 2), 1 / 2),
@@ -58,10 +65,7 @@ struct DoubleTests {
         #expect(Double(input).isApproximatelyEqual(to: expected))
     }
     
-    @Test("toNearestFraction", arguments: [
-        (31 / 32, 4, Fraction(1, 1), 1 / 32),
-//        (33 / 32, 4, Fraction(1, 1), -1 / 32),
-    ]) func toNearestFraction(input: Double, precision: Int, expected: Fraction, expectedRemainder: Double?) {
+    @Test("toNearestFraction", arguments: cases) func toNearestFraction(input: Double, precision: Int, expected: Fraction, expectedRemainder: Double?) {
         let actual = input.toNearestFraction(withPrecision: precision)
         #expect(actual.0 == expected)
         if case .some(let actualRemainder) = actual.1, case .some(let expectedRemainder) = expectedRemainder {

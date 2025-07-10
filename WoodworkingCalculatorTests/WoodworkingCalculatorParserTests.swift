@@ -26,4 +26,15 @@ struct WoodworkingCalculatorParserTests {
             }
         }
     }
+    
+    @Test("formatAsUsCustomary", arguments: [
+        (Fraction(0, 1), "0\""),
+        (Fraction(12, 1), "1'"),
+        (Fraction(48, 1), "4'"),
+        (Fraction(13, 1), "1' 1\""),
+        (Fraction(49, 1), "4' 1\""),
+        (Fraction(99, 2), "4' 1-1/2\""),
+    ]) func testFormatAsUsCustomary(input: Fraction, expected: String) throws {
+        #expect(formatAsUsCustomary(input) == expected)
+    }
 }

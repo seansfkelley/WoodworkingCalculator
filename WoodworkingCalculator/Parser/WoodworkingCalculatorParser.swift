@@ -106,11 +106,11 @@ extension Evaluatable: CustomStringConvertible {
 typealias LexedTokenData = (WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode)
 
 func parseFraction(_ input: String) -> LexedTokenData? {
-    if let result = try? #/((?<int>[0-9]+) *[- ] *)?(?<num>[0-9]+)/(?<den>[0-9]+)/#.wholeMatch(in: input) {
-        let int = if let i = result.int { Int(i).unsafelyUnwrapped } else { 0 }
+    if let result = try? #/((?<whole>[0-9]+) *[- ] *)?(?<num>[0-9]+)/(?<den>[0-9]+)/#.wholeMatch(in: input) {
+        let whole = if let i = result.whole { Int(i).unsafelyUnwrapped } else { 0 }
         let num = Int(result.num).unsafelyUnwrapped
         let den = Int(result.den).unsafelyUnwrapped
-        return (.fraction(Fraction(int * den + num, den)), .Fraction)
+        return (.fraction(Fraction(whole * den + num, den)), .Fraction)
     } else {
         return nil
     }
@@ -164,16 +164,20 @@ enum UsCustomaryPrecision: Equatable {
 }
 
 func formatAsUsCustomary(_ fraction: Fraction, _ precision: UsCustomaryPrecision = .feet) -> String {
-    let n = fraction.reduced.num
+    var n = fraction.reduced.num
     let d = fraction.reduced.den
     if d == 1 {
-        if n > 12 && precision == .feet {
-            return "\(n / 12)' \(n % 12)\""
-        } else {
-            return "\(n)\""
+        var parts: [String] = []
+        if n >= 12 && precision == .feet {
+            parts.append("\(n / 12)'")
+            n = n % 12;
         }
+        if parts.isEmpty || n > 0 {
+            parts.append("\(n)\"")
+        }
+        return parts.joined(separator: " ")
     } else {
-        if n > 12 * d && precision == .feet {
+        if n >= 12 * d && precision == .feet {
             return "\(n / (12 * d))' \(formatAsUsCustomary(Fraction(n % (12 * d), d)))"
         } else if n > d {
             return "\(n / d)-\(n % d)/\(d)\""
