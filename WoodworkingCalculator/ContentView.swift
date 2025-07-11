@@ -65,16 +65,16 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            Image(systemName: "gear")
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .font(.system(size: 32))
-                .foregroundStyle(.orange)
-                .padding()
-                .onTapGesture { isSettingsPresented.toggle() }
-                .sheet(isPresented: $isSettingsPresented) {
-                    Settings()
-                        .presentationDetents([.medium])
-                }
+            Button(action: { isSettingsPresented.toggle() }) {
+                Image(systemName: "gear")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.system(size: 32))
+                    .foregroundStyle(.orange)
+            }
+            .sheet(isPresented: $isSettingsPresented) {
+                Settings()
+                    .presentationDetents([.medium])
+            }
             Text(previous)
                 .frame(
                     minWidth: 0,
@@ -128,7 +128,7 @@ struct ContentView: View {
                 // is a little inelegant but I specifically want to keep the button instance
                 // the same so the stateful on-press color-change animation doesn't abruptly
                 // end while you're actively long-pressing the button due to a change in identity.
-                CircleButton(fill: Color.gray, text: input.backspaceable ? "⌫" : "C") {
+                CircleButton(.text(input.backspaceable ? "⌫" : "C"), .gray) {
                     previous = ""
                     isErrorPresented = false
                     
@@ -143,39 +143,39 @@ struct ContentView: View {
                     isErrorPresented = false
                     input.set(.string(""))
                 })
-                CircleButton(fill: Color.gray, text: "'") { append("'") }
-                CircleButton(fill: Color.gray, text: "\"") { append("\"") }
-                CircleButton(fill: Color.orange, text: "÷", size: 48) { append("/") }
+                CircleButton(.text("'"), .gray) { append("'") }
+                CircleButton(.text("\""), .gray) { append("\"") }
+                CircleButton(.image("divide"), .orange) { append("/") }
             }
             HStack {
-                CircleButton(fill: Color.gray, text: "7") { append("7") }
-                CircleButton(fill: Color.gray, text: "8") { append("8") }
-                CircleButton(fill: Color.gray, text: "9") { append("9") }
-                CircleButton(fill: Color.orange, text: "×", size: 48) { append("x") }
+                CircleButton(.text("7"), .gray) { append("7") }
+                CircleButton(.text("8"), .gray) { append("8") }
+                CircleButton(.text("9"), .gray) { append("9") }
+                CircleButton(.image("multiply"), .orange) { append("x") }
             }
             HStack {
-                CircleButton(fill: Color.gray, text: "4") { append("4") }
-                CircleButton(fill: Color.gray, text: "5") { append("5") }
-                CircleButton(fill: Color.gray, text: "6") { append("6") }
-                CircleButton(fill: Color.orange, text: "-", size: 48) { append("-") }
+                CircleButton(.text("4"), .gray) { append("4") }
+                CircleButton(.text("5"), .gray) { append("5") }
+                CircleButton(.text("6"), .gray) { append("6") }
+                CircleButton(.image("minus"), .orange) { append("-") }
             }
             HStack {
-                CircleButton(fill: Color.gray, text: "1") { append("1") }
-                CircleButton(fill: Color.gray, text: "2") { append("2") }
-                CircleButton(fill: Color.gray, text: "3") { append("3") }
-                CircleButton(fill: Color.orange, text: "+", size: 48) { append("+") }
+                CircleButton(.text("1"), .gray) { append("1") }
+                CircleButton(.text("2"), .gray) { append("2") }
+                CircleButton(.text("3"), .gray) { append("3") }
+                CircleButton(.image("plus"), .orange) { append("+") }
             }
             HStack {
-                CircleButton(fill: Color.gray, text: "_") { append(" ") }
-                CircleButton(fill: Color.gray, text: "0") { append("0") }
-                CircleButton(fill: Color.gray, text: ".") { append(".") }
-                CircleButton(fill: Color.orange, text: "=", size: 48) { evaluate() }
+                CircleButton(.text("_"), .gray) { append(" ") }
+                CircleButton(.text("0"), .gray) { append("0") }
+                CircleButton(.text("."), .gray) { append(".") }
+                CircleButton(.image("equal"), .orange) { evaluate() }
             }
             HStack {
-                CircleButton(fill: Color.gray, text: "ⁿ⁄₂") { append("/2") }
-                CircleButton(fill: Color.gray, text: "ⁿ⁄₄") { append("/4") }
-                CircleButton(fill: Color.gray, text: "ⁿ⁄₈") { append("/8") }
-                CircleButton(fill: Color.gray, text: "ⁿ⁄₁₆") { append("/16") }
+                CircleButton(.text("ⁿ⁄₂"), .gray) { append("/2") }
+                CircleButton(.text("ⁿ⁄₄"), .gray) { append("/4") }
+                CircleButton(.text("ⁿ⁄₈"), .gray) { append("/8") }
+                CircleButton(.text("ⁿ⁄₁₆"), .gray) { append("/16") }
             }
         }
         .padding()
@@ -200,24 +200,35 @@ struct ContentView: View {
 }
 
 struct CircleButton: View {
+    enum Content {
+        case text(String)
+        case image(String)
+    }
+    
+    let content: Content
     let fill: Color
-    let text: String
-    let size: Int
     let action: () -> Void
     
-    init(fill: Color, text: String, size: Int = 32, action: @escaping () -> Void) {
-        self.fill = fill;
-        self.text = text;
-        self.size = size;
-        self.action = action;
+    init(_ content: Content, _ fill: Color, action: @escaping () -> Void) {
+        self.content = content
+        self.fill = fill
+        self.action = action
     }
     
     var body: some View {
         Button(action: action) {
-            Text(text)
-                .foregroundStyle(.white)
-                .font(.system(size: CGFloat(size)))
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            switch content {
+            case .text(let text):
+                Text(text)
+                    .font(.system(size: 32))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            case .image(let image):
+                Image(systemName: image)
+                    .font(.system(size: 40))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         }
         .buttonStyle(.borderedProminent)
         .buttonBorderShape(.circle)
