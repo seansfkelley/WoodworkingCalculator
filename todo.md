@@ -1,9 +1,15 @@
-- pretty up the buttons and the input text
-    - stacked fractions, nicer arithmetic symbols
+- pretty frations: parser has to be able to read them, or keep a non-pretty version of it under the hood
+    - probably easiest to support parsing them properly so that copy-paste works
 - pretty up the error display and make sure the sign makes sense
+    - use wavy-equals as the symbol (inside a circle?)
+    - on tap, pop up a tooltip with the exact figure and error
 - add more unit tests
 - add UI tests
 - prevent input if it doesn't make sense in that place (a la the regular Calculator app)
 - color palette and then test dark mode
-- how does it behave on other interfaces?
+- how does it behave on other device form factors?
 - what to do about negative values?
+- add toggle for rounding mode (feet + inches or just inches)
+- clear button should turn to backspace when input is not empty
+    - a la calculator app, holding it should delete everything
+- show visual feedback when tapping a button

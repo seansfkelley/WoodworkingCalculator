@@ -38,7 +38,7 @@ extension Evaluatable: CustomStringConvertible {
             if f.den == 1 {
                 return "\(f.num)"
             } else {
-                return "\(f.num)\u{2044}\(f.den)"
+                return "\(asSuperscript(f.num))\u{2044}\(asSubscript(f.den))"
             }
         case .real(let r):
             return "\(r)"
@@ -163,61 +163,32 @@ enum UsCustomaryPrecision: Equatable {
     case inches
 }
 
-let unicodeSuperscript = [
-    "0": "⁰",
-    "1": "¹",
-    "2": "²",
-    "3": "³",
-    "4": "⁴",
-    "5": "⁵",
-    "6": "⁶",
-    "7": "⁷",
-    "8": "⁸",
-    "9": "⁹",
-]
-let unicodeSubscript = [
-    "0": "₀",
-    "1": "₁",
-    "2": "₂",
-    "3": "₃",
-    "4": "₄",
-    "5": "₅",
-    "6": "₆",
-    "7": "₇",
-    "8": "₈",
-    "9": "₉",
-]
-
-func asSuperscript(_ int: Int) -> String {
-    var formatted = String(int)
-    formatted.replace(#/[0-9]/#, with: { digit in [unicodeSuperscript[digit.first]] })
-    return formatted
-}
-
-func asSubscript(_ int: Int) -> String {
-    
-}
-
 func formatAsUsCustomary(_ fraction: Fraction, _ precision: UsCustomaryPrecision = .feet) -> String {
     var n = fraction.reduced.num
     let d = fraction.reduced.den
+    var parts: [String] = []
+    
     if d == 1 {
-        var parts: [String] = []
         if n >= 12 && precision == .feet {
             parts.append("\(n / 12)'")
             n = n % 12;
         }
+        
         if parts.isEmpty || n > 0 {
             parts.append("\(n)\"")
         }
-        return parts.joined(separator: " ")
     } else {
         if n >= 12 * d && precision == .feet {
-            return "\(n / (12 * d))' \(formatAsUsCustomary(Fraction(n % (12 * d), d)))"
-        } else if n > d {
-            return "\(n / d)-\(asSuperscript(n % d))\u{2044}\(asSubscript(d))\""
+            parts.append("\(n / (12 * d))' ");
+            n = n % (12 * d);
+        }
+        
+        if n > d {
+            parts.append("\(n / d) \(asSuperscript(n % d))\u{2044}\(asSubscript(d))\"")
         } else {
-            return "\(asSuperscript(n))\u{2044}\(asSubscript(d))\""
+            parts.append("\(asSuperscript(n))\u{2044}\(asSubscript(d))\"")
         }
     }
+    
+    return parts.joined(separator: " ")
 }

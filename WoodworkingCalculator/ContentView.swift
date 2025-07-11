@@ -22,27 +22,25 @@ struct ContentView: View {
                     self.input = previous
                     self.previous = ""
                 }
-            Text(input)
-                .frame(
-                    minWidth: 0,
-                    maxWidth:  .infinity,
-                    minHeight: 100,
-                    maxHeight: 100,
-                    alignment: .trailing
-                )
-                .font(.system(size: 100, weight: .light))
-                .minimumScaleFactor(0.3)
-            Text(error)
-                .frame(
-                    minWidth: 0,
-                    maxWidth:  .infinity,
-                    minHeight: 40,
-                    maxHeight: 40,
-                    alignment: .trailing
-                )
-                .font(.system(size: 40, weight: .light))
-                .minimumScaleFactor(0.3)
-                .foregroundColor(Color.red)
+            HStack {
+                if !error.isEmpty {
+                    Image(systemName: "notequal.circle")
+                        .font(.system(size: 32))
+                        .foregroundColor(Color.yellow)
+                        .padding()
+                        .help("send help")
+                }
+                Text(input)
+                    .frame(
+                        minWidth: 0,
+                        maxWidth:  .infinity,
+                        minHeight: 100,
+                        maxHeight: 100,
+                        alignment: .trailing
+                    )
+                    .font(.system(size: 100, weight: .light))
+                    .minimumScaleFactor(0.3)
+            }
             HStack {
                 Button(fill: Color.gray, text: "C") {
                     self.previous = ""
@@ -51,13 +49,13 @@ struct ContentView: View {
                 }
                 Button(fill: Color.gray, text: "'") { self.input.append("'") }
                 Button(fill: Color.gray, text: "\"") { self.input.append("\"") }
-                Button(fill: Color.orange, text: "/") { self.input.append("/") }
+                Button(fill: Color.orange, text: "÷", size: 48) { self.input.append("/") }
             }
             HStack {
                 Button(fill: Color.gray, text: "7") { self.input.append("7") }
                 Button(fill: Color.gray, text: "8") { self.input.append("8") }
                 Button(fill: Color.gray, text: "9") { self.input.append("9") }
-                Button(fill: Color.orange, text: "x") { self.input.append("x") }
+                Button(fill: Color.orange, text: "×") { self.input.append("x") }
             }
             HStack {
                 Button(fill: Color.gray, text: "4") { self.input.append("4") }
@@ -78,10 +76,10 @@ struct ContentView: View {
                 Button(fill: Color.orange, text: "=") { self.evaluate() }
             }
             HStack {
-                Button(fill: Color.gray, text: "/2") { self.input.append("/2\"") }
-                Button(fill: Color.gray, text: "/4") { self.input.append("/4\"") }
-                Button(fill: Color.gray, text: "/8") { self.input.append("/8\"") }
-                Button(fill: Color.gray, text: "/16") { self.input.append("/16\"") }
+                Button(fill: Color.gray, text: "ⁿ⁄₂\"") { self.input.append("/2\"") }
+                Button(fill: Color.gray, text: "ⁿ⁄₄\"") { self.input.append("/4\"") }
+                Button(fill: Color.gray, text: "ⁿ⁄₈\"") { self.input.append("/8\"") }
+                Button(fill: Color.gray, text: "ⁿ⁄₁₆\"") { self.input.append("/16\"") }
             }
         }
         .padding()
@@ -101,18 +99,20 @@ struct ContentView: View {
         }
         self.previous = self.input
         self.input = formatAsUsCustomary(fraction)
-        self.error = if let error { "error: \(String(format: "%+.3f", error))\"" } else { "" }
+        self.error = if let error { "approximation: \(String(format: "%+.3f", error))\"" } else { "" }
     }
 }
 
 struct Button: View {
     let fill: Color;
     let text: String;
+    let size: Int;
     let action: (() -> Void)?;
     
-    init(fill: Color, text: String, action: (() -> Void)? = nil) {
+    init(fill: Color, text: String, size: Int = 32, action: (() -> Void)? = nil) {
         self.fill = fill;
         self.text = text;
+        self.size = size;
         self.action = action;
     }
     
@@ -122,7 +122,7 @@ struct Button: View {
             .overlay(content: {
                 Text(text)
                     .foregroundColor(.white)
-                    .font(.system(size: 32, weight: .bold))
+                    .font(.system(size: CGFloat(size)))
             })
             .onTapGesture { action?() }
     }
