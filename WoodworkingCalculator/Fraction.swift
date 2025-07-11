@@ -1,7 +1,3 @@
-// 1/64th ~ 0.015, so quite a bit larger than a thou, meaning this is very conservative about fractionalizing things.
-let EPSILON = 0.001;
-let HIGHEST_PRECISION: Int = 64;
-
 struct Fraction: Equatable, Hashable, CustomStringConvertible {
     let num: Int
     let den: Int
@@ -99,16 +95,16 @@ extension Double {
         self = Double(fraction.num) / Double(fraction.den)
     }
     
-    func toNearestFraction(withPrecision: Int) -> (Fraction, Double?) {
+    func toNearestFraction(withPrecision: Int, epsilon: Double = 0.0001) -> (Fraction, Double?) {
         let upperFraction = Fraction(Int((self * Double(withPrecision)).rounded(.up)), withPrecision).reduced
         let lowerFraction = Fraction(Int((self * Double(withPrecision)).rounded(.down)), withPrecision).reduced
         
         let upperError = Double(upperFraction) - self
         let lowerError = self - Double(lowerFraction)
         
-        if upperError <= EPSILON {
+        if upperError <= epsilon {
             return (upperFraction, nil)
-        } else if lowerError <= EPSILON {
+        } else if lowerError <= epsilon {
             return (lowerFraction, nil)
         } else if upperError < lowerError {
             return (upperFraction, upperError)

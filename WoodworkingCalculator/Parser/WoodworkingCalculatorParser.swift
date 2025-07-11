@@ -53,44 +53,44 @@ extension Evaluatable: CustomStringConvertible {
         }
     }
     
-    func evaluate() -> EvaluatedResult {
+    func evaluate(_ precision: Int) -> EvaluatedResult {
         switch (self) {
         case .rational(let r):
             return .rational(r.reduced)
         case .real(let r):
-            let (fraction, error) = r.toNearestFraction(withPrecision: HIGHEST_PRECISION)
+            let (fraction, error) = r.toNearestFraction(withPrecision: precision)
             if error == nil {
                 return .rational(fraction)
             } else {
                 return .real(r)
             }
         case .add(let left, let right):
-            let l = left.evaluate()
-            let r = right.evaluate()
+            let l = left.evaluate(precision)
+            let r = right.evaluate(precision)
             if case .rational(let lrational) = l, case .rational(let rrational) = r {
                 return .rational(lrational + rrational)
             } else {
                 return .real(Double(l) + Double(r))
             }
         case .subtract(let left, let right):
-            let l = left.evaluate()
-            let r = right.evaluate()
+            let l = left.evaluate(precision)
+            let r = right.evaluate(precision)
             if case .rational(let lrational) = l, case .rational(let rrational) = r {
                 return .rational(lrational - rrational)
             } else {
                 return .real(Double(l) - Double(r))
             }
         case .multiply(let left, let right):
-            let l = left.evaluate()
-            let r = right.evaluate()
+            let l = left.evaluate(precision)
+            let r = right.evaluate(precision)
             if case .rational(let lrational) = l, case .rational(let rrational) = r {
                 return .rational(lrational * rrational)
             } else {
                 return .real(Double(l) * Double(r))
             }
         case .divide(let left, let right):
-            let l = left.evaluate()
-            let r = right.evaluate()
+            let l = left.evaluate(precision)
+            let r = right.evaluate(precision)
             if case .rational(let lrational) = l, case .rational(let rrational) = r {
                 return .rational(lrational / rrational)
             } else {

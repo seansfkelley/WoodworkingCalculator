@@ -56,6 +56,7 @@ struct ContentView: View {
     @State private var isErrorPresented: Bool = false
     @State private var input: Input = Input()
     @AppStorage(Constants.AppStorage.displayInchesOnlyKey) private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
+    @AppStorage(Constants.AppStorage.precisionKey) private var precision: Int = Constants.AppStorage.precisionDefault
     
     private func append(_ string: String) {
         input.append(string)
@@ -99,6 +100,7 @@ struct ContentView: View {
                         .onTapGesture { isErrorPresented.toggle() }
                         .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
                             Text("popover")
+                                .padding()
                                 .presentationCompactAdaptation(.popover)
                         }
                 }
@@ -166,16 +168,16 @@ struct ContentView: View {
     }
     
     private func evaluate() {
-        let result = try? parse(input.description).evaluate()
+        let result = try? parse(input.description).evaluate(precision)
         guard result != nil else {
             return
         }
         
         let (fraction, error) = switch result! {
         case .rational(let r):
-            r.roundedToPrecision(HIGHEST_PRECISION)
+            r.roundedToPrecision(precision)
         case .real(let r):
-            r.toNearestFraction(withPrecision: HIGHEST_PRECISION)
+            r.toNearestFraction(withPrecision: precision)
         }
         previous = input.description
         input.set(.result(fraction, error))

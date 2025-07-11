@@ -1,6 +1,7 @@
 - put in popover content for approxation equality
-- show visual feedback when tapping a button
 - add setting for maximum precision: 1/16, 1/32, 1/64... thou?
+    - should `evaluate` take a precision or always operate at maximum fidelity?
+- show visual feedback when tapping a button
 - prevent input if it doesn't make sense in that place (a la the regular Calculator app)
     - consider reformatting input with pretty fractions as-you-type so you can see how it's being parsed
 - color palette and then test dark mode
