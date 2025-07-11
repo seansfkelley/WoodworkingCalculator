@@ -1,11 +1,65 @@
 import SwiftUI
 
+enum InputValue {
+    case string(String)
+    case result(Fraction, Double?)
+}
+
+struct Input: CustomStringConvertible {
+    private var value: InputValue = .string("")
+    @AppStorage(Constants.AppStorage.displayInchesOnlyKey) private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
+    
+    mutating func set(_ value: InputValue) {
+        self.value = value
+    }
+    
+    mutating func append(_ string: String) {
+        value = .string(description + string)
+    }
+    
+    mutating func backspace() {
+        let stringified = description
+        value = .string(stringified.count == 0 ? "" : String(stringified.prefix(stringified.count - 1)))
+    }
+    
+    var description: String {
+        return switch value {
+        case .string(let s):
+            s
+        case .result(let f, _):
+            formatAsUsCustomary(f, displayInchesOnly ? .inches : .feet)
+        }
+    }
+    
+    var error: Double? {
+        return switch value {
+        case .string:
+            nil
+        case .result(_, let e):
+            e
+        }
+    }
+    
+    var backspaceable: Bool {
+        return switch value {
+        case .string(let s):
+            !s.isEmpty
+        case .result:
+            false
+        }
+    }
+}
+
 struct ContentView: View {
     @State private var previous: String = ""
-    @State private var error: String = ""
-    @State private var input: String = ""
     @State private var isSettingsPresented: Bool = false
+    @State private var input: Input = Input()
     @AppStorage(Constants.AppStorage.displayInchesOnlyKey) private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
+    
+    private func append(_ string: String) {
+        input.append(string)
+        previous = ""
+    }
     
     var body: some View {
         VStack {
@@ -31,17 +85,17 @@ struct ContentView: View {
                 .foregroundColor(Color.gray)
                 .minimumScaleFactor(0.3)
                 .onTapGesture {
-                    self.input = previous
-                    self.previous = ""
+                    input.set(.string(previous))
+                    previous = ""
                 }
             HStack {
-                if !error.isEmpty {
+                if input.error != nil {
                     Image(systemName: "notequal.circle")
                         .font(.system(size: 32))
                         .foregroundColor(Color.yellow)
                         .padding()
                 }
-                Text(input)
+                Text(input.description)
                     .frame(
                         minWidth: 0,
                         maxWidth:  .infinity,
@@ -53,51 +107,57 @@ struct ContentView: View {
                     .minimumScaleFactor(0.3)
             }
             HStack {
-                Button(fill: Color.gray, text: "C") {
-                    self.previous = ""
-                    self.input = ""
-                    self.error = ""
+                if input.backspaceable {
+                    Button(fill: Color.gray, text: "⌫") {
+                        previous = ""
+                        input.backspace()
+                    }
+                } else {
+                    Button(fill: Color.gray, text: "C") {
+                        previous = ""
+                        input.set(.string(""))
+                    }
                 }
-                Button(fill: Color.gray, text: "'") { self.input.append("'") }
-                Button(fill: Color.gray, text: "\"") { self.input.append("\"") }
-                Button(fill: Color.orange, text: "÷", size: 48) { self.input.append("/") }
+                Button(fill: Color.gray, text: "'") { append("'") }
+                Button(fill: Color.gray, text: "\"") { append("\"") }
+                Button(fill: Color.orange, text: "÷", size: 48) { append("/") }
             }
             HStack {
-                Button(fill: Color.gray, text: "7") { self.input.append("7") }
-                Button(fill: Color.gray, text: "8") { self.input.append("8") }
-                Button(fill: Color.gray, text: "9") { self.input.append("9") }
-                Button(fill: Color.orange, text: "×") { self.input.append("x") }
+                Button(fill: Color.gray, text: "7") { append("7") }
+                Button(fill: Color.gray, text: "8") { append("8") }
+                Button(fill: Color.gray, text: "9") { append("9") }
+                Button(fill: Color.orange, text: "×") { append("x") }
             }
             HStack {
-                Button(fill: Color.gray, text: "4") { self.input.append("4") }
-                Button(fill: Color.gray, text: "5") { self.input.append("5") }
-                Button(fill: Color.gray, text: "6") { self.input.append("6") }
-                Button(fill: Color.orange, text: "-") { self.input.append("-") }
+                Button(fill: Color.gray, text: "4") { append("4") }
+                Button(fill: Color.gray, text: "5") { append("5") }
+                Button(fill: Color.gray, text: "6") { append("6") }
+                Button(fill: Color.orange, text: "-") { append("-") }
             }
             HStack {
-                Button(fill: Color.gray, text: "1") { self.input.append("1") }
-                Button(fill: Color.gray, text: "2") { self.input.append("2") }
-                Button(fill: Color.gray, text: "3") { self.input.append("3") }
-                Button(fill: Color.orange, text: "+") { self.input.append("+") }
+                Button(fill: Color.gray, text: "1") { append("1") }
+                Button(fill: Color.gray, text: "2") { append("2") }
+                Button(fill: Color.gray, text: "3") { append("3") }
+                Button(fill: Color.orange, text: "+") { append("+") }
             }
             HStack {
-                Button(fill: Color.gray, text: "_") { self.input.append(" ") }
-                Button(fill: Color.gray, text: "0") { self.input.append("0") }
-                Button(fill: Color.gray, text: ".") { self.input.append(".") }
+                Button(fill: Color.gray, text: "_") { append(" ") }
+                Button(fill: Color.gray, text: "0") { append("0") }
+                Button(fill: Color.gray, text: ".") { append(".") }
                 Button(fill: Color.orange, text: "=") { self.evaluate() }
             }
             HStack {
-                Button(fill: Color.gray, text: "ⁿ⁄₂\"") { self.input.append("/2\"") }
-                Button(fill: Color.gray, text: "ⁿ⁄₄\"") { self.input.append("/4\"") }
-                Button(fill: Color.gray, text: "ⁿ⁄₈\"") { self.input.append("/8\"") }
-                Button(fill: Color.gray, text: "ⁿ⁄₁₆\"") { self.input.append("/16\"") }
+                Button(fill: Color.gray, text: "ⁿ⁄₂") { append("/2") }
+                Button(fill: Color.gray, text: "ⁿ⁄₄") { append("/4") }
+                Button(fill: Color.gray, text: "ⁿ⁄₈") { append("/8") }
+                Button(fill: Color.gray, text: "ⁿ⁄₁₆") { append("/16") }
             }
         }
         .padding()
     }
     
     private func evaluate() {
-        let result = try? parse(input).evaluate()
+        let result = try? parse(input.description).evaluate()
         guard result != nil else {
             return
         }
@@ -108,9 +168,8 @@ struct ContentView: View {
         case .real(let r):
             r.toNearestFraction(withPrecision: HIGHEST_PRECISION)
         }
-        self.previous = input
-        self.input = formatAsUsCustomary(fraction, displayInchesOnly ? .inches : .feet)
-        self.error = if let error { "approximation: \(String(format: "%+.3f", error))\"" } else { "" }
+        self.previous = input.description
+        self.input.set(.result(fraction, error))
     }
 }
 
