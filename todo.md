@@ -1,8 +1,6 @@
-- pretty up the error display and make sure the sign makes sense
-    - use wavy-equals as the symbol (inside a circle?)
-    - on tap, pop up a tooltip with the exact figure and error
-- add more unit tests
-- add UI tests
+- put in popover content for approxation equality
+- show visual feedback when tapping a button
+- add setting for maximum precision: 1/16, 1/32, 1/64... thou?
 - prevent input if it doesn't make sense in that place (a la the regular Calculator app)
     - consider reformatting input with pretty fractions as-you-type so you can see how it's being parsed
 - color palette and then test dark mode
@@ -15,6 +13,9 @@
     3. set display for inches only
     4. hit "+"
     5. the calculated result switches to inches, then appends "+"
-- show visual feedback when tapping a button
 - pretty frations: parser has to be able to read them, or keep a non-pretty version of it under the hood
     - probably easiest to support parsing them properly so that copy-paste works
+- figure out how to not have to punch AppStorage through 3 different places
+- add more unit tests
+- add UI tests
+- support parentheses? where to put buttons?

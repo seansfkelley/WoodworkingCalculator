@@ -53,6 +53,7 @@ struct Input: CustomStringConvertible {
 struct ContentView: View {
     @State private var previous: String = ""
     @State private var isSettingsPresented: Bool = false
+    @State private var isErrorPresented: Bool = false
     @State private var input: Input = Input()
     @AppStorage(Constants.AppStorage.displayInchesOnlyKey) private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
     
@@ -87,13 +88,19 @@ struct ContentView: View {
                 .onTapGesture {
                     input.set(.string(previous))
                     previous = ""
+                    isErrorPresented = false
                 }
             HStack {
                 if input.error != nil {
-                    Image(systemName: "notequal.circle")
-                        .font(.system(size: 32))
-                        .foregroundColor(Color.yellow)
+                    Text("≈")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(Color.red)
                         .padding()
+                        .onTapGesture { isErrorPresented.toggle() }
+                        .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
+                            Text("popover")
+                                .presentationCompactAdaptation(.popover)
+                        }
                 }
                 Text(input.description)
                     .frame(
@@ -111,11 +118,13 @@ struct ContentView: View {
                     Button(fill: Color.gray, text: "⌫") {
                         previous = ""
                         input.backspace()
+                        isErrorPresented = false
                     }
                 } else {
                     Button(fill: Color.gray, text: "C") {
                         previous = ""
                         input.set(.string(""))
+                        isErrorPresented = false
                     }
                 }
                 Button(fill: Color.gray, text: "'") { append("'") }
@@ -168,8 +177,9 @@ struct ContentView: View {
         case .real(let r):
             r.toNearestFraction(withPrecision: HIGHEST_PRECISION)
         }
-        self.previous = input.description
-        self.input.set(.result(fraction, error))
+        previous = input.description
+        input.set(.result(fraction, error))
+        isErrorPresented = false
     }
 }
 
