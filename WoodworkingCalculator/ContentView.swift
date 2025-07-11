@@ -94,7 +94,7 @@ struct ContentView: View {
             HStack {
                 if input.error != nil {
                     Text("≈")
-                        .font(.system(size: 48, weight: .bold))
+                        .font(.system(size: 40, weight: .bold))
                         .foregroundStyle(.red)
                         .padding()
                         .onTapGesture { isErrorPresented.toggle() }
@@ -214,14 +214,14 @@ struct CircleButton: View {
     
     var body: some View {
         Button(action: action) {
-            Circle()
-                .fill(fill)
-                .overlay(content: {
-                    Text(text)
-                        .foregroundStyle(.white)
-                        .font(.system(size: CGFloat(size)))
-                })
+            Text(text)
+                .foregroundStyle(.white)
+                .font(.system(size: CGFloat(size)))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .buttonStyle(.borderedProminent)
+        .buttonBorderShape(.circle)
+        .tint(fill)
     }
 }
 
