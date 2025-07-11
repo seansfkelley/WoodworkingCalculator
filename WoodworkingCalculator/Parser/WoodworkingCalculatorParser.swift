@@ -34,11 +34,11 @@ extension Double {
 extension Evaluatable: CustomStringConvertible {
     var description: String {
         switch (self) {
-        case .rational(let f):
+        case .rational(var f):
             if f.den == 1 {
                 return "\(f.num)"
             } else {
-                return "\(asSuperscript(f.num))\u{2044}\(asSubscript(f.den))"
+                return "\(f)"
             }
         case .real(let r):
             return "\(r)"
@@ -179,14 +179,14 @@ func formatAsUsCustomary(_ fraction: Fraction, _ precision: UsCustomaryPrecision
         }
     } else {
         if n >= 12 * d && precision == .feet {
-            parts.append("\(n / (12 * d))' ");
+            parts.append("\(n / (12 * d))'");
             n = n % (12 * d);
         }
         
         if n > d {
-            parts.append("\(n / d) \(asSuperscript(n % d))\u{2044}\(asSubscript(d))\"")
+            parts.append("\(n / d) \(Fraction(n % d, d))\"")
         } else {
-            parts.append("\(asSuperscript(n))\u{2044}\(asSubscript(d))\"")
+            parts.append("\(Fraction(n, d))\"")
         }
     }
     

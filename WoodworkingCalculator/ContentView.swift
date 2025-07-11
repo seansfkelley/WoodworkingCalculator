@@ -1,12 +1,23 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var previous: String = "";
-    @State private var error: String = "";
-    @State private var input: String = "";
+    @State private var previous: String = ""
+    @State private var error: String = ""
+    @State private var input: String = ""
+    @State private var isSettingsPresented: Bool = false
     
     var body: some View {
         VStack {
+            Image(systemName: "gear")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .font(.system(size: 32))
+                .foregroundColor(Color.orange)
+                .padding()
+                .onTapGesture { isSettingsPresented.toggle() }
+                .sheet(isPresented: $isSettingsPresented) {
+                    Text("hello")
+                        .presentationDetents([.medium])
+                }
             Text(previous)
                 .frame(
                     minWidth: 0,
@@ -28,7 +39,6 @@ struct ContentView: View {
                         .font(.system(size: 32))
                         .foregroundColor(Color.yellow)
                         .padding()
-                        .help("send help")
                 }
                 Text(input)
                     .frame(
