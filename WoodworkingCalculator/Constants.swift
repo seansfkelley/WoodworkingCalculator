@@ -1,5 +1,6 @@
 struct Constants {
-    struct AppStorageKey {
-        static let displayFeet = "displayFeet"
+    struct AppStorage {
+        static let displayInchesOnlyKey = "displayInchesOnly"
+        static let displayInchesOnlyDefault = false
     }
 }

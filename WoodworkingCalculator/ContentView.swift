@@ -5,6 +5,7 @@ struct ContentView: View {
     @State private var error: String = ""
     @State private var input: String = ""
     @State private var isSettingsPresented: Bool = false
+    @AppStorage(Constants.AppStorage.displayInchesOnlyKey) private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
     
     var body: some View {
         VStack {
@@ -107,8 +108,8 @@ struct ContentView: View {
         case .real(let r):
             r.toNearestFraction(withPrecision: HIGHEST_PRECISION)
         }
-        self.previous = self.input
-        self.input = formatAsUsCustomary(fraction)
+        self.previous = input
+        self.input = formatAsUsCustomary(fraction, displayInchesOnly ? .inches : .feet)
         self.error = if let error { "approximation: \(String(format: "%+.3f", error))\"" } else { "" }
     }
 }
