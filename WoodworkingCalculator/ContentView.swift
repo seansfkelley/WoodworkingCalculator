@@ -68,7 +68,7 @@ struct ContentView: View {
             Image(systemName: "gear")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .font(.system(size: 32))
-                .foregroundColor(Color.orange)
+                .foregroundStyle(.orange)
                 .padding()
                 .onTapGesture { isSettingsPresented.toggle() }
                 .sheet(isPresented: $isSettingsPresented) {
@@ -84,7 +84,7 @@ struct ContentView: View {
                     alignment: .trailing
                 )
                 .font(.system(size: 40, weight: .light))
-                .foregroundColor(Color.gray)
+                .foregroundStyle(.secondary)
                 .minimumScaleFactor(0.3)
                 .onTapGesture {
                     input.set(.string(previous))
@@ -94,12 +94,20 @@ struct ContentView: View {
             HStack {
                 if input.error != nil {
                     Text("≈")
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(Color.red)
+                        .font(.system(size: 48, weight: .bold))
+                        .foregroundStyle(.red)
                         .padding()
                         .onTapGesture { isErrorPresented.toggle() }
                         .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
-                            Text("popover")
+                            VStack {
+                                Text("Approximation error \(String(format: "%+.3f", input.error!))\"")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                Spacer()
+                                Text("Rounded to the nearest 1/\(precision)\"")
+                                    .font(.system(.callout))
+                                    .foregroundStyle(.secondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
                                 .padding()
                                 .presentationCompactAdaptation(.popover)
                         }
@@ -137,25 +145,25 @@ struct ContentView: View {
                 Button(fill: Color.gray, text: "7") { append("7") }
                 Button(fill: Color.gray, text: "8") { append("8") }
                 Button(fill: Color.gray, text: "9") { append("9") }
-                Button(fill: Color.orange, text: "×") { append("x") }
+                Button(fill: Color.orange, text: "×", size: 48) { append("x") }
             }
             HStack {
                 Button(fill: Color.gray, text: "4") { append("4") }
                 Button(fill: Color.gray, text: "5") { append("5") }
                 Button(fill: Color.gray, text: "6") { append("6") }
-                Button(fill: Color.orange, text: "-") { append("-") }
+                Button(fill: Color.orange, text: "-", size: 48) { append("-") }
             }
             HStack {
                 Button(fill: Color.gray, text: "1") { append("1") }
                 Button(fill: Color.gray, text: "2") { append("2") }
                 Button(fill: Color.gray, text: "3") { append("3") }
-                Button(fill: Color.orange, text: "+") { append("+") }
+                Button(fill: Color.orange, text: "+", size: 48) { append("+") }
             }
             HStack {
                 Button(fill: Color.gray, text: "_") { append(" ") }
                 Button(fill: Color.gray, text: "0") { append("0") }
                 Button(fill: Color.gray, text: ".") { append(".") }
-                Button(fill: Color.orange, text: "=") { self.evaluate() }
+                Button(fill: Color.orange, text: "=", size: 48) { evaluate() }
             }
             HStack {
                 Button(fill: Color.gray, text: "ⁿ⁄₂") { append("/2") }
@@ -168,7 +176,7 @@ struct ContentView: View {
     }
     
     private func evaluate() {
-        let result = try? parse(input.description).evaluate(precision)
+        let result = try? parse(input.description).evaluate()
         guard result != nil else {
             return
         }
@@ -189,9 +197,9 @@ struct Button: View {
     let fill: Color;
     let text: String;
     let size: Int;
-    let action: (() -> Void)?;
+    let action: () -> Void;
     
-    init(fill: Color, text: String, size: Int = 32, action: (() -> Void)? = nil) {
+    init(fill: Color, text: String, size: Int = 32, action: @escaping () -> Void) {
         self.fill = fill;
         self.text = text;
         self.size = size;
@@ -203,10 +211,10 @@ struct Button: View {
             .fill(fill)
             .overlay(content: {
                 Text(text)
-                    .foregroundColor(.white)
+                    .foregroundStyle(.white)
                     .font(.system(size: CGFloat(size)))
             })
-            .onTapGesture { action?() }
+            .onTapGesture { action() }
     }
 }
 

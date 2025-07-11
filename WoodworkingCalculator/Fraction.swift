@@ -95,7 +95,7 @@ extension Double {
         self = Double(fraction.num) / Double(fraction.den)
     }
     
-    func toNearestFraction(withPrecision: Int, epsilon: Double = 0.0001) -> (Fraction, Double?) {
+    func toNearestFraction(withPrecision: Int, epsilon: Double = 0.001) -> (Fraction, Double?) {
         let upperFraction = Fraction(Int((self * Double(withPrecision)).rounded(.up)), withPrecision).reduced
         let lowerFraction = Fraction(Int((self * Double(withPrecision)).rounded(.down)), withPrecision).reduced
         

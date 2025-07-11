@@ -6,9 +6,9 @@ if CommandLine.argc != 2 {
         let result = tree.evaluate()
         let (fraction, error) = switch result {
         case .rational(let r):
-            r.roundedToPrecision(HIGHEST_PRECISION)
+            r.roundedToPrecision(64)
         case .real(let r):
-            r.toNearestFraction(withPrecision: HIGHEST_PRECISION)
+            r.toNearestFraction(withPrecision: 64)
         }
         if error == nil {
             print("\(tree) -> \(formatAsUsCustomary(fraction, .feet))")
