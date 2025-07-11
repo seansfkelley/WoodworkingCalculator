@@ -124,52 +124,58 @@ struct ContentView: View {
                     .minimumScaleFactor(0.3)
             }
             HStack {
-                if input.backspaceable {
-                    Button(fill: Color.gray, text: "⌫") {
-                        previous = ""
+                // Branching inside the component instead of outside to make two distinct ones
+                // is a little inelegant but I specifically want to keep the button instance
+                // the same so the stateful on-press color-change animation doesn't abruptly
+                // end while you're actively long-pressing the button due to a change in identity.
+                CircleButton(fill: Color.gray, text: input.backspaceable ? "⌫" : "C") {
+                    previous = ""
+                    isErrorPresented = false
+                    
+                    if input.backspaceable {
                         input.backspace()
-                        isErrorPresented = false
-                    }
-                } else {
-                    Button(fill: Color.gray, text: "C") {
-                        previous = ""
+                    } else {
                         input.set(.string(""))
-                        isErrorPresented = false
                     }
                 }
-                Button(fill: Color.gray, text: "'") { append("'") }
-                Button(fill: Color.gray, text: "\"") { append("\"") }
-                Button(fill: Color.orange, text: "÷", size: 48) { append("/") }
+                .simultaneousGesture(LongPressGesture(minimumDuration: 1).onEnded { _ in
+                    previous = ""
+                    isErrorPresented = false
+                    input.set(.string(""))
+                })
+                CircleButton(fill: Color.gray, text: "'") { append("'") }
+                CircleButton(fill: Color.gray, text: "\"") { append("\"") }
+                CircleButton(fill: Color.orange, text: "÷", size: 48) { append("/") }
             }
             HStack {
-                Button(fill: Color.gray, text: "7") { append("7") }
-                Button(fill: Color.gray, text: "8") { append("8") }
-                Button(fill: Color.gray, text: "9") { append("9") }
-                Button(fill: Color.orange, text: "×", size: 48) { append("x") }
+                CircleButton(fill: Color.gray, text: "7") { append("7") }
+                CircleButton(fill: Color.gray, text: "8") { append("8") }
+                CircleButton(fill: Color.gray, text: "9") { append("9") }
+                CircleButton(fill: Color.orange, text: "×", size: 48) { append("x") }
             }
             HStack {
-                Button(fill: Color.gray, text: "4") { append("4") }
-                Button(fill: Color.gray, text: "5") { append("5") }
-                Button(fill: Color.gray, text: "6") { append("6") }
-                Button(fill: Color.orange, text: "-", size: 48) { append("-") }
+                CircleButton(fill: Color.gray, text: "4") { append("4") }
+                CircleButton(fill: Color.gray, text: "5") { append("5") }
+                CircleButton(fill: Color.gray, text: "6") { append("6") }
+                CircleButton(fill: Color.orange, text: "-", size: 48) { append("-") }
             }
             HStack {
-                Button(fill: Color.gray, text: "1") { append("1") }
-                Button(fill: Color.gray, text: "2") { append("2") }
-                Button(fill: Color.gray, text: "3") { append("3") }
-                Button(fill: Color.orange, text: "+", size: 48) { append("+") }
+                CircleButton(fill: Color.gray, text: "1") { append("1") }
+                CircleButton(fill: Color.gray, text: "2") { append("2") }
+                CircleButton(fill: Color.gray, text: "3") { append("3") }
+                CircleButton(fill: Color.orange, text: "+", size: 48) { append("+") }
             }
             HStack {
-                Button(fill: Color.gray, text: "_") { append(" ") }
-                Button(fill: Color.gray, text: "0") { append("0") }
-                Button(fill: Color.gray, text: ".") { append(".") }
-                Button(fill: Color.orange, text: "=", size: 48) { evaluate() }
+                CircleButton(fill: Color.gray, text: "_") { append(" ") }
+                CircleButton(fill: Color.gray, text: "0") { append("0") }
+                CircleButton(fill: Color.gray, text: ".") { append(".") }
+                CircleButton(fill: Color.orange, text: "=", size: 48) { evaluate() }
             }
             HStack {
-                Button(fill: Color.gray, text: "ⁿ⁄₂") { append("/2") }
-                Button(fill: Color.gray, text: "ⁿ⁄₄") { append("/4") }
-                Button(fill: Color.gray, text: "ⁿ⁄₈") { append("/8") }
-                Button(fill: Color.gray, text: "ⁿ⁄₁₆") { append("/16") }
+                CircleButton(fill: Color.gray, text: "ⁿ⁄₂") { append("/2") }
+                CircleButton(fill: Color.gray, text: "ⁿ⁄₄") { append("/4") }
+                CircleButton(fill: Color.gray, text: "ⁿ⁄₈") { append("/8") }
+                CircleButton(fill: Color.gray, text: "ⁿ⁄₁₆") { append("/16") }
             }
         }
         .padding()
@@ -193,11 +199,11 @@ struct ContentView: View {
     }
 }
 
-struct Button: View {
-    let fill: Color;
-    let text: String;
-    let size: Int;
-    let action: () -> Void;
+struct CircleButton: View {
+    let fill: Color
+    let text: String
+    let size: Int
+    let action: () -> Void
     
     init(fill: Color, text: String, size: Int = 32, action: @escaping () -> Void) {
         self.fill = fill;
@@ -207,14 +213,15 @@ struct Button: View {
     }
     
     var body: some View {
-        Circle()
-            .fill(fill)
-            .overlay(content: {
-                Text(text)
-                    .foregroundStyle(.white)
-                    .font(.system(size: CGFloat(size)))
-            })
-            .onTapGesture { action() }
+        Button(action: action) {
+            Circle()
+                .fill(fill)
+                .overlay(content: {
+                    Text(text)
+                        .foregroundStyle(.white)
+                        .font(.system(size: CGFloat(size)))
+                })
+        }
     }
 }
 

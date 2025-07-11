@@ -1,10 +1,8 @@
-- show visual feedback when tapping a button
 - prevent input if it doesn't make sense in that place (a la the regular Calculator app)
     - consider reformatting input with pretty fractions as-you-type so you can see how it's being parsed
 - color palette and then test dark mode
 - how does it behave on other device form factors?
 - what to do about negative values?
-- a la calculator app, holding backspace it should delete everything
 - bug
     1. set display for feet and inches
     2. do a calculation that yields feet
