@@ -15,7 +15,7 @@ struct ContentView: View {
                 .padding()
                 .onTapGesture { isSettingsPresented.toggle() }
                 .sheet(isPresented: $isSettingsPresented) {
-                    Text("hello")
+                    Settings()
                         .presentationDetents([.medium])
                 }
             Text(previous)

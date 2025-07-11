@@ -25,7 +25,7 @@ struct Fraction: Equatable, Hashable, CustomStringConvertible {
     }
     
     var description: String {
-        return "\(asSubscript(self.num))\u{2044}\(asSubscript(self.den))"
+        return "\(asSuperscript(self.num))\u{2044}\(asSubscript(self.den))"
     }
     
     static func == (left: Fraction, right: Fraction) -> Bool {
