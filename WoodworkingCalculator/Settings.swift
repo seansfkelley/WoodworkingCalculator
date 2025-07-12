@@ -19,7 +19,10 @@ struct Settings: View {
                 Text("Calculation")
             }
             Section {
-                Toggle("Show Only Inches", isOn: $displayInchesOnly)
+                Picker(selection: $displayInchesOnly, label: Text("Result Format")) {
+                    Text("Inches").tag(true)
+                    Text("Feet and Inches").tag(false)
+                }
             } header: {
                 Text("Display")
             }

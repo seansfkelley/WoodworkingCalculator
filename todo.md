@@ -12,6 +12,8 @@
 - pretty frations: parser has to be able to read them, or keep a non-pretty version of it under the hood
     - probably easiest to support parsing them properly so that copy-paste works
 - figure out how to not have to punch AppStorage through 3 different places
+- support parentheses? where to put buttons?
+- consider highlighting whitespace with light grey underscores somehow
 - add more unit tests
 - add UI tests
-- support parentheses? where to put buttons?
+- 1 7/16 looks a lot like 17/16 -- whitespace/dash?

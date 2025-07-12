@@ -13,8 +13,12 @@ struct Input: CustomStringConvertible {
         self.value = value
     }
     
-    mutating func append(_ string: String) {
-        value = .string(description + string)
+    mutating func append(_ string: String, replaceResult: Bool = false) {
+        if replaceResult, case .result = value {
+            value = .string(string)
+        } else {
+            value = .string(description + string)
+        }
     }
     
     mutating func backspace() {
@@ -58,9 +62,9 @@ struct ContentView: View {
     @AppStorage(Constants.AppStorage.displayInchesOnlyKey) private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
     @AppStorage(Constants.AppStorage.precisionKey) private var precision: Int = Constants.AppStorage.precisionDefault
     
-    private func append(_ string: String) {
-        input.append(string)
+    private func append(_ string: String, replaceResult: Bool = false) {
         previous = ""
+        input.append(string, replaceResult: replaceResult)
     }
     
     var body: some View {
@@ -143,32 +147,32 @@ struct ContentView: View {
                     isErrorPresented = false
                     input.set(.string(""))
                 })
-                CircleButton(.text("'"), .gray) { append("'") }
-                CircleButton(.text("\""), .gray) { append("\"") }
+                CircleButton(.text("'"), .gray) { append("'", replaceResult: true) }
+                CircleButton(.text("\""), .gray) { append("\"", replaceResult: true) }
                 CircleButton(.image("divide"), .orange) { append("/") }
             }
             HStack {
-                CircleButton(.text("7"), .gray) { append("7") }
-                CircleButton(.text("8"), .gray) { append("8") }
-                CircleButton(.text("9"), .gray) { append("9") }
+                CircleButton(.text("7"), .gray) { append("7", replaceResult: true) }
+                CircleButton(.text("8"), .gray) { append("8", replaceResult: true) }
+                CircleButton(.text("9"), .gray) { append("9", replaceResult: true) }
                 CircleButton(.image("multiply"), .orange) { append("x") }
             }
             HStack {
-                CircleButton(.text("4"), .gray) { append("4") }
-                CircleButton(.text("5"), .gray) { append("5") }
-                CircleButton(.text("6"), .gray) { append("6") }
+                CircleButton(.text("4"), .gray) { append("4", replaceResult: true) }
+                CircleButton(.text("5"), .gray) { append("5", replaceResult: true) }
+                CircleButton(.text("6"), .gray) { append("6", replaceResult: true) }
                 CircleButton(.image("minus"), .orange) { append("-") }
             }
             HStack {
-                CircleButton(.text("1"), .gray) { append("1") }
-                CircleButton(.text("2"), .gray) { append("2") }
-                CircleButton(.text("3"), .gray) { append("3") }
+                CircleButton(.text("1"), .gray) { append("1", replaceResult: true) }
+                CircleButton(.text("2"), .gray) { append("2", replaceResult: true) }
+                CircleButton(.text("3"), .gray) { append("3", replaceResult: true) }
                 CircleButton(.image("plus"), .orange) { append("+") }
             }
             HStack {
-                CircleButton(.text("_"), .gray) { append(" ") }
-                CircleButton(.text("0"), .gray) { append("0") }
-                CircleButton(.text("."), .gray) { append(".") }
+                CircleButton(.text("_"), .gray) { append(" ", replaceResult: true) }
+                CircleButton(.text("0"), .gray) { append("0", replaceResult: true) }
+                CircleButton(.text("."), .gray) { append(".", replaceResult: true) }
                 CircleButton(.image("equal"), .orange) { evaluate() }
             }
             HStack {
