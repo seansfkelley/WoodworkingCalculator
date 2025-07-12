@@ -14,19 +14,26 @@ struct Input: CustomStringConvertible {
     }
     
     mutating func append(_ string: String, replaceResult: Bool = false) -> Bool {
-        if replaceResult, case .result = value {
-            if string != " " {
-                value = .string(string)
-                return true
+        let candidate: String? = {
+            if replaceResult, case .result = value {
+                if string != " " {
+                    return string
+                }
+            } else {
+                let stringified = description
+                if string != " " || stringified.last != " " {
+                    return stringified + string
+                }
             }
+            return nil
+        }()
+        
+        if candidate != nil && isValidPrefix(candidate!) {
+            value = .string(candidate!)
+            return true
         } else {
-            let stringified = description
-            if string != " " || stringified.last != " " {
-                value = .string(stringified + string)
-                return true
-            }
+            return false
         }
-        return false
     }
     
     mutating func backspace() {
@@ -72,6 +79,14 @@ struct ContentView: View {
     
     private func append(_ string: String, replaceResult: Bool = false) {
         if input.append(string, replaceResult: replaceResult) {
+            previous = ""
+        }
+    }
+    
+    private func appendToleratingPrefix(_ preexistingPrefix: String, _ suffix: String) {
+        if input.description.hasSuffix(preexistingPrefix) && input.append(suffix) {
+            previous = ""
+        } else if input.append(preexistingPrefix + suffix) {
             previous = ""
         }
     }
@@ -199,10 +214,10 @@ struct ContentView: View {
                 CircleButton(.image("equal"), .orange) { evaluate() }
             }
             HStack {
-                CircleButton(.text("ⁿ⁄₂"), .gray) { append("/2") }
-                CircleButton(.text("ⁿ⁄₄"), .gray) { append("/4") }
-                CircleButton(.text("ⁿ⁄₈"), .gray) { append("/8") }
-                CircleButton(.text("ⁿ⁄₁₆"), .gray) { append("/16") }
+                CircleButton(.text("ⁿ⁄₂"), .gray) { appendToleratingPrefix("/", "2") }
+                CircleButton(.text("ⁿ⁄₄"), .gray) { appendToleratingPrefix("/", "4") }
+                CircleButton(.text("ⁿ⁄₈"), .gray) { appendToleratingPrefix("/", "8") }
+                CircleButton(.text("ⁿ⁄₁₆"), .gray) { appendToleratingPrefix("/", "16") }
             }
         }
         .padding()
@@ -210,11 +225,11 @@ struct ContentView: View {
     
     private func evaluate() {
         let result = try? parse(input.description).evaluate()
-        guard result != nil else {
+        guard let result else {
             return
         }
         
-        let (fraction, error) = switch result! {
+        let (fraction, error) = switch result {
         case .rational(let r):
             r.roundedToPrecision(precision)
         case .real(let r):

@@ -1,5 +1,3 @@
-- prevent input if it doesn't make sense in that place (a la the regular Calculator app)
-    - consider reformatting input with pretty fractions as-you-type so you can see how it's being parsed
 - color palette and then test dark mode
 - how does it behave on other device form factors?
 - what to do about negative values?
@@ -16,5 +14,7 @@
 - consider highlighting whitespace with light grey underscores somehow
 - add more unit tests
 - add UI tests
-- 1 7/16 looks a lot like 17/16 -- whitespace/dash?
+- 1 7/16 looks a lot like 17/16 -- more whitespace (two spaces)? dash character?
 - improve visuals of wavy equals, right now it looks kind of like a mistake
+- support pasting -- should evaluate immediately or just put the stuff in?
+- consider reformatting input with pretty fractions as-you-type so you can see how it's being parsed

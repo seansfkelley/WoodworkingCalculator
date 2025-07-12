@@ -153,6 +153,19 @@ func parse(_ input: String) throws -> Evaluatable {
     return try parser.endParsing()
 }
 
+func isValidPrefix(_ input: String) -> Bool {
+    do {
+        _ = try parse(input)
+        return true
+    } catch is CitronParserUnexpectedEndOfInputError {
+        return true
+    } catch is _CitronParserUnexpectedTokenError<WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode> {
+        return false
+    } catch {
+        return false
+    }
+}
+
 enum UsCustomaryPrecision: Equatable {
     case feet
     case inches
