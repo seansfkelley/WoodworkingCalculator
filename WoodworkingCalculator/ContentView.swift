@@ -106,31 +106,33 @@ struct ContentView: View {
                 }
             HStack {
                 if input.error != nil {
-                    Text("≈")
-                        .font(.system(size: 40, weight: .bold))
-                        .foregroundStyle(.red)
-                        .padding()
-                        .onTapGesture { isErrorPresented.toggle() }
-                        .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
-                            VStack {
-                                Text("Approximation error \(String(format: "%+.3f", input.error!))\"")
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                Spacer()
-                                Text("Rounded to the nearest 1/\(precision)\"")
-                                    .font(.system(.callout))
-                                    .foregroundStyle(.secondary)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                                .padding()
-                                .presentationCompactAdaptation(.popover)
+                    Button(action: { isErrorPresented.toggle() }) {
+                        Text("≈")
+                            .font(.system(size: 40, weight: .bold))
+                            .foregroundStyle(.red)
+                            .padding()
+//                            .overlay(Circle().stroke(.red, lineWidth: 4))
+                    }
+                    .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
+                        VStack {
+                            Text("Approximation error \(String(format: "%+.3f", input.error!))\"")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Spacer()
+                            Text("Rounded to the nearest 1/\(precision)\"")
+                                .font(.system(.callout))
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
+                            .padding()
+                            .presentationCompactAdaptation(.popover)
+                    }
                 }
                 // This is how you'd replace the space with another character with different styling.
 //                let formattedString: AttributedString = input.description
 //                    .split(separator: " ", omittingEmptySubsequences: false)
 //                    .reduce(into: AttributedString()) { accumulator, s in
 //                        if accumulator.characters.count > 0 {
-//                            var space = AttributedString("ˍ")
+//                            var space = AttributedString("_")
 //                            space.foregroundColor = .lightGray
 //                            accumulator.append(space)
 //                        }

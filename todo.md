@@ -17,3 +17,4 @@
 - add more unit tests
 - add UI tests
 - 1 7/16 looks a lot like 17/16 -- whitespace/dash?
+- improve visuals of wavy equals, right now it looks kind of like a mistake
