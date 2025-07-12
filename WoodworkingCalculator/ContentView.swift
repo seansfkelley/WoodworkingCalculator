@@ -147,6 +147,9 @@ struct ContentView: View {
 //                    .split(separator: " ", omittingEmptySubsequences: false)
 //                    .reduce(into: AttributedString()) { accumulator, s in
 //                        if accumulator.characters.count > 0 {
+////                            var space = AttributedString(" ")
+////                            space.underlineStyle = .single
+////                            space.underlineColor = .lightGray
 //                            var space = AttributedString("_")
 //                            space.foregroundColor = .lightGray
 //                            accumulator.append(space)

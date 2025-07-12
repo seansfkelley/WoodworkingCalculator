@@ -1,3 +1,4 @@
+- bug: cannot type "1 1/4" because the parser doesn't like the partial string "1 1" and doesn't consider it a prefix
 - color palette and then test dark mode
 - how does it behave on other device form factors?
 - what to do about negative values?
@@ -18,3 +19,4 @@
 - improve visuals of wavy equals, right now it looks kind of like a mistake
 - support pasting -- should evaluate immediately or just put the stuff in?
 - consider reformatting input with pretty fractions as-you-type so you can see how it's being parsed
+- if the result is unmodified, when the feet/inches setting changes, it should rerender in the new format
