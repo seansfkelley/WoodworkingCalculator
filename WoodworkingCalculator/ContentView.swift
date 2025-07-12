@@ -13,12 +13,20 @@ struct Input: CustomStringConvertible {
         self.value = value
     }
     
-    mutating func append(_ string: String, replaceResult: Bool = false) {
+    mutating func append(_ string: String, replaceResult: Bool = false) -> Bool {
         if replaceResult, case .result = value {
-            value = .string(string)
+            if string != " " {
+                value = .string(string)
+                return true
+            }
         } else {
-            value = .string(description + string)
+            let stringified = description
+            if string != " " || stringified.last != " " {
+                value = .string(stringified + string)
+                return true
+            }
         }
+        return false
     }
     
     mutating func backspace() {
@@ -63,8 +71,9 @@ struct ContentView: View {
     @AppStorage(Constants.AppStorage.precisionKey) private var precision: Int = Constants.AppStorage.precisionDefault
     
     private func append(_ string: String, replaceResult: Bool = false) {
-        previous = ""
-        input.append(string, replaceResult: replaceResult)
+        if input.append(string, replaceResult: replaceResult) {
+            previous = ""
+        }
     }
     
     var body: some View {
@@ -116,6 +125,18 @@ struct ContentView: View {
                                 .presentationCompactAdaptation(.popover)
                         }
                 }
+                // This is how you'd replace the space with another character with different styling.
+//                let formattedString: AttributedString = input.description
+//                    .split(separator: " ", omittingEmptySubsequences: false)
+//                    .reduce(into: AttributedString()) { accumulator, s in
+//                        if accumulator.characters.count > 0 {
+//                            var space = AttributedString("ˍ")
+//                            space.foregroundColor = .lightGray
+//                            accumulator.append(space)
+//                        }
+//                        accumulator.append(AttributedString(s))
+//                    }
+                
                 Text(input.description)
                     .frame(
                         minWidth: 0,
