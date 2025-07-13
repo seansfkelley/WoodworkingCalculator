@@ -130,9 +130,10 @@ func parseInteger(_ input: String) -> LexedTokenData? {
 }
 
 let lexer = CitronLexer<LexedTokenData>(rules: [
-        .regexPattern("([0-9]+ +)?[0-9]+/[0-9]+", parseFraction),
+        .regexPattern("[0-9]+/[0-9]+", parseFraction),
         .regexPattern("([0-9]+)?\\.[0-9]+", parseReal),
         .regexPattern("[0-9]+\\.?", parseInteger),
+        .string(" ", (.void, .Space)),
         .string("'", (.void, .Feet)),
         .string("\"", (.void, .Inches)),
         .string("+", (.void, .Add)),
@@ -141,8 +142,7 @@ let lexer = CitronLexer<LexedTokenData>(rules: [
         .string("x", (.void, .Multiply)),
         .string("/", (.void, .Divide)),
         .string("(", (.void, .LeftParen)),
-        .string(")", (.void, .RightParen)),
-        .regexPattern("\\s", { _ in nil })
+        .string(")", (.void, .RightParen))
     ])
 
 func parse(_ input: String) throws -> Evaluatable {

@@ -38,28 +38,52 @@ atom ::= LeftParen expression(x) RightParen. {
 }
 
 %nonterminal_type quantity Evaluatable
-quantity ::= integer(f) Feet integer(i_int) fraction(i_frac) Inches. {
+quantity ::= integer(f) Feet Space integer(i_int) Space fraction(i_frac) Inches. {
     return .rational(Fraction((f * 12 + i_int) * i_frac.den + i_frac.num, i_frac.den))
 }
-quantity ::= integer(f) Feet integer(i_int) fraction(i_frac). {
+quantity ::= integer(f) Feet integer(i_int) Space fraction(i_frac) Inches. {
     return .rational(Fraction((f * 12 + i_int) * i_frac.den + i_frac.num, i_frac.den))
+}
+quantity ::= integer(f) Feet Space integer(i_int) Space fraction(i_frac). {
+    return .rational(Fraction((f * 12 + i_int) * i_frac.den + i_frac.num, i_frac.den))
+}
+quantity ::= integer(f) Feet integer(i_int) Space fraction(i_frac). {
+    return .rational(Fraction((f * 12 + i_int) * i_frac.den + i_frac.num, i_frac.den))
+}
+quantity ::= integer(f) Feet Space integer(i_int) Inches. {
+    return .rational(Fraction(f * 12 + i_int, 1))
 }
 quantity ::= integer(f) Feet integer(i_int) Inches. {
+    return .rational(Fraction(f * 12 + i_int, 1))
+}
+quantity ::= integer(f) Feet Space integer(i_int). {
     return .rational(Fraction(f * 12 + i_int, 1))
 }
 quantity ::= integer(f) Feet integer(i_int). {
     return .rational(Fraction(f * 12 + i_int, 1))
 }
+quantity ::= integer(f) Feet Space fraction(i_frac) Inches. {
+    return .rational(Fraction(f * 12 * i_frac.den + i_frac.num, i_frac.den))
+}
 quantity ::= integer(f) Feet fraction(i_frac) Inches. {
+    return .rational(Fraction(f * 12 * i_frac.den + i_frac.num, i_frac.den))
+}
+quantity ::= integer(f) Feet Space fraction(i_frac). {
     return .rational(Fraction(f * 12 * i_frac.den + i_frac.num, i_frac.den))
 }
 quantity ::= integer(f) Feet fraction(i_frac). {
     return .rational(Fraction(f * 12 * i_frac.den + i_frac.num, i_frac.den))
 }
+quantity ::= integer(f) Feet Space real(i) Inches. {
+    return .real(Double(f * 12) + i)
+}
 quantity ::= integer(f) Feet real(i) Inches. {
     return .real(Double(f * 12) + i)
 }
 quantity ::= integer(f) Feet real(i). {
+    return .real(Double(f * 12) + i)
+}
+quantity ::= integer(f) Feet Space real(i). {
     return .real(Double(f * 12) + i)
 }
 quantity ::= integer(f) Feet. {
@@ -68,10 +92,10 @@ quantity ::= integer(f) Feet. {
 quantity ::= real(f) Feet. {
     return .real(f * 12)
 }
-quantity ::= integer(i_int) fraction(i_frac) Inches. {
+quantity ::= integer(i_int) Space fraction(i_frac) Inches. {
     return .rational(Fraction(i_int * i_frac.den + i_frac.num, i_frac.den))
 }
-quantity ::= integer(i_int) fraction(i_frac). {
+quantity ::= integer(i_int) Space fraction(i_frac). {
     return .rational(Fraction(i_int * i_frac.den + i_frac.num, i_frac.den))
 }
 quantity ::= integer(i_int) Inches. {

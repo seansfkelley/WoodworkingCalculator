@@ -23,21 +23,22 @@ class WoodworkingCalculatorGrammar: CitronParser {
       case LeftParen                      =   5
       case RightParen                     =   6
       case Feet                           =   7
-      case Inches                         =   8
-      case Integer                        =   9
-      case Fraction                       =  10
-      case Real                           =  11
+      case Space                          =   8
+      case Inches                         =   9
+      case Integer                        =  10
+      case Fraction                       =  11
+      case Real                           =  12
     }
 
     enum CitronNonTerminalCode: CitronSymbolNumber {
-      case equation                       =  12
-      case expression                     =  13
-      case multiplicative                 =  14
-      case atom                           =  15
-      case quantity                       =  16
-      case integer                        =  17
-      case fraction                       =  18
-      case real                           =  19
+      case equation                       =  13
+      case expression                     =  14
+      case multiplicative                 =  15
+      case atom                           =  16
+      case quantity                       =  17
+      case integer                        =  18
+      case fraction                       =  19
+      case real                           =  20
     }
 
     enum CitronSymbolCode : RawRepresentable, Equatable {
@@ -50,9 +51,9 @@ class WoodworkingCalculatorGrammar: CitronParser {
         init(rawValue: CitronSymbolNumber) {
             if (rawValue == 0) {
                 self = .endOfInput
-            } else if (rawValue < 12) {
+            } else if (rawValue < 13) {
                 self = .token(CitronTokenCode(rawValue: rawValue)!)
-            } else if (rawValue < 20) {
+            } else if (rawValue < 21) {
                 self = .nonterminal(CitronNonTerminalCode(rawValue: rawValue)!)
             } else {
                 fatalError()
@@ -74,19 +75,19 @@ class WoodworkingCalculatorGrammar: CitronParser {
     enum CitronSymbol {
         case yyBaseOfStack
         case yy0(CitronToken)
-        case yy4(Int)
-        case yy8(Double)
-        case yy31(Evaluatable)
-        case yy32(Fraction)
+        case yy3(Fraction)
+        case yy22(Double)
+        case yy37(Evaluatable)
+        case yy38(Int)
 
         func typeErasedContent() -> Any {
             switch (self) {
             case .yyBaseOfStack: fatalError()
             case .yy0(let value): return value as Any
-            case .yy4(let value): return value as Any
-            case .yy8(let value): return value as Any
-            case .yy31(let value): return value as Any
-            case .yy32(let value): return value as Any
+            case .yy3(let value): return value as Any
+            case .yy22(let value): return value as Any
+            case .yy37(let value): return value as Any
+            case .yy38(let value): return value as Any
             }
         }
     }
@@ -95,48 +96,55 @@ class WoodworkingCalculatorGrammar: CitronParser {
 
     // Counts
 
-    let yyNumberOfSymbols: Int = 20
-    let yyNumberOfStates: Int = 20
+    let yyNumberOfSymbols: Int = 21
+    let yyNumberOfStates: Int = 28
 
     // Action tables
 
     let yyLookaheadAction: [(CitronSymbolNumber, CitronParsingAction)] = [
-/*   0 */  (12, .ACCEPT),   (13, .SH(10)), (14, .SH(11)), (15, .RD( 6)), (16, .RD( 7)),
-/*   5 */  (17, .SH( 7)), (18, .SH(15)), (19, .SH(12)), (13, .SH( 9)), (14, .SH(11)),
-/*  10 */  (15, .RD( 6)), (16, .RD( 7)), (17, .SH( 7)), (18, .SH(15)), (19, .SH(12)),
-/*  15 */  (14, .SH(13)), (15, .RD( 6)), (16, .RD( 7)), (17, .SH( 7)), (18, .SH(15)),
-/*  20 */  (19, .SH(12)), (14, .SH(14)), (15, .RD( 6)), (16, .RD( 7)), (17, .SH( 7)),
-/*  25 */  (18, .SH(15)), (19, .SH(12)), (15, .RD( 5)), (16, .RD( 7)), (17, .SH( 7)),
-/*  30 */  (18, .SH(15)), (19, .SH(12)), (15, .RD( 4)), (16, .RD( 7)), (17, .SH( 7)),
-/*  35 */  (18, .SH(15)), (19, .SH(12)), ( 5, .SH( 1)), ( 9, .SR(27)), (10, .SR(28)),
-/*  40 */  (11, .SR(29)), ( 9, .SR(27)), (10, .SR(28)), (11, .SR(29)), (17, .SH( 8)),
-/*  45 */  (18, .SH(18)), (19, .SH(17)), ( 7, .SH( 6)), ( 8, .SR(21)), ( 8, .SR(11)),
-/*  50 */  (10, .SR(28)), (10, .SR(28)), ( 1, .SH( 3)), ( 2, .SH( 2)), ( 0, .RD( 0)),
-/*  55 */  ( 1, .SH( 3)), ( 2, .SH( 2)), ( 6, .SR( 8)), ( 3, .SH( 5)), ( 4, .SH( 4)),
-/*  60 */  ( 7, .SR(18)), ( 8, .SR(25)), (18, .SH(16)), (18, .SH(19)), ( 8, .SR(23)),
-/*  65 */  ( 8, .SR(19)), ( 8, .SR(15)), ( 8, .SR(13)), ( 8, .SR( 9)),
+/*   0 */  (13, .ACCEPT),   (14, .SH(13)), (15, .SH(14)), (16, .RD( 6)), (17, .RD( 7)),
+/*   5 */  (18, .SH(11)), (19, .SH(20)), (20, .SH(15)), (14, .SH(12)), (15, .SH(14)),
+/*  10 */  (16, .RD( 6)), (17, .RD( 7)), (18, .SH(11)), (19, .SH(20)), (20, .SH(15)),
+/*  15 */  (15, .SH(18)), (16, .RD( 6)), (17, .RD( 7)), (18, .SH(11)), (19, .SH(20)),
+/*  20 */  (20, .SH(15)), (15, .SH(19)), (16, .RD( 6)), (17, .RD( 7)), (18, .SH(11)),
+/*  25 */  (19, .SH(20)), (20, .SH(15)), (16, .RD( 5)), (17, .RD( 7)), (18, .SH(11)),
+/*  30 */  (19, .SH(20)), (20, .SH(15)), (16, .RD( 4)), (17, .RD( 7)), (18, .SH(11)),
+/*  35 */  (19, .SH(20)), (20, .SH(15)), ( 5, .SH( 1)), (18, .SH(16)), (19, .SH(23)),
+/*  40 */  (20, .SH(22)), (11, .SR(36)), (10, .SR(35)), (11, .SR(36)), (12, .SR(37)),
+/*  45 */  ( 8, .SH( 7)), (19, .SH(21)), (10, .SR(35)), (11, .SR(36)), (12, .SR(37)),
+/*  50 */  (10, .SR(35)), (11, .SR(36)), (12, .SR(37)), (18, .SH(17)), (19, .SH(26)),
+/*  55 */  (20, .SH(25)), ( 7, .SH( 6)), ( 8, .SH( 8)), ( 9, .SR(29)), ( 1, .SH( 3)),
+/*  60 */  ( 2, .SH( 2)), ( 0, .RD( 0)), ( 1, .SH( 3)), ( 2, .SH( 2)), ( 6, .SR( 8)),
+/*  65 */  ( 3, .SH( 5)), ( 4, .SH( 4)), ( 7, .SR(26)), ( 9, .SR(31)), ( 9, .SR(33)),
+/*  70 */  (19, .SH(24)), ( 8, .SH( 9)), ( 9, .SR(14)), ( 8, .SH(10)), ( 9, .SR(13)),
+/*  75 */  (19, .SH(27)), ( 9, .SR(27)), ( 9, .SR(22)), ( 9, .SR(18)), ( 9, .SR(10)),
+/*  80 */  ( 9, .SR(21)), ( 9, .SR(17)), ( 9, .SR( 9)),
     ]
 
-    let yyShiftUseDefault: Int = 69
+    let yyShiftUseDefault: Int = 83
     let yyShiftOffsetMin: Int = 0
-    let yyShiftOffsetMax: Int = 60
+    let yyShiftOffsetMax: Int = 73
     let yyShiftOffset: [Int] = [
-        /*     0 */    32,   32,   32,   32,   32,   32,   29,   40,   41,   51,
-        /*    10 */    54,   55,   53,   55,   55,   56,   57,   58,   59,   60,
+        /*     0 */    32,   32,   32,   32,   32,   32,   37,   40,   30,   30,
+        /*    10 */    30,   49,   58,   61,   62,   60,   63,   65,   62,   62,
+        /*    20 */    59,   67,   68,   69,   70,   71,   72,   73,
     ]
 
-    let yyReduceUseDefault: Int = -13
-    let yyReduceOffsetMin: Int =   -12
-    let yyReduceOffsetMax: Int =   45
+    let yyReduceUseDefault: Int = -14
+    let yyReduceOffsetMin: Int =   -13
+    let yyReduceOffsetMax: Int =   56
     let yyReduceOffset: [Int] = [
-        /*     0 */   -12,   -5,    1,    7,   12,   17,   27,   44,   45,
+        /*     0 */   -13,   -6,    0,    6,   11,   16,   20,   35,   27,   51,
+        /*    10 */    56,
     ]
 
     let yyDefaultAction: [CitronParsingAction] = [
   /*     0 */  .ERROR , .ERROR , .ERROR , .ERROR , .ERROR ,
-  /*     5 */  .ERROR , .RD(17), .RD(22), .RD(12), .ERROR ,
-  /*    10 */  .ERROR , .RD( 3), .RD(26), .RD( 2), .RD( 1),
-  /*    15 */  .RD(24), .RD(20), .RD(16), .RD(14), .RD(10),
+  /*     5 */  .ERROR , .RD(25), .ERROR , .ERROR , .ERROR ,
+  /*    10 */  .ERROR , .RD(30), .ERROR , .ERROR , .RD( 3),
+  /*    15 */  .RD(34), .RD(16), .RD(15), .RD( 2), .RD( 1),
+  /*    20 */  .RD(32), .RD(28), .RD(23), .RD(20), .RD(12),
+  /*    25 */  .RD(24), .RD(19), .RD(11),
     ]
 
     // Fallback
@@ -151,36 +159,44 @@ class WoodworkingCalculatorGrammar: CitronParser {
     // Rules
 
     let yyRuleInfo: [(lhs: CitronSymbolNumber, nrhs: UInt)] = [
-        (lhs: 12, nrhs: 1),
-        (lhs: 13, nrhs: 3),
-        (lhs: 13, nrhs: 3),
         (lhs: 13, nrhs: 1),
         (lhs: 14, nrhs: 3),
         (lhs: 14, nrhs: 3),
         (lhs: 14, nrhs: 1),
-        (lhs: 15, nrhs: 1),
         (lhs: 15, nrhs: 3),
-        (lhs: 16, nrhs: 5),
-        (lhs: 16, nrhs: 4),
-        (lhs: 16, nrhs: 4),
-        (lhs: 16, nrhs: 3),
-        (lhs: 16, nrhs: 4),
-        (lhs: 16, nrhs: 3),
-        (lhs: 16, nrhs: 4),
-        (lhs: 16, nrhs: 3),
-        (lhs: 16, nrhs: 2),
-        (lhs: 16, nrhs: 2),
-        (lhs: 16, nrhs: 3),
-        (lhs: 16, nrhs: 2),
-        (lhs: 16, nrhs: 2),
+        (lhs: 15, nrhs: 3),
+        (lhs: 15, nrhs: 1),
         (lhs: 16, nrhs: 1),
-        (lhs: 16, nrhs: 2),
-        (lhs: 16, nrhs: 1),
-        (lhs: 16, nrhs: 2),
-        (lhs: 16, nrhs: 1),
+        (lhs: 16, nrhs: 3),
+        (lhs: 17, nrhs: 7),
+        (lhs: 17, nrhs: 6),
+        (lhs: 17, nrhs: 6),
+        (lhs: 17, nrhs: 5),
+        (lhs: 17, nrhs: 5),
+        (lhs: 17, nrhs: 4),
+        (lhs: 17, nrhs: 4),
+        (lhs: 17, nrhs: 3),
+        (lhs: 17, nrhs: 5),
+        (lhs: 17, nrhs: 4),
+        (lhs: 17, nrhs: 4),
+        (lhs: 17, nrhs: 3),
+        (lhs: 17, nrhs: 5),
+        (lhs: 17, nrhs: 4),
+        (lhs: 17, nrhs: 3),
+        (lhs: 17, nrhs: 4),
+        (lhs: 17, nrhs: 2),
+        (lhs: 17, nrhs: 2),
+        (lhs: 17, nrhs: 4),
+        (lhs: 17, nrhs: 3),
+        (lhs: 17, nrhs: 2),
+        (lhs: 17, nrhs: 1),
+        (lhs: 17, nrhs: 2),
+        (lhs: 17, nrhs: 1),
+        (lhs: 17, nrhs: 2),
         (lhs: 17, nrhs: 1),
         (lhs: 18, nrhs: 1),
         (lhs: 19, nrhs: 1),
+        (lhs: 20, nrhs: 1),
     ]
 
     // Stack
@@ -205,18 +221,19 @@ class WoodworkingCalculatorGrammar: CitronParser {
     /*  5 */ "LeftParen",
     /*  6 */ "RightParen",
     /*  7 */ "Feet",
-    /*  8 */ "Inches",
-    /*  9 */ "Integer",
-    /* 10 */ "Fraction",
-    /* 11 */ "Real",
-    /* 12 */ "equation",
-    /* 13 */ "expression",
-    /* 14 */ "multiplicative",
-    /* 15 */ "atom",
-    /* 16 */ "quantity",
-    /* 17 */ "integer",
-    /* 18 */ "fraction",
-    /* 19 */ "real",
+    /*  8 */ "Space",
+    /*  9 */ "Inches",
+    /* 10 */ "Integer",
+    /* 11 */ "Fraction",
+    /* 12 */ "Real",
+    /* 13 */ "equation",
+    /* 14 */ "expression",
+    /* 15 */ "multiplicative",
+    /* 16 */ "atom",
+    /* 17 */ "quantity",
+    /* 18 */ "integer",
+    /* 19 */ "fraction",
+    /* 20 */ "real",
     ]
     let yyRuleText: [String] = [
         /*   0 */ "equation ::= expression(e)",
@@ -228,27 +245,35 @@ class WoodworkingCalculatorGrammar: CitronParser {
         /*   6 */ "multiplicative ::= atom(x)",
         /*   7 */ "atom ::= quantity(x)",
         /*   8 */ "atom ::= LeftParen expression(x) RightParen",
-        /*   9 */ "quantity ::= integer(f) Feet integer(i_int) fraction(i_frac) Inches",
-        /*  10 */ "quantity ::= integer(f) Feet integer(i_int) fraction(i_frac)",
-        /*  11 */ "quantity ::= integer(f) Feet integer(i_int) Inches",
-        /*  12 */ "quantity ::= integer(f) Feet integer(i_int)",
-        /*  13 */ "quantity ::= integer(f) Feet fraction(i_frac) Inches",
-        /*  14 */ "quantity ::= integer(f) Feet fraction(i_frac)",
-        /*  15 */ "quantity ::= integer(f) Feet real(i) Inches",
-        /*  16 */ "quantity ::= integer(f) Feet real(i)",
-        /*  17 */ "quantity ::= integer(f) Feet",
-        /*  18 */ "quantity ::= real(f) Feet",
-        /*  19 */ "quantity ::= integer(i_int) fraction(i_frac) Inches",
-        /*  20 */ "quantity ::= integer(i_int) fraction(i_frac)",
-        /*  21 */ "quantity ::= integer(i_int) Inches",
-        /*  22 */ "quantity ::= integer(i_int)",
-        /*  23 */ "quantity ::= fraction(i_frac) Inches",
-        /*  24 */ "quantity ::= fraction(i_frac)",
-        /*  25 */ "quantity ::= real(i) Inches",
-        /*  26 */ "quantity ::= real(i)",
-        /*  27 */ "integer ::= Integer(x)",
-        /*  28 */ "fraction ::= Fraction(x)",
-        /*  29 */ "real ::= Real(x)",
+        /*   9 */ "quantity ::= integer(f) Feet Space integer(i_int) Space fraction(i_frac) Inches",
+        /*  10 */ "quantity ::= integer(f) Feet integer(i_int) Space fraction(i_frac) Inches",
+        /*  11 */ "quantity ::= integer(f) Feet Space integer(i_int) Space fraction(i_frac)",
+        /*  12 */ "quantity ::= integer(f) Feet integer(i_int) Space fraction(i_frac)",
+        /*  13 */ "quantity ::= integer(f) Feet Space integer(i_int) Inches",
+        /*  14 */ "quantity ::= integer(f) Feet integer(i_int) Inches",
+        /*  15 */ "quantity ::= integer(f) Feet Space integer(i_int)",
+        /*  16 */ "quantity ::= integer(f) Feet integer(i_int)",
+        /*  17 */ "quantity ::= integer(f) Feet Space fraction(i_frac) Inches",
+        /*  18 */ "quantity ::= integer(f) Feet fraction(i_frac) Inches",
+        /*  19 */ "quantity ::= integer(f) Feet Space fraction(i_frac)",
+        /*  20 */ "quantity ::= integer(f) Feet fraction(i_frac)",
+        /*  21 */ "quantity ::= integer(f) Feet Space real(i) Inches",
+        /*  22 */ "quantity ::= integer(f) Feet real(i) Inches",
+        /*  23 */ "quantity ::= integer(f) Feet real(i)",
+        /*  24 */ "quantity ::= integer(f) Feet Space real(i)",
+        /*  25 */ "quantity ::= integer(f) Feet",
+        /*  26 */ "quantity ::= real(f) Feet",
+        /*  27 */ "quantity ::= integer(i_int) Space fraction(i_frac) Inches",
+        /*  28 */ "quantity ::= integer(i_int) Space fraction(i_frac)",
+        /*  29 */ "quantity ::= integer(i_int) Inches",
+        /*  30 */ "quantity ::= integer(i_int)",
+        /*  31 */ "quantity ::= fraction(i_frac) Inches",
+        /*  32 */ "quantity ::= fraction(i_frac)",
+        /*  33 */ "quantity ::= real(i) Inches",
+        /*  34 */ "quantity ::= real(i)",
+        /*  35 */ "integer ::= Integer(x)",
+        /*  36 */ "fraction ::= Fraction(x)",
+        /*  37 */ "real ::= Real(x)",
     ]
 
     // Function definitions
@@ -267,8 +292,8 @@ class WoodworkingCalculatorGrammar: CitronParser {
 
 #sourceLocation()
 }
-            if case .yy31(let e) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule00(e: e))
+            if case .yy37(let e) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule00(e: e))
             }
         case 1: /* expression ::= expression(left) Add multiplicative(right) */
             func codeBlockForRule01(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
@@ -278,9 +303,9 @@ class WoodworkingCalculatorGrammar: CitronParser {
 
 #sourceLocation()
 }
-            if case .yy31(let left) = yySymbolOnStack(distanceFromTop: 2),
-               case .yy31(let right) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule01(left: left, right: right))
+            if case .yy37(let left) = yySymbolOnStack(distanceFromTop: 2),
+               case .yy37(let right) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule01(left: left, right: right))
             }
         case 2: /* expression ::= expression(left) Subtract multiplicative(right) */
             func codeBlockForRule02(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
@@ -290,9 +315,9 @@ class WoodworkingCalculatorGrammar: CitronParser {
 
 #sourceLocation()
 }
-            if case .yy31(let left) = yySymbolOnStack(distanceFromTop: 2),
-               case .yy31(let right) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule02(left: left, right: right))
+            if case .yy37(let left) = yySymbolOnStack(distanceFromTop: 2),
+               case .yy37(let right) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule02(left: left, right: right))
             }
         case 3: /* expression ::= multiplicative(x) */
             func codeBlockForRule03(x: Evaluatable) throws -> Evaluatable {
@@ -302,8 +327,8 @@ class WoodworkingCalculatorGrammar: CitronParser {
 
 #sourceLocation()
 }
-            if case .yy31(let x) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule03(x: x))
+            if case .yy37(let x) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule03(x: x))
             }
         case 4: /* multiplicative ::= multiplicative(left) Multiply atom(right) */
             func codeBlockForRule04(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
@@ -313,9 +338,9 @@ class WoodworkingCalculatorGrammar: CitronParser {
 
 #sourceLocation()
 }
-            if case .yy31(let left) = yySymbolOnStack(distanceFromTop: 2),
-               case .yy31(let right) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule04(left: left, right: right))
+            if case .yy37(let left) = yySymbolOnStack(distanceFromTop: 2),
+               case .yy37(let right) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule04(left: left, right: right))
             }
         case 5: /* multiplicative ::= multiplicative(left) Divide atom(right) */
             func codeBlockForRule05(left: Evaluatable, right: Evaluatable) throws -> Evaluatable {
@@ -325,9 +350,9 @@ class WoodworkingCalculatorGrammar: CitronParser {
 
 #sourceLocation()
 }
-            if case .yy31(let left) = yySymbolOnStack(distanceFromTop: 2),
-               case .yy31(let right) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule05(left: left, right: right))
+            if case .yy37(let left) = yySymbolOnStack(distanceFromTop: 2),
+               case .yy37(let right) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule05(left: left, right: right))
             }
         case 6: /* multiplicative ::= atom(x) */
             func codeBlockForRule06(x: Evaluatable) throws -> Evaluatable {
@@ -337,8 +362,8 @@ class WoodworkingCalculatorGrammar: CitronParser {
 
 #sourceLocation()
 }
-            if case .yy31(let x) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule06(x: x))
+            if case .yy37(let x) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule06(x: x))
             }
         case 7: /* atom ::= quantity(x) */
             func codeBlockForRule07(x: Evaluatable) throws -> Evaluatable {
@@ -348,8 +373,8 @@ class WoodworkingCalculatorGrammar: CitronParser {
 
 #sourceLocation()
 }
-            if case .yy31(let x) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule07(x: x))
+            if case .yy37(let x) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule07(x: x))
             }
         case 8: /* atom ::= LeftParen expression(x) RightParen */
             func codeBlockForRule08(x: Evaluatable) throws -> Evaluatable {
@@ -359,10 +384,10 @@ class WoodworkingCalculatorGrammar: CitronParser {
 
 #sourceLocation()
 }
-            if case .yy31(let x) = yySymbolOnStack(distanceFromTop: 1) {
-                return .yy31(try codeBlockForRule08(x: x))
+            if case .yy37(let x) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule08(x: x))
             }
-        case 9: /* quantity ::= integer(f) Feet integer(i_int) fraction(i_frac) Inches */
+        case 9: /* quantity ::= integer(f) Feet Space integer(i_int) Space fraction(i_frac) Inches */
             func codeBlockForRule09(f: Int, i_int: Int, i_frac: Fraction) throws -> Evaluatable {
 #sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 41)
 
@@ -370,12 +395,12 @@ class WoodworkingCalculatorGrammar: CitronParser {
 
 #sourceLocation()
 }
-            if case .yy4(let f) = yySymbolOnStack(distanceFromTop: 4),
-               case .yy4(let i_int) = yySymbolOnStack(distanceFromTop: 2),
-               case .yy32(let i_frac) = yySymbolOnStack(distanceFromTop: 1) {
-                return .yy31(try codeBlockForRule09(f: f, i_int: i_int, i_frac: i_frac))
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 6),
+               case .yy38(let i_int) = yySymbolOnStack(distanceFromTop: 3),
+               case .yy3(let i_frac) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule09(f: f, i_int: i_int, i_frac: i_frac))
             }
-        case 10: /* quantity ::= integer(f) Feet integer(i_int) fraction(i_frac) */
+        case 10: /* quantity ::= integer(f) Feet integer(i_int) Space fraction(i_frac) Inches */
             func codeBlockForRule10(f: Int, i_int: Int, i_frac: Fraction) throws -> Evaluatable {
 #sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 44)
 
@@ -383,198 +408,296 @@ class WoodworkingCalculatorGrammar: CitronParser {
 
 #sourceLocation()
 }
-            if case .yy4(let f) = yySymbolOnStack(distanceFromTop: 3),
-               case .yy4(let i_int) = yySymbolOnStack(distanceFromTop: 1),
-               case .yy32(let i_frac) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule10(f: f, i_int: i_int, i_frac: i_frac))
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 5),
+               case .yy38(let i_int) = yySymbolOnStack(distanceFromTop: 3),
+               case .yy3(let i_frac) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule10(f: f, i_int: i_int, i_frac: i_frac))
             }
-        case 11: /* quantity ::= integer(f) Feet integer(i_int) Inches */
-            func codeBlockForRule11(f: Int, i_int: Int) throws -> Evaluatable {
+        case 11: /* quantity ::= integer(f) Feet Space integer(i_int) Space fraction(i_frac) */
+            func codeBlockForRule11(f: Int, i_int: Int, i_frac: Fraction) throws -> Evaluatable {
 #sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 47)
 
-    return .rational(Fraction(f * 12 + i_int, 1))
+    return .rational(Fraction((f * 12 + i_int) * i_frac.den + i_frac.num, i_frac.den))
 
 #sourceLocation()
 }
-            if case .yy4(let f) = yySymbolOnStack(distanceFromTop: 3),
-               case .yy4(let i_int) = yySymbolOnStack(distanceFromTop: 1) {
-                return .yy31(try codeBlockForRule11(f: f, i_int: i_int))
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 5),
+               case .yy38(let i_int) = yySymbolOnStack(distanceFromTop: 2),
+               case .yy3(let i_frac) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule11(f: f, i_int: i_int, i_frac: i_frac))
             }
-        case 12: /* quantity ::= integer(f) Feet integer(i_int) */
-            func codeBlockForRule12(f: Int, i_int: Int) throws -> Evaluatable {
+        case 12: /* quantity ::= integer(f) Feet integer(i_int) Space fraction(i_frac) */
+            func codeBlockForRule12(f: Int, i_int: Int, i_frac: Fraction) throws -> Evaluatable {
 #sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 50)
 
+    return .rational(Fraction((f * 12 + i_int) * i_frac.den + i_frac.num, i_frac.den))
+
+#sourceLocation()
+}
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 4),
+               case .yy38(let i_int) = yySymbolOnStack(distanceFromTop: 2),
+               case .yy3(let i_frac) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule12(f: f, i_int: i_int, i_frac: i_frac))
+            }
+        case 13: /* quantity ::= integer(f) Feet Space integer(i_int) Inches */
+            func codeBlockForRule13(f: Int, i_int: Int) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 53)
+
     return .rational(Fraction(f * 12 + i_int, 1))
 
 #sourceLocation()
 }
-            if case .yy4(let f) = yySymbolOnStack(distanceFromTop: 2),
-               case .yy4(let i_int) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule12(f: f, i_int: i_int))
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 4),
+               case .yy38(let i_int) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule13(f: f, i_int: i_int))
             }
-        case 13: /* quantity ::= integer(f) Feet fraction(i_frac) Inches */
-            func codeBlockForRule13(f: Int, i_frac: Fraction) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 53)
-
-    return .rational(Fraction(f * 12 * i_frac.den + i_frac.num, i_frac.den))
-
-#sourceLocation()
-}
-            if case .yy4(let f) = yySymbolOnStack(distanceFromTop: 3),
-               case .yy32(let i_frac) = yySymbolOnStack(distanceFromTop: 1) {
-                return .yy31(try codeBlockForRule13(f: f, i_frac: i_frac))
-            }
-        case 14: /* quantity ::= integer(f) Feet fraction(i_frac) */
-            func codeBlockForRule14(f: Int, i_frac: Fraction) throws -> Evaluatable {
+        case 14: /* quantity ::= integer(f) Feet integer(i_int) Inches */
+            func codeBlockForRule14(f: Int, i_int: Int) throws -> Evaluatable {
 #sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 56)
 
+    return .rational(Fraction(f * 12 + i_int, 1))
+
+#sourceLocation()
+}
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 3),
+               case .yy38(let i_int) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule14(f: f, i_int: i_int))
+            }
+        case 15: /* quantity ::= integer(f) Feet Space integer(i_int) */
+            func codeBlockForRule15(f: Int, i_int: Int) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 59)
+
+    return .rational(Fraction(f * 12 + i_int, 1))
+
+#sourceLocation()
+}
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 3),
+               case .yy38(let i_int) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule15(f: f, i_int: i_int))
+            }
+        case 16: /* quantity ::= integer(f) Feet integer(i_int) */
+            func codeBlockForRule16(f: Int, i_int: Int) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 62)
+
+    return .rational(Fraction(f * 12 + i_int, 1))
+
+#sourceLocation()
+}
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 2),
+               case .yy38(let i_int) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule16(f: f, i_int: i_int))
+            }
+        case 17: /* quantity ::= integer(f) Feet Space fraction(i_frac) Inches */
+            func codeBlockForRule17(f: Int, i_frac: Fraction) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 65)
+
     return .rational(Fraction(f * 12 * i_frac.den + i_frac.num, i_frac.den))
 
 #sourceLocation()
 }
-            if case .yy4(let f) = yySymbolOnStack(distanceFromTop: 2),
-               case .yy32(let i_frac) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule14(f: f, i_frac: i_frac))
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 4),
+               case .yy3(let i_frac) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule17(f: f, i_frac: i_frac))
             }
-        case 15: /* quantity ::= integer(f) Feet real(i) Inches */
-            func codeBlockForRule15(f: Int, i: Double) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 59)
+        case 18: /* quantity ::= integer(f) Feet fraction(i_frac) Inches */
+            func codeBlockForRule18(f: Int, i_frac: Fraction) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 68)
+
+    return .rational(Fraction(f * 12 * i_frac.den + i_frac.num, i_frac.den))
+
+#sourceLocation()
+}
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 3),
+               case .yy3(let i_frac) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule18(f: f, i_frac: i_frac))
+            }
+        case 19: /* quantity ::= integer(f) Feet Space fraction(i_frac) */
+            func codeBlockForRule19(f: Int, i_frac: Fraction) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 71)
+
+    return .rational(Fraction(f * 12 * i_frac.den + i_frac.num, i_frac.den))
+
+#sourceLocation()
+}
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 3),
+               case .yy3(let i_frac) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule19(f: f, i_frac: i_frac))
+            }
+        case 20: /* quantity ::= integer(f) Feet fraction(i_frac) */
+            func codeBlockForRule20(f: Int, i_frac: Fraction) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 74)
+
+    return .rational(Fraction(f * 12 * i_frac.den + i_frac.num, i_frac.den))
+
+#sourceLocation()
+}
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 2),
+               case .yy3(let i_frac) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule20(f: f, i_frac: i_frac))
+            }
+        case 21: /* quantity ::= integer(f) Feet Space real(i) Inches */
+            func codeBlockForRule21(f: Int, i: Double) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 77)
 
     return .real(Double(f * 12) + i)
 
 #sourceLocation()
 }
-            if case .yy4(let f) = yySymbolOnStack(distanceFromTop: 3),
-               case .yy8(let i) = yySymbolOnStack(distanceFromTop: 1) {
-                return .yy31(try codeBlockForRule15(f: f, i: i))
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 4),
+               case .yy22(let i) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule21(f: f, i: i))
             }
-        case 16: /* quantity ::= integer(f) Feet real(i) */
-            func codeBlockForRule16(f: Int, i: Double) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 62)
+        case 22: /* quantity ::= integer(f) Feet real(i) Inches */
+            func codeBlockForRule22(f: Int, i: Double) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 80)
 
     return .real(Double(f * 12) + i)
 
 #sourceLocation()
 }
-            if case .yy4(let f) = yySymbolOnStack(distanceFromTop: 2),
-               case .yy8(let i) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule16(f: f, i: i))
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 3),
+               case .yy22(let i) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule22(f: f, i: i))
             }
-        case 17: /* quantity ::= integer(f) Feet */
-            func codeBlockForRule17(f: Int) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 65)
+        case 23: /* quantity ::= integer(f) Feet real(i) */
+            func codeBlockForRule23(f: Int, i: Double) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 83)
+
+    return .real(Double(f * 12) + i)
+
+#sourceLocation()
+}
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 2),
+               case .yy22(let i) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule23(f: f, i: i))
+            }
+        case 24: /* quantity ::= integer(f) Feet Space real(i) */
+            func codeBlockForRule24(f: Int, i: Double) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 86)
+
+    return .real(Double(f * 12) + i)
+
+#sourceLocation()
+}
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 3),
+               case .yy22(let i) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule24(f: f, i: i))
+            }
+        case 25: /* quantity ::= integer(f) Feet */
+            func codeBlockForRule25(f: Int) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 89)
 
     return .rational(Fraction(f * 12, 1))
 
 #sourceLocation()
 }
-            if case .yy4(let f) = yySymbolOnStack(distanceFromTop: 1) {
-                return .yy31(try codeBlockForRule17(f: f))
+            if case .yy38(let f) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule25(f: f))
             }
-        case 18: /* quantity ::= real(f) Feet */
-            func codeBlockForRule18(f: Double) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 68)
+        case 26: /* quantity ::= real(f) Feet */
+            func codeBlockForRule26(f: Double) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 92)
 
     return .real(f * 12)
 
 #sourceLocation()
 }
-            if case .yy8(let f) = yySymbolOnStack(distanceFromTop: 1) {
-                return .yy31(try codeBlockForRule18(f: f))
+            if case .yy22(let f) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule26(f: f))
             }
-        case 19: /* quantity ::= integer(i_int) fraction(i_frac) Inches */
-            func codeBlockForRule19(i_int: Int, i_frac: Fraction) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 71)
+        case 27: /* quantity ::= integer(i_int) Space fraction(i_frac) Inches */
+            func codeBlockForRule27(i_int: Int, i_frac: Fraction) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 95)
 
     return .rational(Fraction(i_int * i_frac.den + i_frac.num, i_frac.den))
 
 #sourceLocation()
 }
-            if case .yy4(let i_int) = yySymbolOnStack(distanceFromTop: 2),
-               case .yy32(let i_frac) = yySymbolOnStack(distanceFromTop: 1) {
-                return .yy31(try codeBlockForRule19(i_int: i_int, i_frac: i_frac))
+            if case .yy38(let i_int) = yySymbolOnStack(distanceFromTop: 3),
+               case .yy3(let i_frac) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule27(i_int: i_int, i_frac: i_frac))
             }
-        case 20: /* quantity ::= integer(i_int) fraction(i_frac) */
-            func codeBlockForRule20(i_int: Int, i_frac: Fraction) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 74)
+        case 28: /* quantity ::= integer(i_int) Space fraction(i_frac) */
+            func codeBlockForRule28(i_int: Int, i_frac: Fraction) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 98)
 
     return .rational(Fraction(i_int * i_frac.den + i_frac.num, i_frac.den))
 
 #sourceLocation()
 }
-            if case .yy4(let i_int) = yySymbolOnStack(distanceFromTop: 1),
-               case .yy32(let i_frac) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule20(i_int: i_int, i_frac: i_frac))
+            if case .yy38(let i_int) = yySymbolOnStack(distanceFromTop: 2),
+               case .yy3(let i_frac) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule28(i_int: i_int, i_frac: i_frac))
             }
-        case 21: /* quantity ::= integer(i_int) Inches */
-            func codeBlockForRule21(i_int: Int) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 77)
+        case 29: /* quantity ::= integer(i_int) Inches */
+            func codeBlockForRule29(i_int: Int) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 101)
 
     return .rational(Fraction(i_int, 1))
 
 #sourceLocation()
 }
-            if case .yy4(let i_int) = yySymbolOnStack(distanceFromTop: 1) {
-                return .yy31(try codeBlockForRule21(i_int: i_int))
+            if case .yy38(let i_int) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule29(i_int: i_int))
             }
-        case 22: /* quantity ::= integer(i_int) */
-            func codeBlockForRule22(i_int: Int) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 80)
+        case 30: /* quantity ::= integer(i_int) */
+            func codeBlockForRule30(i_int: Int) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 104)
 
     return .rational(Fraction(i_int, 1))
 
 #sourceLocation()
 }
-            if case .yy4(let i_int) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule22(i_int: i_int))
+            if case .yy38(let i_int) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule30(i_int: i_int))
             }
-        case 23: /* quantity ::= fraction(i_frac) Inches */
-            func codeBlockForRule23(i_frac: Fraction) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 83)
+        case 31: /* quantity ::= fraction(i_frac) Inches */
+            func codeBlockForRule31(i_frac: Fraction) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 107)
 
     return .rational(Fraction(i_frac.num, i_frac.den))
 
 #sourceLocation()
 }
-            if case .yy32(let i_frac) = yySymbolOnStack(distanceFromTop: 1) {
-                return .yy31(try codeBlockForRule23(i_frac: i_frac))
+            if case .yy3(let i_frac) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule31(i_frac: i_frac))
             }
-        case 24: /* quantity ::= fraction(i_frac) */
-            func codeBlockForRule24(i_frac: Fraction) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 86)
+        case 32: /* quantity ::= fraction(i_frac) */
+            func codeBlockForRule32(i_frac: Fraction) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 110)
 
     return .rational(Fraction(i_frac.num, i_frac.den))
 
 #sourceLocation()
 }
-            if case .yy32(let i_frac) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule24(i_frac: i_frac))
+            if case .yy3(let i_frac) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule32(i_frac: i_frac))
             }
-        case 25: /* quantity ::= real(i) Inches */
-            func codeBlockForRule25(i: Double) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 89)
+        case 33: /* quantity ::= real(i) Inches */
+            func codeBlockForRule33(i: Double) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 113)
 
     return .real(i)
 
 #sourceLocation()
 }
-            if case .yy8(let i) = yySymbolOnStack(distanceFromTop: 1) {
-                return .yy31(try codeBlockForRule25(i: i))
+            if case .yy22(let i) = yySymbolOnStack(distanceFromTop: 1) {
+                return .yy37(try codeBlockForRule33(i: i))
             }
-        case 26: /* quantity ::= real(i) */
-            func codeBlockForRule26(i: Double) throws -> Evaluatable {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 92)
+        case 34: /* quantity ::= real(i) */
+            func codeBlockForRule34(i: Double) throws -> Evaluatable {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 116)
 
     return .real(i)
 
 #sourceLocation()
 }
-            if case .yy8(let i) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy31(try codeBlockForRule26(i: i))
+            if case .yy22(let i) = yySymbolOnStack(distanceFromTop: 0) {
+                return .yy37(try codeBlockForRule34(i: i))
             }
-        case 27: /* integer ::= Integer(x) */
-            func codeBlockForRule27(x: Token) throws -> Int {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 97)
+        case 35: /* integer ::= Integer(x) */
+            func codeBlockForRule35(x: Token) throws -> Int {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 121)
 
     if case .integer(let int) = x {
         return int
@@ -585,11 +708,11 @@ class WoodworkingCalculatorGrammar: CitronParser {
 #sourceLocation()
 }
             if case .yy0(let x) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy4(try codeBlockForRule27(x: x))
+                return .yy38(try codeBlockForRule35(x: x))
             }
-        case 28: /* fraction ::= Fraction(x) */
-            func codeBlockForRule28(x: Token) throws -> Fraction {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 106)
+        case 36: /* fraction ::= Fraction(x) */
+            func codeBlockForRule36(x: Token) throws -> Fraction {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 130)
 
     if case .fraction(let fraction) = x {
         return fraction
@@ -600,11 +723,11 @@ class WoodworkingCalculatorGrammar: CitronParser {
 #sourceLocation()
 }
             if case .yy0(let x) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy32(try codeBlockForRule28(x: x))
+                return .yy3(try codeBlockForRule36(x: x))
             }
-        case 29: /* real ::= Real(x) */
-            func codeBlockForRule29(x: Token) throws -> Double {
-#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 115)
+        case 37: /* real ::= Real(x) */
+            func codeBlockForRule37(x: Token) throws -> Double {
+#sourceLocation(file: "WoodworkingCalculatorGrammar.y", line: 139)
 
     if case .real(let real) = x {
         return real
@@ -615,7 +738,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
 #sourceLocation()
 }
             if case .yy0(let x) = yySymbolOnStack(distanceFromTop: 0) {
-                return .yy8(try codeBlockForRule29(x: x))
+                return .yy22(try codeBlockForRule37(x: x))
             }
         default:
             fatalError("Can't invoke code block for rule number \(ruleNumber) - no such rule")
@@ -629,7 +752,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
     }
 
     func yyUnwrapResultFromSymbol(_ symbol: CitronSymbol) -> CitronResult {
-        if case .yy31(let result) = symbol {
+        if case .yy37(let result) = symbol {
             return result
         } else {
             fatalError("Unexpected mismatch in result type")
@@ -659,8 +782,8 @@ class WoodworkingCalculatorGrammar: CitronParser {
 
     func yySymbolContent(_ symbol: CitronSymbol) -> Any { return symbol.typeErasedContent() }
 
-    let yyStartSymbolNumber: CitronSymbolNumber = 12
-    let yyEndStateNumber: CitronStateNumber = 10
+    let yyStartSymbolNumber: CitronSymbolNumber = 13
+    let yyEndStateNumber: CitronStateNumber = 13
 
     var yyErrorCaptureSavedError: (error: Error, isLexerError: Bool)? = nil
     var yyErrorCaptureTokensSinceError: [(token: CitronToken, tokenCode: CitronTokenCode)] = []
