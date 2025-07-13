@@ -153,17 +153,33 @@ func parse(_ input: String) throws -> Evaluatable {
     return try parser.endParsing()
 }
 
+// This function abuses the simplicity of the grammar whereby almost all tokens are single
+// characters or repetitions of the same kind of character, so that it generally does not require
+// multiple keystrokes "uninterrupted" to produce a valid token. This means that almost all
+// cases where parsing terminates due to unexpected tokens, it's because the token is indeed
+// illegal in that location, rather than it being an incomplete token that is being mis-parsed. The
+// glaring exception is that fractions require two distinct numbers separated by a slash, which is
+// a minimum of three keystrokes in a row.
 func isValidPrefix(_ input: String) -> Bool {
-    do {
-        _ = try parse(input)
-        return true
-    } catch is CitronParserUnexpectedEndOfInputError {
-        return true
-    } catch is _CitronParserUnexpectedTokenError<WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode> {
-        return false
-    } catch {
-        return false
+    func check(_ s: String) -> Bool {
+        do {
+            _ = try parse(input)
+            return true
+        } catch is CitronParserUnexpectedEndOfInputError {
+            return true
+        } catch is _CitronParserUnexpectedTokenError<WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode> {
+            return false
+        } catch {
+            return false
+        }
     }
+
+    // This is where the abuse really happens. Since fractions are the only token that has no legal
+    // prefixes that are shorter than 3 characters, we attempt to manufacture one to see if that
+    // would make this a legal prefix. I don't think this risks any false positives w/r/t the slash
+    // also functioning as an operator, but even if it doesn't, better too permissive than not
+    // permissive enough.
+    return check(input) || (input.contains(/[0-9]$/) && check(input + "/1"))
 }
 
 enum UsCustomaryPrecision: Equatable {
