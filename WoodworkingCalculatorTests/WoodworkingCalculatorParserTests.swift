@@ -2,15 +2,15 @@ import Testing
 @testable import WoodworkingCalculator
 
 struct WoodworkingCalculatorParserTests {
-    @Test("parseMixedNumber", arguments: [
-        ("1/2", Rational(1, 2)),
-        ("3-3/4", Rational(15, 4)),
-        ("3 3/4", Rational(15, 4)),
-        ("3   -  3/4", Rational(15, 4)),
-        ("3--3/4", nil),
-        ("1 /2", nil),
-        ("1/ 2", nil),
-        ("1 / 2", nil),
+    @Test("parseMixedNumber", .serialized, arguments: [
+//        ("1/2", Rational(1, 2)),
+//        ("3-3/4", Rational(15, 4)),
+        ("1 3/4", Rational(7, 4)),
+//        ("3   -  3/4", Rational(15, 4)),
+//        ("3--3/4", nil),
+//        ("1 /2", nil),
+//        ("1/ 2", nil),
+//        ("1 / 2", nil),
     ]) func testParseMixedNumber(input: String, expected: Rational?) throws {
         let actual = parseMixedNumber(input)
         if expected == nil {

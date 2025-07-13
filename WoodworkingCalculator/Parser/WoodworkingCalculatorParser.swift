@@ -1,3 +1,5 @@
+import RegexBuilder
+
 enum Token {
     case void
     case integer(Int)
@@ -100,39 +102,77 @@ extension Evaluatable: CustomStringConvertible {
 // modify it.
 typealias LexedTokenData = (WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode)
 
+private let mixedNumberRegexString = "([0-9]+ +)?[0-9]+/[0-9]+"
+// https://github.com/swiftlang/swift/issues/83022
+private let mixedNumberRegex = Regex {
+    Optionally {
+        Capture {
+            OneOrMore(.digit)
+        } transform: { Int($0)! }
+        OneOrMore { " " }
+    }
+    Capture {
+        OneOrMore(.digit)
+    } transform: { Int($0)! }
+    "/"
+    Capture {
+        OneOrMore(.digit)
+    } transform: { Int($0)! }
+}
+
 func parseMixedNumber(_ input: String) -> LexedTokenData? {
-    if let result = try? #/((?<whole>[0-9]+) *[- ] *)?(?<num>[0-9]+)/(?<den>[0-9]+)/#.wholeMatch(in: input) {
-        let whole = if let i = result.whole { Int(i).unsafelyUnwrapped } else { 0 }
-        let num = Int(result.num).unsafelyUnwrapped
-        let den = Int(result.den).unsafelyUnwrapped
-        return (.rational(Rational(whole * den + num, den)), .MixedNumber)
+    if let match = try? mixedNumberRegex.wholeMatch(in: input) {
+//        let whole = match.1 ?? 0
+//        let num = match.2
+//        let den = match.3
+        print(match.1, match.2, match.3)
+        return nil
+//        return (.rational(Rational(whole * den + num, den)), .MixedNumber)
     } else {
         return nil
     }
+}
+
+// Note that `[0-9]+.` is considered an integer, and is covered below.
+private let realRegexString = "([0-9]+)?\\.[0-9]+"
+private let realRegex = Regex {
+    Capture {
+        Optionally {
+            OneOrMore(.digit)
+        }
+        "."
+        OneOrMore(.digit)
+    } transform: { Double($0)! }
 }
 
 func parseReal(_ input: String) -> LexedTokenData? {
-    if let _ = try? #/([0-9]+)?\.[0-9]+/#.wholeMatch(in: input) {
-        let real = Double(input).unsafelyUnwrapped
-        return (.real(real), .Real)
+    if let match = try? realRegex.wholeMatch(in: input) {
+        return (.real(match.1), .Real)
     } else {
         return nil
     }
 }
 
+private let integerRegexString = "[0-9]+\\.?"
+private let integerRegex = Regex {
+    Capture {
+        OneOrMore(.digit)
+    } transform: { Int($0)! }
+    Optionally { "." }
+}
+
 func parseInteger(_ input: String) -> LexedTokenData? {
-    if let result = try? #/(?<int>[0-9]+)\.?/#.wholeMatch(in: input) {
-        let int = Int(result.int).unsafelyUnwrapped
-        return (.integer(int), .Integer)
+    if let match = try? integerRegex.wholeMatch(in: input) {
+        return (.integer(match.1), .Integer)
     } else {
         return nil
     }
 }
 
 let lexer = CitronLexer<LexedTokenData>(rules: [
-        .regexPattern("([0-9]+ +)?[0-9]+/[0-9]+", parseMixedNumber),
-        .regexPattern("([0-9]+)?\\.[0-9]+", parseReal),
-        .regexPattern("[0-9]+\\.?", parseInteger),
+        .regexPattern(mixedNumberRegexString, parseMixedNumber),
+        .regexPattern(realRegexString, parseReal),
+        .regexPattern(integerRegexString, parseInteger),
         .string("'", (.void, .Feet)),
         .string("\"", (.void, .Inches)),
         .string("+", (.void, .Add)),
