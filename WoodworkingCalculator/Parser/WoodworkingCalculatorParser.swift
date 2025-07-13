@@ -1,13 +1,13 @@
 enum Token {
     case void
     case integer(Int)
-    case fraction(Fraction)
+    case rational(Rational)
     case real(Double)
 }
 
 enum Evaluatable {
     // n.b. all quantities are in inches (or fractions thereof)
-    case rational(Fraction)
+    case rational(Rational)
     case real(Double)
     indirect case add(Evaluatable, Evaluatable)
     indirect case subtract(Evaluatable, Evaluatable)
@@ -16,7 +16,7 @@ enum Evaluatable {
 }
 
 enum EvaluatedResult: Equatable {
-    case rational(Fraction)
+    case rational(Rational)
     case real(Double)
 }
 
@@ -34,11 +34,11 @@ extension Double {
 extension Evaluatable: CustomStringConvertible {
     var description: String {
         switch (self) {
-        case .rational(let f):
-            if f.den == 1 {
-                return "\(f.num)"
+        case .rational(let r):
+            if r.den == 1 {
+                return "\(r.num)"
             } else {
-                return "\(f)"
+                return r.description
             }
         case .real(let r):
             return "\(r)"
@@ -100,12 +100,12 @@ extension Evaluatable: CustomStringConvertible {
 // modify it.
 typealias LexedTokenData = (WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode)
 
-func parseFraction(_ input: String) -> LexedTokenData? {
+func parseMixedNumber(_ input: String) -> LexedTokenData? {
     if let result = try? #/((?<whole>[0-9]+) *[- ] *)?(?<num>[0-9]+)/(?<den>[0-9]+)/#.wholeMatch(in: input) {
         let whole = if let i = result.whole { Int(i).unsafelyUnwrapped } else { 0 }
         let num = Int(result.num).unsafelyUnwrapped
         let den = Int(result.den).unsafelyUnwrapped
-        return (.fraction(Fraction(whole * den + num, den)), .Fraction)
+        return (.rational(Rational(whole * den + num, den)), .MixedNumber)
     } else {
         return nil
     }
@@ -130,7 +130,7 @@ func parseInteger(_ input: String) -> LexedTokenData? {
 }
 
 let lexer = CitronLexer<LexedTokenData>(rules: [
-        .regexPattern("([0-9]+ +)?[0-9]+/[0-9]+", parseFraction),
+        .regexPattern("([0-9]+ +)?[0-9]+/[0-9]+", parseMixedNumber),
         .regexPattern("([0-9]+)?\\.[0-9]+", parseReal),
         .regexPattern("[0-9]+\\.?", parseInteger),
         .string("'", (.void, .Feet)),
@@ -158,7 +158,7 @@ func parse(_ input: String) throws -> Evaluatable {
 // multiple keystrokes "uninterrupted" to produce a valid token. This means that almost all
 // cases where parsing terminates due to unexpected tokens, it's because the token is indeed
 // illegal in that location, rather than it being an incomplete token that is being mis-parsed. The
-// glaring exception is that fractions require two distinct numbers separated by a slash, which is
+// glaring exception is that rationals require two distinct numbers separated by a slash, which is
 // a minimum of three keystrokes in a row.
 func isValidPrefix(_ input: String) -> Bool {
     func check(_ s: String) -> Bool {
@@ -174,7 +174,8 @@ func isValidPrefix(_ input: String) -> Bool {
         }
     }
     
-    // This is where the abuse really happens. Since fractions are the only token that has no legal
+    // HACK HACK HACK
+    // This is where the abuse really happens. Since rationals are the only token that has no legal
     // prefixes that are shorter than 3 characters, we attempt to manufacture one to see if that
     // would make this a legal prefix. I don't think this risks any false positives w/r/t the slash
     // also functioning as an operator, but even if it doesn't, better too permissive than not
@@ -187,9 +188,9 @@ enum UsCustomaryPrecision: Equatable {
     case inches
 }
 
-func formatAsUsCustomary(_ fraction: Fraction, _ precision: UsCustomaryPrecision = .feet) -> String {
-    var n = fraction.reduced.num
-    let d = fraction.reduced.den
+func formatAsUsCustomary(_ rational: Rational, _ precision: UsCustomaryPrecision = .feet) -> String {
+    var n = rational.reduced.num
+    let d = rational.reduced.den
     var parts: [String] = []
     
     if d == 1 {
@@ -208,9 +209,9 @@ func formatAsUsCustomary(_ fraction: Fraction, _ precision: UsCustomaryPrecision
         }
         
         if n > d {
-            parts.append("\(n / d) \(Fraction(n % d, d))\"")
+            parts.append("\(n / d) \(Rational(n % d, d))\"")
         } else {
-            parts.append("\(Fraction(n, d))\"")
+            parts.append("\(Rational(n, d))\"")
         }
     }
     

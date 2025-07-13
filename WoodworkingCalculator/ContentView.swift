@@ -2,7 +2,7 @@ import SwiftUI
 
 enum InputValue {
     case string(String)
-    case result(Fraction, Double?)
+    case result(Rational, Double?)
 }
 
 struct Input: CustomStringConvertible {
@@ -232,14 +232,14 @@ struct ContentView: View {
             return
         }
         
-        let (fraction, error) = switch result {
+        let (rational, error) = switch result {
         case .rational(let r):
             r.roundedToPrecision(precision)
         case .real(let r):
-            r.toNearestFraction(withPrecision: precision)
+            r.toNearestRational(withPrecision: precision)
         }
         previous = input.description
-        input.set(.result(fraction, error))
+        input.set(.result(rational, error))
         isErrorPresented = false
     }
 }

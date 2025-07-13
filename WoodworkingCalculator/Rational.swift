@@ -1,4 +1,4 @@
-struct Fraction: Equatable, Hashable, CustomStringConvertible {
+struct Rational: Equatable, Hashable, CustomStringConvertible {
     let num: Int
     let den: Int
     
@@ -7,16 +7,16 @@ struct Fraction: Equatable, Hashable, CustomStringConvertible {
         self.den = den
     }
     
-    var reduced: Fraction {
+    var reduced: Rational {
         let divisor = gcd(self.num, self.den)
-        return Fraction(self.num / divisor, self.den / divisor)
+        return Rational(self.num / divisor, self.den / divisor)
     }
     
-    func roundedToPrecision(_ precision: Int) -> (Fraction, Double?) {
+    func roundedToPrecision(_ precision: Int) -> (Rational, Double?) {
         if self.den <= precision && self.den % precision == 0 {
             return (self, nil)
         } else {
-            return Double(self).toNearestFraction(withPrecision: precision)
+            return Double(self).toNearestRational(withPrecision: precision)
         }
     }
     
@@ -25,26 +25,26 @@ struct Fraction: Equatable, Hashable, CustomStringConvertible {
 //        return "\(asSuperscript(self.num))\u{2044}\(asSubscript(self.den))"
     }
     
-    static func == (left: Fraction, right: Fraction) -> Bool {
+    static func == (left: Rational, right: Rational) -> Bool {
         let lreduced = left.reduced
         let rreduced = right.reduced
         return lreduced.num == rreduced.num && lreduced.den == rreduced.den
     }
     
-    static func + (left: Fraction, right: Fraction) -> Fraction {
-        return Fraction(left.num * right.den + right.num * left.den, left.den * right.den).reduced
+    static func + (left: Rational, right: Rational) -> Rational {
+        return Rational(left.num * right.den + right.num * left.den, left.den * right.den).reduced
     }
     
-    static func - (left: Fraction, right: Fraction) -> Fraction {
-        return Fraction(left.num * right.den - right.num * left.den, left.den * right.den).reduced
+    static func - (left: Rational, right: Rational) -> Rational {
+        return Rational(left.num * right.den - right.num * left.den, left.den * right.den).reduced
     }
     
-    static func * (left: Fraction, right: Fraction) -> Fraction {
-        return Fraction(left.num * right.num, left.den * right.den).reduced
+    static func * (left: Rational, right: Rational) -> Rational {
+        return Rational(left.num * right.num, left.den * right.den).reduced
     }
     
-    static func / (left: Fraction, right: Fraction) -> Fraction {
-        return Fraction(left.num * right.den, left.den * right.num).reduced
+    static func / (left: Rational, right: Rational) -> Rational {
+        return Rational(left.num * right.den, left.den * right.num).reduced
     }
 }
 
@@ -91,25 +91,25 @@ func asSubscript(_ int: Int) -> String {
 }
 
 extension Double {
-    init(_ fraction: Fraction) {
-        self = Double(fraction.num) / Double(fraction.den)
+    init(_ rational: Rational) {
+        self = Double(rational.num) / Double(rational.den)
     }
     
-    func toNearestFraction(withPrecision: Int, epsilon: Double = 0.001) -> (Fraction, Double?) {
-        let upperFraction = Fraction(Int((self * Double(withPrecision)).rounded(.up)), withPrecision).reduced
-        let lowerFraction = Fraction(Int((self * Double(withPrecision)).rounded(.down)), withPrecision).reduced
+    func toNearestRational(withPrecision: Int, epsilon: Double = 0.001) -> (Rational, Double?) {
+        let higherRational = Rational(Int((self * Double(withPrecision)).rounded(.up)), withPrecision).reduced
+        let lowerRational = Rational(Int((self * Double(withPrecision)).rounded(.down)), withPrecision).reduced
         
-        let upperError = Double(upperFraction) - self
-        let lowerError = self - Double(lowerFraction)
+        let upperError = Double(higherRational) - self
+        let lowerError = self - Double(lowerRational)
         
         if upperError <= epsilon {
-            return (upperFraction, nil)
+            return (higherRational, nil)
         } else if lowerError <= epsilon {
-            return (lowerFraction, nil)
+            return (lowerRational, nil)
         } else if upperError < lowerError {
-            return (upperFraction, upperError)
+            return (higherRational, upperError)
         } else {
-            return (lowerFraction, -lowerError)
+            return (lowerRational, -lowerError)
         }
     }
 }

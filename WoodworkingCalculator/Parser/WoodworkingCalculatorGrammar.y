@@ -38,23 +38,17 @@ atom ::= LeftParen expression(x) RightParen. {
 }
 
 %nonterminal_type quantity Evaluatable
-quantity ::= integer(f) Feet integer(i_int) fraction(i_frac) Inches. {
-    return .rational(Fraction((f * 12 + i_int) * i_frac.den + i_frac.num, i_frac.den))
+quantity ::= integer(f) Feet mixed_number(i) Inches. {
+    return .rational(Rational((f * 12) * i.den + i.num, i.den))
 }
-quantity ::= integer(f) Feet integer(i_int) fraction(i_frac). {
-    return .rational(Fraction((f * 12 + i_int) * i_frac.den + i_frac.num, i_frac.den))
+quantity ::= integer(f) Feet mixed_number(i). {
+    return .rational(Rational((f * 12) * i.den + i.num, i.den))
 }
-quantity ::= integer(f) Feet integer(i_int) Inches. {
-    return .rational(Fraction(f * 12 + i_int, 1))
+quantity ::= integer(f) Feet integer(i) Inches. {
+    return .rational(Rational(f * 12 + i, 1))
 }
-quantity ::= integer(f) Feet integer(i_int). {
-    return .rational(Fraction(f * 12 + i_int, 1))
-}
-quantity ::= integer(f) Feet fraction(i_frac) Inches. {
-    return .rational(Fraction(f * 12 * i_frac.den + i_frac.num, i_frac.den))
-}
-quantity ::= integer(f) Feet fraction(i_frac). {
-    return .rational(Fraction(f * 12 * i_frac.den + i_frac.num, i_frac.den))
+quantity ::= integer(f) Feet integer(i). {
+    return .rational(Rational(f * 12 + i, 1))
 }
 quantity ::= integer(f) Feet real(i) Inches. {
     return .real(Double(f * 12) + i)
@@ -63,28 +57,22 @@ quantity ::= integer(f) Feet real(i). {
     return .real(Double(f * 12) + i)
 }
 quantity ::= integer(f) Feet. {
-    return .rational(Fraction(f * 12, 1))
+    return .rational(Rational(f * 12, 1))
 }
 quantity ::= real(f) Feet. {
     return .real(f * 12)
 }
-quantity ::= integer(i_int) fraction(i_frac) Inches. {
-    return .rational(Fraction(i_int * i_frac.den + i_frac.num, i_frac.den))
+quantity ::= mixed_number(i) Inches. {
+    return .rational(i)
 }
-quantity ::= integer(i_int) fraction(i_frac). {
-    return .rational(Fraction(i_int * i_frac.den + i_frac.num, i_frac.den))
+quantity ::= mixed_number(i). {
+    return .rational(i)
 }
-quantity ::= integer(i_int) Inches. {
-    return .rational(Fraction(i_int, 1))
+quantity ::= integer(i) Inches. {
+    return .rational(Rational(i, 1))
 }
-quantity ::= integer(i_int). {
-    return .rational(Fraction(i_int, 1))
-}
-quantity ::= fraction(i_frac) Inches. {
-    return .rational(Fraction(i_frac.num, i_frac.den))
-}
-quantity ::= fraction(i_frac). {
-    return .rational(Fraction(i_frac.num, i_frac.den))
+quantity ::= integer(i). {
+    return .rational(Rational(i, 1))
 }
 quantity ::= real(i) Inches. {
     return .real(i)
@@ -102,12 +90,12 @@ integer ::= Integer(x). {
     }
 }
 
-%nonterminal_type fraction Fraction
-fraction ::= Fraction(x). {
-    if case .fraction(let fraction) = x {
-        return fraction
+%nonterminal_type mixed_number Rational
+mixed_number ::= MixedNumber(x). {
+    if case .rational(let r) = x {
+        return r
     } else {
-        preconditionFailure("lexer did not return Token.fraction for the Fraction token")
+        preconditionFailure("lexer did not return Token.rational for the MixedNumber token")
     }
 }
 
