@@ -1,28 +1,75 @@
 import SwiftUI
 
-enum InputValue {
-    case string(String)
-    case result(Rational, Double?)
-}
-
-struct Input: CustomStringConvertible {
-    private var value: InputValue = .string("")
-    @AppStorage(Constants.AppStorage.displayInchesOnlyKey) private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
+class Input: ObservableObject {
+    enum RawValue {
+        case string(String)
+        case result(CalculationResult)
+    }
     
-    mutating func set(_ value: InputValue) {
+    @Published
+    private var value: RawValue = .string("")
+    @AppStorage(Constants.AppStorage.displayInchesOnlyKey)
+    private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
+    @AppStorage(Constants.AppStorage.precisionKey)
+    private var precision: Int = Constants.AppStorage.precisionDefault
+    
+    var stringified: String {
+        switch value {
+        case .string(let s):
+            return s
+        case .result(let r):
+            let (rational, _) = switch r {
+            case .rational(let r):
+                r.roundedToPrecision(precision)
+            case .real(let r):
+                r.toNearestRational(withPrecision: precision)
+            }
+            return formatAsUsCustomary(rational, displayInchesOnly ? .inches : .feet)
+        }
+    }
+    
+    var error: (Int, Double)? {
+        switch value {
+        case .string:
+            return nil
+        case .result(let r):
+            let (_, error) = switch r {
+            case .rational(let r):
+                r.roundedToPrecision(precision)
+            case .real(let r):
+                r.toNearestRational(withPrecision: precision)
+            }
+            if let e = error {
+                return (precision, e)
+            } else {
+                return nil
+            }
+        }
+    }
+    
+    var backspaceable: Bool {
+        return switch value {
+        case .string(let s):
+            !s.isEmpty
+        case .result:
+            false
+        }
+    }
+    
+    func set(_ value: RawValue) {
         self.value = value
     }
     
-    mutating func append(_ string: String, replaceResult: Bool = false) -> Bool {
+    func append(_ string: String, replaceResult: Bool = false) -> Bool {
         let candidate: String? = {
             if replaceResult, case .result = value {
                 if string != " " {
                     return string
                 }
             } else {
-                let stringified = description
-                if string != " " || stringified.last != " " {
-                    return stringified + string
+                let s = stringified
+                if string != " " || s.last != " " {
+                    return s + string
                 }
             }
             return nil
@@ -36,36 +83,9 @@ struct Input: CustomStringConvertible {
         }
     }
     
-    mutating func backspace() {
-        let stringified = description
-        value = .string(stringified.count == 0 ? "" : String(stringified.prefix(stringified.count - 1)))
-    }
-    
-    var description: String {
-        return switch value {
-        case .string(let s):
-            s
-        case .result(let f, _):
-            formatAsUsCustomary(f, displayInchesOnly ? .inches : .feet)
-        }
-    }
-    
-    var error: Double? {
-        return switch value {
-        case .string:
-            nil
-        case .result(_, let e):
-            e
-        }
-    }
-    
-    var backspaceable: Bool {
-        return switch value {
-        case .string(let s):
-            !s.isEmpty
-        case .result:
-            false
-        }
+    func backspace() {
+        let s = stringified
+        value = .string(s.count == 0 ? "" : String(s.prefix(s.count - 1)))
     }
 }
 
@@ -73,9 +93,7 @@ struct ContentView: View {
     @State private var previous: String = ""
     @State private var isSettingsPresented: Bool = false
     @State private var isErrorPresented: Bool = false
-    @State private var input: Input = Input()
-    @AppStorage(Constants.AppStorage.displayInchesOnlyKey) private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
-    @AppStorage(Constants.AppStorage.precisionKey) private var precision: Int = Constants.AppStorage.precisionDefault
+    @StateObject private var input: Input = Input()
     
     private func append(_ string: String, replaceResult: Bool = false) {
         if input.append(string, replaceResult: replaceResult) {
@@ -84,7 +102,7 @@ struct ContentView: View {
     }
     
     private func appendToleratingPrefix(_ preexistingPrefix: String, _ suffix: String) {
-        if input.description.hasSuffix(preexistingPrefix) && input.append(suffix) {
+        if input.stringified.hasSuffix(preexistingPrefix) && input.append(suffix) {
             previous = ""
         } else if input.append(preexistingPrefix + suffix) {
             previous = ""
@@ -120,7 +138,7 @@ struct ContentView: View {
                     isErrorPresented = false
                 }
             HStack {
-                if input.error != nil {
+                if let (precision, error) = input.error {
                     Button(action: { isErrorPresented.toggle() }) {
                         Text("≈")
                             .font(.system(size: 40, weight: .bold))
@@ -130,7 +148,7 @@ struct ContentView: View {
                     }
                     .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
                         VStack {
-                            Text("Approximation error \(String(format: "%+.3f", input.error!))\"")
+                            Text("Approximation error \(String(format: "%+.3f", error))\"")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Spacer()
                             Text("Rounded to the nearest 1/\(precision)\"")
@@ -156,13 +174,7 @@ struct ContentView: View {
 //                        }
 //                        accumulator.append(AttributedString(s))
 //                    }
-                
-                // HACK FIXME
-                // This is because input.description is a function of displayInchesOnly, but since we don't
-                // directly access displayInchesOnly in this render function and the Input object doesn't
-                // correctly broadcast changes to `description` based on a change on displayInchesOnly, we
-                // hack it back in by accessing it here. The correct fix is to fix Input to cooperate.
-                Text(displayInchesOnly ? input.description : input.description)
+                Text(input.stringified)
                     .frame(
                         minWidth: 0,
                         maxWidth:  .infinity,
@@ -232,19 +244,14 @@ struct ContentView: View {
     }
     
     private func evaluate() {
-        let result = EvaluatableCalculation.from(input.description)?.evaluate()
+        let inputString = input.stringified
+        let result = EvaluatableCalculation.from(inputString)?.evaluate()
         guard let result else {
             return
         }
-        
-        let (rational, error) = switch result {
-        case .rational(let r):
-            r.roundedToPrecision(precision)
-        case .real(let r):
-            r.toNearestRational(withPrecision: precision)
-        }
-        previous = input.description
-        input.set(.result(rational, error))
+
+        previous = inputString
+        input.set(.result(result))
         isErrorPresented = false
     }
 }

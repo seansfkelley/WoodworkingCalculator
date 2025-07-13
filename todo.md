@@ -8,6 +8,7 @@ appearance
 calculation features
 - what to do about negative values?
 - support parentheses? where to put buttons?
+    - could put them on the bottom row with a +/- (assuming negative values are supported), but would probably need a fourth button
 - support pasting -- should evaluate immediately or just put the stuff in?
 
 fractions and division
@@ -17,9 +18,4 @@ fractions and division
 - reconcile / versus ÷: the fractional helpers type / but it would be nice if the ÷ button typed a literal ÷
 
 best practices
-- figure out how to not have to punch AppStorage through 3 different places
 - add UI tests
-- rethink Input object
-    - since `description` can change when `displayInchesOnly` changes, it should be @Published or something similar so that when downstream things render based on it they get the latest (i.e. the input)
-    - same as above for precision, so you can change it after you've already calculated a result
-        - this means that it should hold the CalculationResult, not the rounded result
