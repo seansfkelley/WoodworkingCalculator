@@ -157,7 +157,7 @@ struct ContentView: View {
 //                        accumulator.append(AttributedString(s))
 //                    }
                 
-                Text(input.description)
+                Text(displayInchesOnly ? input.description : input.description)
                     .frame(
                         minWidth: 0,
                         maxWidth:  .infinity,
