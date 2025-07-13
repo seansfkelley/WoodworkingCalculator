@@ -535,7 +535,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
     if case .rational(let r) = x {
         return r
     } else {
-        preconditionFailure("lexer did not return Token.mixed for the MixedNumber token")
+        preconditionFailure("lexer did not return Token.rational for the MixedNumber token")
     }
 
 #sourceLocation()
