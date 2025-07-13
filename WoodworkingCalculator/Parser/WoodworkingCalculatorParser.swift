@@ -1,11 +1,9 @@
-internal enum Token {
-    case void
-    case integer(Int)
+enum CalculationResult: Equatable {
     case rational(Rational)
     case real(Double)
 }
 
-enum EvaluatableCalculation {
+enum EvaluatableCalculation: CustomStringConvertible {
     // n.b. all quantities are in inches (or fractions thereof)
     case rational(Rational)
     case real(Double)
@@ -13,25 +11,7 @@ enum EvaluatableCalculation {
     indirect case subtract(EvaluatableCalculation, EvaluatableCalculation)
     indirect case multiply(EvaluatableCalculation, EvaluatableCalculation)
     indirect case divide(EvaluatableCalculation, EvaluatableCalculation)
-}
-
-enum CalculationResult: Equatable {
-    case rational(Rational)
-    case real(Double)
-}
-
-extension Double {
-    init(_ result: CalculationResult) {
-        switch (result) {
-        case .rational(let f):
-            self = Double(f)
-        case .real(let r):
-            self = r
-        }
-    }
-}
-
-extension EvaluatableCalculation: CustomStringConvertible {
+    
     var description: String {
         switch (self) {
         case .rational(let r):
@@ -49,7 +29,7 @@ extension EvaluatableCalculation: CustomStringConvertible {
         case .multiply(let left, let right):
             return "(\(left) × \(right))"
         case .divide(let left, let right):
-            return "(\(left) / \(right))"
+            return "(\(left) ÷ \(right))"
         }
     }
     
@@ -98,7 +78,7 @@ extension EvaluatableCalculation: CustomStringConvertible {
         return try? parse(input)
     }
     
-    // This function abuses the simplicity of the grammar whereby almost all tokens are:
+    // This function abuses the simplicity of the grammar whereby almost all tokens either:
     //   - single characters (e.g. oeprators)
     //   - repetitions of the same kind of character (e.g. integers)
     //   - in the same position as, and a superset of, another token meeting the above criteria (e.g.
@@ -126,16 +106,44 @@ extension EvaluatableCalculation: CustomStringConvertible {
         
         // HACK HACK HACK
         //
-        // This is where the abuse really happens. Since rationals are the only token that has no legal
-        // prefixes that are shorter than 3 characters, we attempt to manufacture one to see if that
-        // would make this a legal prefix. I don't think this risks any false positives w/r/t the slash
-        // also functioning as an operator, but even if it doesn't, better too permissive than not
-        // permissive enough.
+        // This is where the abuse really happens. Rationals and reals both have prefixes that
+        // aren't any kind of legal token:
+        //   - rational: "1/"
+        //     - as a special case, "1 2" is only legal if the 2 is the beginning of a rational
+        //   - real: "."
+        //     - note that "0." is considered an integer, so "fully-qualified" reals are already
+        //       handled as a matter of course (since reals are not in any position where another
+        //       rule has an integer)
         //
-        // Note that reals require at least 2 characters, but an integer is a legal prefix to a real
-        // that can become a legal real with just one keystroke (a dot).
-        return check(input) || (input.contains(#/[0-9]$/#) && check(input + "/1")) || (input.contains(#/\/$/#) && check(input + "1"))
+        // If the expression is not already legal, this boolean expression attempts to manufacture
+        // derivatives of it that would make the above cases legal and checks those too.
+        //
+        // I don't think this risks any false positives w/r/t the slash also functioning as an
+        // operator, but even if it doesn't, better too permissive than not permissive enough.
+        return check(input)
+            // rationals
+            || (input.contains(/[0-9]$/) && check(input + "/1")) || (input.contains(#/\/$/#) && check(input + "1"))
+            // reals
+            || (input.contains(/\.$/) && check(input + "0"))
     }
+}
+
+extension Double {
+    init(_ result: CalculationResult) {
+        switch (result) {
+        case .rational(let f):
+            self = Double(f)
+        case .real(let r):
+            self = r
+        }
+    }
+}
+
+internal enum Token {
+    case void
+    case integer(Int)
+    case rational(Rational)
+    case real(Double)
 }
 
 // n.b. this is a pair because the lexer has to be able to forward the token code (type),
@@ -190,7 +198,7 @@ private let lexer = CitronLexer<LexedTokenData>(rules: [
     .regexPattern("\\s", { _ in nil })
 ])
 
-fileprivate func parse(_ input: String) throws -> EvaluatableCalculation {
+private func parse(_ input: String) throws -> EvaluatableCalculation {
     let parser = WoodworkingCalculatorGrammar()
     try lexer.tokenize(input) { (t, c) in
         try parser.consume(token: t, code: c)

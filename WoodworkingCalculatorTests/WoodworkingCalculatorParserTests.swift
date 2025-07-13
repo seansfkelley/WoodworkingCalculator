@@ -103,6 +103,9 @@ struct EvaluatableCalculationTests {
         "1'1\"",
         "1' ",
         "1\" ",
+        "1.",
+        ".",
+        "1.1",
         " ",
     ]) func isValidPrefix(input: String) throws {
         #expect(EvaluatableCalculation.isValidPrefix(input))
@@ -116,6 +119,7 @@ struct EvaluatableCalculationTests {
         "1++",
         "1+-",
         "1''",
+        "..",
     ]) func notIsValidPrefix(input: String) throws {
         #expect(!EvaluatableCalculation.isValidPrefix(input))
     }
