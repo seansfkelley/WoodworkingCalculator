@@ -1,4 +1,3 @@
-- add more unit tests
 - color palette and then test dark mode
 - how does it behave on other device form factors?
 - what to do about negative values?

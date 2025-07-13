@@ -80,13 +80,45 @@ struct WoodworkingCalculatorParserTests {
 
 struct EvaluatableCalculationTests {
     // Serialized: Citron is not thread-safe.
-    @Test("from", .serialized, arguments: [
-        ("1/2", CalculationResult.rational(Rational(1, 2))),
-        ("3.5", CalculationResult.real(3.5)),
-        ("1 + 2 * 3", CalculationResult.rational(Rational(7, 1))),
-        ("(1 + 2) * 3", CalculationResult.rational(Rational(9, 1))),
-    ]) func from(_ input: (String, CalculationResult)) throws {
-        #expect(EvaluatableCalculation.from(input.0)?.evaluate() == input.1)
+    @Test<[(String, EvaluatableCalculation, CalculationResult)]>("from", .serialized, arguments: [
+        (
+            "1/2",
+            .rational(Rational(1, 2)),
+            .rational(Rational(1, 2)),
+        ),
+        (
+            "3.5",
+            .real(3.5),
+            .real(3.5),
+        ),
+        (
+            "1 + 2 * 3",
+            .add(.rational(Rational(1, 1)), .multiply(.rational(Rational(2, 1)), .rational(Rational(3, 1)))),
+            .rational(Rational(7, 1)),
+        ),
+        (
+            "(1 + 2) * 3",
+            .multiply(.add(.rational(Rational(1, 1)), .rational(Rational(2, 1))), .rational(Rational(3, 1))),
+            .rational(Rational(9, 1)),
+        ),
+        (
+            "1' 3\" * 3.2",
+            .multiply(.rational(Rational(15, 1)), .real(3.2)),
+            .real(48.0),
+        )
+    ]) func from(input: String, expectedEvaluatable: EvaluatableCalculation, expectedResult: CalculationResult) throws {
+        let evaluatable = EvaluatableCalculation.from(input)
+        #expect(evaluatable == expectedEvaluatable)
+        #expect(evaluatable!.evaluate() == expectedResult)
+    }
+    
+    // Serialized: Citron is not thread-safe.
+    @Test("from (nil)", .serialized, arguments: [
+        "1//2",
+        "1++",
+        "1 1",
+    ]) func fromNil(input: String) throws {
+        #expect(EvaluatableCalculation.from(input) == nil)
     }
     
     // Serialized: Citron is not thread-safe.

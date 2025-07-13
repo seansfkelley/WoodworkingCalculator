@@ -3,7 +3,7 @@ enum CalculationResult: Equatable {
     case real(Double)
 }
 
-enum EvaluatableCalculation: CustomStringConvertible {
+enum EvaluatableCalculation: CustomStringConvertible, Equatable {
     // n.b. all quantities are in inches (or fractions thereof)
     case rational(Rational)
     case real(Double)
