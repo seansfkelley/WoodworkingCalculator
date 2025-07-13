@@ -196,7 +196,7 @@ struct ContentView: View {
                 CircleButton(.text("7"), .gray) { append("7", replaceResult: true) }
                 CircleButton(.text("8"), .gray) { append("8", replaceResult: true) }
                 CircleButton(.text("9"), .gray) { append("9", replaceResult: true) }
-                CircleButton(.image("multiply"), .orange) { append("x") }
+                CircleButton(.image("multiply"), .orange) { append("×") }
             }
             HStack {
                 CircleButton(.text("4"), .gray) { append("4", replaceResult: true) }

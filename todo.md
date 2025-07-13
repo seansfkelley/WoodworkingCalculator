@@ -1,3 +1,4 @@
+- add more unit tests
 - color palette and then test dark mode
 - how does it behave on other device form factors?
 - what to do about negative values?
@@ -12,10 +13,10 @@
 - figure out how to not have to punch AppStorage through 3 different places
 - support parentheses? where to put buttons?
 - consider highlighting whitespace with light grey underscores somehow
-- add more unit tests
 - add UI tests
 - 1 7/16 looks a lot like 17/16 -- more whitespace (two spaces)? dash character?
 - improve visuals of wavy equals, right now it looks kind of like a mistake
 - support pasting -- should evaluate immediately or just put the stuff in?
 - consider reformatting input with pretty fractions as-you-type so you can see how it's being parsed
 - if the result is unmodified, when the feet/inches setting changes, it should rerender in the new format
+- reconcile / versus ÷: the fractional helpers type / but it would be nice if the ÷ button typed a literal ÷

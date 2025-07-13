@@ -47,7 +47,7 @@ extension Evaluatable: CustomStringConvertible {
         case .subtract(let left, let right):
             return "(\(left) - \(right))"
         case .multiply(let left, let right):
-            return "(\(left) * \(right))"
+            return "(\(left) × \(right))"
         case .divide(let left, let right):
             return "(\(left) / \(right))"
         }
@@ -139,7 +139,9 @@ let lexer = CitronLexer<LexedTokenData>(rules: [
         .string("-", (.void, .Subtract)),
         .string("*", (.void, .Multiply)),
         .string("x", (.void, .Multiply)),
+        .string("×", (.void, .Multiply)),
         .string("/", (.void, .Divide)),
+        .string("÷", (.void, .Divide)),
         .string("(", (.void, .LeftParen)),
         .string(")", (.void, .RightParen)),
         .regexPattern("\\s", { _ in nil })
