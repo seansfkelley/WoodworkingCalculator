@@ -22,7 +22,6 @@ struct Rational: Equatable, Hashable, CustomStringConvertible {
     
     var description: String {
         return "\(self.num)/\(self.den)"
-//        return "\(asSuperscript(self.num))\u{2044}\(asSubscript(self.den))"
     }
     
     static func == (left: Rational, right: Rational) -> Bool {
@@ -55,39 +54,6 @@ private func gcd(_ a: Int, _ b: Int) -> Int {
   } else {
     return b
   }
-}
-
-let unicodeSuperscript: [Character: Character] = [
-    "0": "⁰",
-    "1": "¹",
-    "2": "²",
-    "3": "³",
-    "4": "⁴",
-    "5": "⁵",
-    "6": "⁶",
-    "7": "⁷",
-    "8": "⁸",
-    "9": "⁹",
-]
-let unicodeSubscript: [Character: Character] = [
-    "0": "₀",
-    "1": "₁",
-    "2": "₂",
-    "3": "₃",
-    "4": "₄",
-    "5": "₅",
-    "6": "₆",
-    "7": "₇",
-    "8": "₈",
-    "9": "₉",
-]
-
-func asSuperscript(_ int: Int) -> String {
-    return String(int).replacing(#/[0-9]/#, with: { match in [unicodeSuperscript[match.output.first!]!] })
-}
-
-func asSubscript(_ int: Int) -> String {
-    return String(int).replacing(#/[0-9]/#, with: { match in [unicodeSubscript[match.output.first!]!] })
 }
 
 extension Double {

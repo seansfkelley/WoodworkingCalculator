@@ -1,27 +1,27 @@
-enum Token {
+internal enum Token {
     case void
     case integer(Int)
     case rational(Rational)
     case real(Double)
 }
 
-enum Evaluatable {
+enum EvaluatableCalculation {
     // n.b. all quantities are in inches (or fractions thereof)
     case rational(Rational)
     case real(Double)
-    indirect case add(Evaluatable, Evaluatable)
-    indirect case subtract(Evaluatable, Evaluatable)
-    indirect case multiply(Evaluatable, Evaluatable)
-    indirect case divide(Evaluatable, Evaluatable)
+    indirect case add(EvaluatableCalculation, EvaluatableCalculation)
+    indirect case subtract(EvaluatableCalculation, EvaluatableCalculation)
+    indirect case multiply(EvaluatableCalculation, EvaluatableCalculation)
+    indirect case divide(EvaluatableCalculation, EvaluatableCalculation)
 }
 
-enum EvaluatedResult: Equatable {
+enum CalculationResult: Equatable {
     case rational(Rational)
     case real(Double)
 }
 
 extension Double {
-    init(_ result: EvaluatedResult) {
+    init(_ result: CalculationResult) {
         switch (result) {
         case .rational(let f):
             self = Double(f)
@@ -31,7 +31,7 @@ extension Double {
     }
 }
 
-extension Evaluatable: CustomStringConvertible {
+extension EvaluatableCalculation: CustomStringConvertible {
     var description: String {
         switch (self) {
         case .rational(let r):
@@ -53,7 +53,7 @@ extension Evaluatable: CustomStringConvertible {
         }
     }
     
-    func evaluate() -> EvaluatedResult {
+    func evaluate() -> CalculationResult {
         switch (self) {
         case .rational(let r):
             return .rational(r.reduced)
@@ -93,6 +93,49 @@ extension Evaluatable: CustomStringConvertible {
             }
         }
     }
+    
+    static func from(_ input: String) -> EvaluatableCalculation? {
+        return try? parse(input)
+    }
+    
+    // This function abuses the simplicity of the grammar whereby almost all tokens are:
+    //   - single characters (e.g. oeprators)
+    //   - repetitions of the same kind of character (e.g. integers)
+    //   - in the same position as, and a superset of, another token meeting the above criteria (e.g.
+    //     reals requiring a dot, but alternating with integers that _allow_ a dot)
+    //
+    // This means it generally does not require multiple keystrokes "uninterrupted" to produce a valid
+    // token in any given position. In turn, this means that in almost all cases where parsing
+    // terminates due to unexpected tokens, it's because some token is indeed illegal in that location,
+    // rather than it being an incomplete token that is being mis-parsed. The glaring exception is that
+    // rationals require two distinct numbers separated by a slash, which is a minimum of three
+    // keystrokes in a row.
+    static func isValidPrefix(_ input: String) -> Bool {
+        func check(_ s: String) -> Bool {
+            do {
+                _ = try parse(s)
+                return true
+            } catch is CitronParserUnexpectedEndOfInputError {
+                return true
+            } catch is _CitronParserUnexpectedTokenError<WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode> {
+                return false
+            } catch {
+                return false
+            }
+        }
+        
+        // HACK HACK HACK
+        //
+        // This is where the abuse really happens. Since rationals are the only token that has no legal
+        // prefixes that are shorter than 3 characters, we attempt to manufacture one to see if that
+        // would make this a legal prefix. I don't think this risks any false positives w/r/t the slash
+        // also functioning as an operator, but even if it doesn't, better too permissive than not
+        // permissive enough.
+        //
+        // Note that reals require at least 2 characters, but an integer is a legal prefix to a real
+        // that can become a legal real with just one keystroke (a dot).
+        return check(input) || (input.contains(#/[0-9]$/#) && check(input + "/1")) || (input.contains(#/\/$/#) && check(input + "1"))
+    }
 }
 
 // n.b. this is a pair because the lexer has to be able to forward the token code (type),
@@ -100,7 +143,7 @@ extension Evaluatable: CustomStringConvertible {
 // modify it.
 typealias LexedTokenData = (WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode)
 
-func parseMixedNumber(_ input: String) -> LexedTokenData? {
+internal func parseMixedNumber(_ input: String) -> LexedTokenData? {
     if let result = try? #/((?<whole>[0-9]+) +)?(?<num>[0-9]+)/(?<den>[0-9]+)/#.wholeMatch(in: input) {
         let whole = if let i = result.whole { Int(i).unsafelyUnwrapped } else { 0 }
         let num = Int(result.num).unsafelyUnwrapped
@@ -111,7 +154,7 @@ func parseMixedNumber(_ input: String) -> LexedTokenData? {
     }
 }
 
-func parseReal(_ input: String) -> LexedTokenData? {
+internal func parseReal(_ input: String) -> LexedTokenData? {
     if let _ = try? #/([0-9]+)?\.[0-9]+/#.wholeMatch(in: input) {
         let real = Double(input).unsafelyUnwrapped
         return (.real(real), .Real)
@@ -120,7 +163,7 @@ func parseReal(_ input: String) -> LexedTokenData? {
     }
 }
 
-func parseInteger(_ input: String) -> LexedTokenData? {
+internal func parseInteger(_ input: String) -> LexedTokenData? {
     if let result = try? #/(?<int>[0-9]+)\.?/#.wholeMatch(in: input) {
         let int = Int(result.int).unsafelyUnwrapped
         return (.integer(int), .Integer)
@@ -129,102 +172,28 @@ func parseInteger(_ input: String) -> LexedTokenData? {
     }
 }
 
-let lexer = CitronLexer<LexedTokenData>(rules: [
-        .regexPattern("([0-9]+ +)?[0-9]+/[0-9]+", parseMixedNumber),
-        .regexPattern("([0-9]+)?\\.[0-9]+", parseReal),
-        .regexPattern("[0-9]+\\.?", parseInteger),
-        .string("'", (.void, .Feet)),
-        .string("\"", (.void, .Inches)),
-        .string("+", (.void, .Add)),
-        .string("-", (.void, .Subtract)),
-        .string("*", (.void, .Multiply)),
-        .string("x", (.void, .Multiply)),
-        .string("×", (.void, .Multiply)),
-        .string("/", (.void, .Divide)),
-        .string("÷", (.void, .Divide)),
-        .string("(", (.void, .LeftParen)),
-        .string(")", (.void, .RightParen)),
-        .regexPattern("\\s", { _ in nil })
-    ])
+private let lexer = CitronLexer<LexedTokenData>(rules: [
+    .regexPattern("([0-9]+ +)?[0-9]+/[0-9]+", parseMixedNumber),
+    .regexPattern("([0-9]+)?\\.[0-9]+", parseReal),
+    .regexPattern("[0-9]+\\.?", parseInteger),
+    .string("'", (.void, .Feet)),
+    .string("\"", (.void, .Inches)),
+    .string("+", (.void, .Add)),
+    .string("-", (.void, .Subtract)),
+    .string("*", (.void, .Multiply)),
+    .string("x", (.void, .Multiply)),
+    .string("×", (.void, .Multiply)),
+    .string("/", (.void, .Divide)),
+    .string("÷", (.void, .Divide)),
+    .string("(", (.void, .LeftParen)),
+    .string(")", (.void, .RightParen)),
+    .regexPattern("\\s", { _ in nil })
+])
 
-func parse(_ input: String) throws -> Evaluatable {
+fileprivate func parse(_ input: String) throws -> EvaluatableCalculation {
     let parser = WoodworkingCalculatorGrammar()
     try lexer.tokenize(input) { (t, c) in
         try parser.consume(token: t, code: c)
     }
     return try parser.endParsing()
-}
-
-// This function abuses the simplicity of the grammar whereby almost all tokens are:
-//   - single characters (e.g. oeprators)
-//   - repetitions of the same kind of character (e.g. integers)
-//   - in the same position as, and a superset of, another token meeting the above criteria (e.g.
-//     reals requiring a dot, but alternating with integers that _allow_ a dot)
-//
-// This means it generally does not require multiple keystrokes "uninterrupted" to produce a valid
-// token in any given position. In turn, this means that in almost all cases where parsing
-// terminates due to unexpected tokens, it's because some token is indeed illegal in that location,
-// rather than it being an incomplete token that is being mis-parsed. The glaring exception is that
-// rationals require two distinct numbers separated by a slash, which is a minimum of three
-// keystrokes in a row.
-func isValidPrefix(_ input: String) -> Bool {
-    func check(_ s: String) -> Bool {
-        do {
-            _ = try parse(s)
-            return true
-        } catch is CitronParserUnexpectedEndOfInputError {
-            return true
-        } catch is _CitronParserUnexpectedTokenError<WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode> {
-            return false
-        } catch {
-            return false
-        }
-    }
-    
-    // HACK HACK HACK
-    //
-    // This is where the abuse really happens. Since rationals are the only token that has no legal
-    // prefixes that are shorter than 3 characters, we attempt to manufacture one to see if that
-    // would make this a legal prefix. I don't think this risks any false positives w/r/t the slash
-    // also functioning as an operator, but even if it doesn't, better too permissive than not
-    // permissive enough.
-    //
-    // Note that reals require at least 2 characters, but an integer is a legal prefix to a real
-    // that can become a legal real with just one keystroke (a dot).
-    return check(input) || (input.contains(#/[0-9]$/#) && check(input + "/1")) || (input.contains(#/\/$/#) && check(input + "1"))
-}
-
-enum UsCustomaryPrecision: Equatable {
-    case feet
-    case inches
-}
-
-func formatAsUsCustomary(_ rational: Rational, _ precision: UsCustomaryPrecision = .feet) -> String {
-    var n = rational.reduced.num
-    let d = rational.reduced.den
-    var parts: [String] = []
-    
-    if d == 1 {
-        if n >= 12 && precision == .feet {
-            parts.append("\(n / 12)'")
-            n = n % 12;
-        }
-        
-        if parts.isEmpty || n > 0 {
-            parts.append("\(n)\"")
-        }
-    } else {
-        if n >= 12 * d && precision == .feet {
-            parts.append("\(n / (12 * d))'");
-            n = n % (12 * d);
-        }
-        
-        if n > d {
-            parts.append("\(n / d) \(Rational(n % d, d))\"")
-        } else {
-            parts.append("\(Rational(n, d))\"")
-        }
-    }
-    
-    return parts.joined(separator: " ")
 }

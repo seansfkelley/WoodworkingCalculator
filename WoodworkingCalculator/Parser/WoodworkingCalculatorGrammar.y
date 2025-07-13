@@ -2,12 +2,12 @@
 
 %token_type Token
 
-%nonterminal_type equation Evaluatable
+%nonterminal_type equation EvaluatableCalculation
 equation ::= expression(e). {
     return e
 }
 
-%nonterminal_type expression Evaluatable
+%nonterminal_type expression EvaluatableCalculation
 expression ::= expression(left) Add multiplicative(right). {
     return .add(left, right)
 }
@@ -18,7 +18,7 @@ expression ::= multiplicative(x). {
     return x
 }
 
-%nonterminal_type multiplicative Evaluatable
+%nonterminal_type multiplicative EvaluatableCalculation
 multiplicative ::= multiplicative(left) Multiply atom(right). {
     return .multiply(left, right)
 }
@@ -29,7 +29,7 @@ multiplicative ::= atom(x). {
     return x
 }
 
-%nonterminal_type atom Evaluatable
+%nonterminal_type atom EvaluatableCalculation
 atom ::= quantity(x). {
     return x
 }
@@ -37,7 +37,7 @@ atom ::= LeftParen expression(x) RightParen. {
     return x
 }
 
-%nonterminal_type quantity Evaluatable
+%nonterminal_type quantity EvaluatableCalculation
 quantity ::= integer(f) Feet mixed_number(i) Inches. {
     return .rational(Rational((f * 12) * i.den + i.num, i.den))
 }

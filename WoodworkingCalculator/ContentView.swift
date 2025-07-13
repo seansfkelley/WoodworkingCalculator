@@ -28,7 +28,7 @@ struct Input: CustomStringConvertible {
             return nil
         }()
         
-        if candidate != nil && isValidPrefix(candidate!) {
+        if candidate != nil && EvaluatableCalculation.isValidPrefix(candidate!) {
             value = .string(candidate!)
             return true
         } else {
@@ -227,7 +227,7 @@ struct ContentView: View {
     }
     
     private func evaluate() {
-        let result = try? parse(input.description).evaluate()
+        let result = EvaluatableCalculation.from(input.description)?.evaluate()
         guard let result else {
             return
         }
