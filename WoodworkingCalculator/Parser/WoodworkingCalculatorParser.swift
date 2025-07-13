@@ -163,7 +163,7 @@ func parse(_ input: String) throws -> Evaluatable {
 func isValidPrefix(_ input: String) -> Bool {
     func check(_ s: String) -> Bool {
         do {
-            _ = try parse(input)
+            _ = try parse(s)
             return true
         } catch is CitronParserUnexpectedEndOfInputError {
             return true
@@ -173,13 +173,13 @@ func isValidPrefix(_ input: String) -> Bool {
             return false
         }
     }
-
+    
     // This is where the abuse really happens. Since fractions are the only token that has no legal
     // prefixes that are shorter than 3 characters, we attempt to manufacture one to see if that
     // would make this a legal prefix. I don't think this risks any false positives w/r/t the slash
     // also functioning as an operator, but even if it doesn't, better too permissive than not
     // permissive enough.
-    return check(input) || (input.contains(/[0-9]$/) && check(input + "/1"))
+    return check(input) || (input.contains(#/[0-9]$/#) && check(input + "/1")) || (input.contains(#/\/$/#) && check(input + "1"))
 }
 
 enum UsCustomaryPrecision: Equatable {

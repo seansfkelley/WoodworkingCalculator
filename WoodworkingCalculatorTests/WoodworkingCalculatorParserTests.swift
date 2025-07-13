@@ -37,4 +37,17 @@ struct WoodworkingCalculatorParserTests {
     ]) func testFormatAsUsCustomary(input: Fraction, expected: String) throws {
         #expect(formatAsUsCustomary(input) == expected)
     }
+    
+    // Serialized: Citron is not thread-safe.
+    @Test("isValidPrefix", .serialized, arguments: [
+        "1",
+        "1.",
+        "1 1",
+        "1 1/",
+        "1+",
+        "1+2-3/4*",
+        "1+1",
+    ]) func testIsValidPrefix(input: String) throws {
+        #expect(isValidPrefix(input))
+    }
 }
