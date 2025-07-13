@@ -4,9 +4,8 @@ import Testing
 struct WoodworkingCalculatorParserTests {
     @Test("parseMixedNumber", arguments: [
         ("1/2", Rational(1, 2)),
-        ("3-3/4", Rational(15, 4)),
         ("3 3/4", Rational(15, 4)),
-        ("3   -  3/4", Rational(15, 4)),
+        ("3-3/4", nil),
         ("3--3/4", nil),
         ("1 /2", nil),
         ("1/ 2", nil),
