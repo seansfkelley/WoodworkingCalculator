@@ -1,4 +1,3 @@
-- bug: cannot type "1 1/4" because the parser doesn't like the partial string "1 1" and doesn't consider it a prefix
 - color palette and then test dark mode
 - how does it behave on other device form factors?
 - what to do about negative values?

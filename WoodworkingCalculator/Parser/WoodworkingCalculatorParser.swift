@@ -153,13 +153,18 @@ func parse(_ input: String) throws -> Evaluatable {
     return try parser.endParsing()
 }
 
-// This function abuses the simplicity of the grammar whereby almost all tokens are single
-// characters or repetitions of the same kind of character, so that it generally does not require
-// multiple keystrokes "uninterrupted" to produce a valid token. This means that almost all
-// cases where parsing terminates due to unexpected tokens, it's because the token is indeed
-// illegal in that location, rather than it being an incomplete token that is being mis-parsed. The
-// glaring exception is that rationals require two distinct numbers separated by a slash, which is
-// a minimum of three keystrokes in a row.
+// This function abuses the simplicity of the grammar whereby almost all tokens are:
+//   - single characters (e.g. oeprators)
+//   - repetitions of the same kind of character (e.g. integers)
+//   - in the same position as, and a superset of, another token meeting the above criteria (e.g.
+//     reals requiring a dot, but alternating with integers that _allow_ a dot)
+//
+// This means it generally does not require multiple keystrokes "uninterrupted" to produce a valid
+// token in any given position. In turn, this means that in almost all cases where parsing
+// terminates due to unexpected tokens, it's because some token is indeed illegal in that location,
+// rather than it being an incomplete token that is being mis-parsed. The glaring exception is that
+// rationals require two distinct numbers separated by a slash, which is a minimum of three
+// keystrokes in a row.
 func isValidPrefix(_ input: String) -> Bool {
     func check(_ s: String) -> Bool {
         do {
@@ -175,11 +180,15 @@ func isValidPrefix(_ input: String) -> Bool {
     }
     
     // HACK HACK HACK
+    //
     // This is where the abuse really happens. Since rationals are the only token that has no legal
     // prefixes that are shorter than 3 characters, we attempt to manufacture one to see if that
     // would make this a legal prefix. I don't think this risks any false positives w/r/t the slash
     // also functioning as an operator, but even if it doesn't, better too permissive than not
     // permissive enough.
+    //
+    // Note that reals require at least 2 characters, but an integer is a legal prefix to a real
+    // that can become a legal real with just one keystroke (a dot).
     return check(input) || (input.contains(#/[0-9]$/#) && check(input + "/1")) || (input.contains(#/\/$/#) && check(input + "1"))
 }
 
