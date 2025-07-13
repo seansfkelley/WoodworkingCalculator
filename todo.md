@@ -19,3 +19,7 @@ fractions and division
 best practices
 - figure out how to not have to punch AppStorage through 3 different places
 - add UI tests
+- rethink Input object
+    - since `description` can change when `displayInchesOnly` changes, it should be @Published or something similar so that when downstream things render based on it they get the latest (i.e. the input)
+    - same as above for precision, so you can change it after you've already calculated a result
+        - this means that it should hold the CalculationResult, not the rounded result

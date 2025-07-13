@@ -157,6 +157,11 @@ struct ContentView: View {
 //                        accumulator.append(AttributedString(s))
 //                    }
                 
+                // HACK FIXME
+                // This is because input.description is a function of displayInchesOnly, but since we don't
+                // directly access displayInchesOnly in this render function and the Input object doesn't
+                // correctly broadcast changes to `description` based on a change on displayInchesOnly, we
+                // hack it back in by accessing it here. The correct fix is to fix Input to cooperate.
                 Text(displayInchesOnly ? input.description : input.description)
                     .frame(
                         minWidth: 0,
