@@ -184,6 +184,7 @@ struct ContentView: View {
                     )
                     .font(.system(size: 100, weight: .light))
                     .minimumScaleFactor(0.3)
+                    .lineLimit(1)
             }
             HStack {
                 // Branching inside the component instead of outside to make two distinct ones
