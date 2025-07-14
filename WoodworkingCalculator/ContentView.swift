@@ -229,7 +229,7 @@ struct ContentView: View {
                 CircleButton(.image("plus"), .orange) { append("+") }
             }
             HStack {
-                CircleButton(.text("_"), .gray) { append(" ", replaceResult: true) }
+                CircleButton(.text("␣"), .gray) { append(" ", replaceResult: true) }
                 CircleButton(.text("0"), .gray) { append("0", replaceResult: true) }
                 CircleButton(.text("."), .gray) { append(".", replaceResult: true) }
                 CircleButton(.image("equal"), .orange) { evaluate() }
