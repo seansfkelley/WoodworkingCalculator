@@ -142,8 +142,9 @@ struct ContentView: View {
                     Button(action: { isErrorPresented.toggle() }) {
                         Text("≈")
                             .font(.system(size: 40, weight: .bold))
-                            .foregroundStyle(.red)
-                            .padding()
+                            .foregroundStyle(.orange)
+                            .padding(.vertical)
+                            .padding(.leading, 8)
 //                            .overlay(Circle().stroke(.red, lineWidth: 4))
                     }
                     .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
