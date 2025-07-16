@@ -1,7 +1,6 @@
 deployment
 - https://developer.apple.com/documentation/xcode/preparing-your-app-for-distribution
 - icon/splash screen
-- remove citron, main and todo.md from the bundle
 
 fractions and division
 - consider reformatting input with pretty fractions as-you-type so you can see how it's being parsed
@@ -28,3 +27,4 @@ calculation features
 
 best practices
 - add UI tests
+- figure out how to build citron and run it as part of the Xcode build

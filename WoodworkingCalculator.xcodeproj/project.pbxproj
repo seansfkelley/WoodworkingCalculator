@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		21005B252E20609400ED60F5 /* todo.md in Resources */ = {isa = PBXBuildFile; fileRef = 21005B242E20609100ED60F5 /* todo.md */; };
 		216BB80C2E26BDFC00D2AF17 /* Numerics in Frameworks */ = {isa = PBXBuildFile; productRef = 216BB80B2E26BDFC00D2AF17 /* Numerics */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +29,7 @@
 
 /* Begin PBXFileReference section */
 		21005B242E20609100ED60F5 /* todo.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = todo.md; sourceTree = "<group>"; };
+		216BB80D2E28144400D2AF17 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		218B780C2E15C69D00F8B129 /* WoodworkingCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WoodworkingCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78192E15C69E00F8B129 /* WoodworkingCalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WoodworkingCalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78232E15C69E00F8B129 /* WoodworkingCalculatorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WoodworkingCalculatorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -42,9 +42,11 @@
 			membershipExceptions = (
 				Headless/.gitignore,
 				Headless/calculate.sh,
+				Headless/main,
 				Headless/main.swift,
 				Headless/Makefile,
 				Parser/.gitignore,
+				Parser/citron,
 				Parser/citron.c,
 				Parser/Makefile,
 				Parser/WoodworkingCalculatorGrammar.y,
@@ -110,6 +112,7 @@
 		218B78032E15C69D00F8B129 = {
 			isa = PBXGroup;
 			children = (
+				216BB80D2E28144400D2AF17 /* README.md */,
 				21005B242E20609100ED60F5 /* todo.md */,
 				219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */,
 				218B780E2E15C69D00F8B129 /* WoodworkingCalculator */,
@@ -255,7 +258,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				21005B252E20609400ED60F5 /* todo.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
