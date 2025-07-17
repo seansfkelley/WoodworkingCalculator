@@ -1,6 +1,3 @@
-deployment
-- icon/splash screen
-
 fractions and division
 - consider reformatting input with pretty fractions as-you-type so you can see how it's being parsed
     - I think this requires synchronization points in the grammar to allow parsing things like "1 1/4+"
