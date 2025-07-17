@@ -29,12 +29,22 @@ multiplicative ::= atom(x). {
     return x
 }
 
+// We define unary negation non-recursively here so that you can't write ----4 (etc.). We also
+// intentionally use a .rational as a minuend so that we (1) don't have to define a dedicated
+// .negate operation and (2) so that if the subtrahend is a rational, we keep the whole expression
+// rational instead of dropping down into floating-point.
 %nonterminal_type atom EvaluatableCalculation
 atom ::= quantity(x). {
     return x
 }
+atom ::= Subtract quantity(x). {
+    return .subtract(.rational(Rational(0, 1)), x)
+}
 atom ::= LeftParen expression(x) RightParen. {
     return x
+}
+atom ::= Subtract LeftParen expression(x) RightParen. {
+    return .subtract(.rational(Rational(0, 1)), x)
 }
 
 %nonterminal_type quantity EvaluatableCalculation

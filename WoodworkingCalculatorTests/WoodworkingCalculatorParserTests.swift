@@ -105,6 +105,16 @@ struct EvaluatableCalculationTests {
             "1' 3\" * 3.2",
             .multiply(.rational(Rational(15, 1)), .real(3.2)),
             .real(48.0),
+        ),
+        (
+            "-1",
+            .subtract(.rational(Rational(0, 1)), .rational(Rational(1, 1))),
+            .rational(Rational(-1, 1)),
+        ),
+        (
+            "1 -- 2",
+            .subtract(.rational(Rational(1, 1)), .subtract(.rational(Rational(0, 1)), .rational(Rational(2, 1)))),
+            .rational(Rational(3, 1)),
         )
     ]) func from(input: String, expectedEvaluatable: EvaluatableCalculation, expectedResult: CalculationResult) throws {
         let evaluatable = EvaluatableCalculation.from(input)
@@ -117,6 +127,7 @@ struct EvaluatableCalculationTests {
         "1//2",
         "1++",
         "1 1",
+        "1--",
     ]) func fromNil(input: String) throws {
         #expect(EvaluatableCalculation.from(input) == nil)
     }
@@ -130,6 +141,7 @@ struct EvaluatableCalculationTests {
         "1+",
         "1+2-3/4*",
         "1+1",
+        "1+-",
         "1'",
         "1'1",
         "1'1\"",
@@ -139,6 +151,7 @@ struct EvaluatableCalculationTests {
         ".",
         "1.1",
         " ",
+        "-",
     ]) func isValidPrefix(input: String) throws {
         #expect(EvaluatableCalculation.isValidPrefix(input))
     }
@@ -149,9 +162,9 @@ struct EvaluatableCalculationTests {
         "'",
         "\"",
         "1++",
-        "1+-",
         "1''",
         "..",
+        "--",
     ]) func notIsValidPrefix(input: String) throws {
         #expect(!EvaluatableCalculation.isValidPrefix(input))
     }

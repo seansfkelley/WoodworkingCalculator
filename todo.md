@@ -15,11 +15,8 @@ appearance
 - color palette and then test dark mode
 
 calculation features
-- support negative values?
-    - seems like a might-as-well only in that it might be more surprising than helpful if it's absent
-    - yes -- you can produce negative values already, and then can't interact because they aren't valid syntax
 - support parentheses? where to put buttons?
-    - could put them on the bottom row with a +/- (assuming negative values are supported), but would probably need a fourth button
+    - each row is 4 buttons, could use a double-height equals for a third, so what's the fourth?
     - this might introduce too much complexity to the try-catch implementation of isValidPrefix
 - support pasting -- should evaluate immediately or just put the stuff in?
 
