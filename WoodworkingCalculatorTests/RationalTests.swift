@@ -21,6 +21,8 @@ struct RationalTests {
         (Rational(2, 4), Rational(1, 2)),
         (Rational(17, 51), Rational(1, 3)),
         (Rational(2, 3), Rational(2, 3)),
+        (Rational(-1, -2), Rational(1, 2)),
+        (Rational(1, -2), Rational(-1, 2)),
     ]) func reduced(input: Rational, expected: Rational) {
         let actual = input.reduced
         #expect(actual.num == expected.num)

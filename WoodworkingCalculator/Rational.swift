@@ -8,12 +8,18 @@ struct Rational: Equatable, Hashable, CustomStringConvertible {
     }
     
     var reduced: Rational {
-        let divisor = gcd(self.num, self.den)
-        return Rational(self.num / divisor, self.den / divisor)
+        var n = num
+        var d = den
+        if (n.signum() == -1 && d.signum() == -1) || (n.signum() == 1 && d.signum() == -1) {
+            n = -n
+            d = -d
+        }
+        let divisor = gcd(abs(n), abs(d))
+        return Rational(n / divisor, d / divisor)
     }
     
     func roundedToPrecision(_ precision: Int) -> (Rational, Double?) {
-        if self.den <= precision && self.den % precision == 0 {
+        if den <= precision && den % precision == 0 {
             return (self, nil)
         } else {
             return Double(self).toNearestRational(withPrecision: precision)
@@ -21,7 +27,7 @@ struct Rational: Equatable, Hashable, CustomStringConvertible {
     }
     
     var description: String {
-        return "\(self.num)/\(self.den)"
+        return "\(num)/\(den)"
     }
     
     func signum() -> Int {
