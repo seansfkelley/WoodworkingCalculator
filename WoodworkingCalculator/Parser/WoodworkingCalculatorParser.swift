@@ -112,7 +112,7 @@ enum EvaluatableCalculation: CustomStringConvertible, Equatable {
         //     - as a special case, "1 2" is only legal if the 2 is the beginning of a rational
         //   - real: "."
         //     - note that "0." is considered an integer, so "fully-qualified" reals are already
-        //       handled as a matter of course (since reals are not in any position where another
+        //       handled as a matter of course (since reals are only in positions where another
         //       rule has an integer)
         //
         // If the expression is not already legal, this boolean expression attempts to manufacture

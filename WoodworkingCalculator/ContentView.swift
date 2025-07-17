@@ -145,7 +145,6 @@ struct ContentView: View {
                             .foregroundStyle(.orange)
                             .padding(.vertical)
                             .padding(.leading, 8)
-//                            .overlay(Circle().stroke(.red, lineWidth: 4))
                     }
                     .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
                         VStack {

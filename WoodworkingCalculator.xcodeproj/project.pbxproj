@@ -37,19 +37,19 @@
 /* Begin PBXFileReference section */
 		21005B242E20609100ED60F5 /* todo.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = todo.md; sourceTree = "<group>"; };
 		216BB80D2E28144400D2AF17 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		218B780C2E15C69D00F8B129 /* WoodworkingCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WoodworkingCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		218B78192E15C69E00F8B129 /* WoodworkingCalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WoodworkingCalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		218B78232E15C69E00F8B129 /* WoodworkingCalculatorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WoodworkingCalculatorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		218B780C2E15C69D00F8B129 /* Wood Calc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wood Calc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		218B78192E15C69E00F8B129 /* Wood Calc Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wood Calc Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		218B78232E15C69E00F8B129 /* Wood Calc UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wood Calc UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = WoodworkingCalculator.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		218B78742E1611BF00F8B129 /* Exceptions for "WoodworkingCalculator" folder in "WoodworkingCalculator" target */ = {
+		218B78742E1611BF00F8B129 /* Exceptions for "WoodworkingCalculator" folder in "Wood Calc" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Parser/WoodworkingCalculatorGrammar.y,
 			);
-			target = 218B780B2E15C69D00F8B129 /* WoodworkingCalculator */;
+			target = 218B780B2E15C69D00F8B129 /* Wood Calc */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -62,7 +62,7 @@
 		218B780E2E15C69D00F8B129 /* WoodworkingCalculator */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				218B78742E1611BF00F8B129 /* Exceptions for "WoodworkingCalculator" folder in "WoodworkingCalculator" target */,
+				218B78742E1611BF00F8B129 /* Exceptions for "WoodworkingCalculator" folder in "Wood Calc" target */,
 			);
 			path = WoodworkingCalculator;
 			sourceTree = "<group>";
@@ -130,9 +130,9 @@
 		218B780D2E15C69D00F8B129 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				218B780C2E15C69D00F8B129 /* WoodworkingCalculator.app */,
-				218B78192E15C69E00F8B129 /* WoodworkingCalculatorTests.xctest */,
-				218B78232E15C69E00F8B129 /* WoodworkingCalculatorUITests.xctest */,
+				218B780C2E15C69D00F8B129 /* Wood Calc.app */,
+				218B78192E15C69E00F8B129 /* Wood Calc Tests.xctest */,
+				218B78232E15C69E00F8B129 /* Wood Calc UI Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -159,9 +159,9 @@
 /* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
-		218B780B2E15C69D00F8B129 /* WoodworkingCalculator */ = {
+		218B780B2E15C69D00F8B129 /* Wood Calc */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 218B782D2E15C69E00F8B129 /* Build configuration list for PBXNativeTarget "WoodworkingCalculator" */;
+			buildConfigurationList = 218B782D2E15C69E00F8B129 /* Build configuration list for PBXNativeTarget "Wood Calc" */;
 			buildPhases = (
 				216BB85F2E29579000D2AF17 /* ShellScript */,
 				218B78082E15C69D00F8B129 /* Sources */,
@@ -176,16 +176,16 @@
 			fileSystemSynchronizedGroups = (
 				218B780E2E15C69D00F8B129 /* WoodworkingCalculator */,
 			);
-			name = WoodworkingCalculator;
+			name = "Wood Calc";
 			packageProductDependencies = (
 			);
 			productName = WoodworkingCalculator;
-			productReference = 218B780C2E15C69D00F8B129 /* WoodworkingCalculator.app */;
+			productReference = 218B780C2E15C69D00F8B129 /* Wood Calc.app */;
 			productType = "com.apple.product-type.application";
 		};
-		218B78182E15C69E00F8B129 /* WoodworkingCalculatorTests */ = {
+		218B78182E15C69E00F8B129 /* Wood Calc Tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 218B78302E15C69E00F8B129 /* Build configuration list for PBXNativeTarget "WoodworkingCalculatorTests" */;
+			buildConfigurationList = 218B78302E15C69E00F8B129 /* Build configuration list for PBXNativeTarget "Wood Calc Tests" */;
 			buildPhases = (
 				218B78152E15C69E00F8B129 /* Sources */,
 				218B78162E15C69E00F8B129 /* Frameworks */,
@@ -199,17 +199,17 @@
 			fileSystemSynchronizedGroups = (
 				218B781C2E15C69E00F8B129 /* WoodworkingCalculatorTests */,
 			);
-			name = WoodworkingCalculatorTests;
+			name = "Wood Calc Tests";
 			packageProductDependencies = (
 				216BB80B2E26BDFC00D2AF17 /* Numerics */,
 			);
 			productName = WoodworkingCalculatorTests;
-			productReference = 218B78192E15C69E00F8B129 /* WoodworkingCalculatorTests.xctest */;
+			productReference = 218B78192E15C69E00F8B129 /* Wood Calc Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		218B78222E15C69E00F8B129 /* WoodworkingCalculatorUITests */ = {
+		218B78222E15C69E00F8B129 /* Wood Calc UI Tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 218B78332E15C69E00F8B129 /* Build configuration list for PBXNativeTarget "WoodworkingCalculatorUITests" */;
+			buildConfigurationList = 218B78332E15C69E00F8B129 /* Build configuration list for PBXNativeTarget "Wood Calc UI Tests" */;
 			buildPhases = (
 				218B781F2E15C69E00F8B129 /* Sources */,
 				218B78202E15C69E00F8B129 /* Frameworks */,
@@ -223,11 +223,11 @@
 			fileSystemSynchronizedGroups = (
 				218B78262E15C69E00F8B129 /* WoodworkingCalculatorUITests */,
 			);
-			name = WoodworkingCalculatorUITests;
+			name = "Wood Calc UI Tests";
 			packageProductDependencies = (
 			);
 			productName = WoodworkingCalculatorUITests;
-			productReference = 218B78232E15C69E00F8B129 /* WoodworkingCalculatorUITests.xctest */;
+			productReference = 218B78232E15C69E00F8B129 /* Wood Calc UI Tests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -274,9 +274,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				218B780B2E15C69D00F8B129 /* WoodworkingCalculator */,
-				218B78182E15C69E00F8B129 /* WoodworkingCalculatorTests */,
-				218B78222E15C69E00F8B129 /* WoodworkingCalculatorUITests */,
+				218B780B2E15C69D00F8B129 /* Wood Calc */,
+				218B78182E15C69E00F8B129 /* Wood Calc Tests */,
+				218B78222E15C69E00F8B129 /* Wood Calc UI Tests */,
 				216BB8412E29506400D2AF17 /* Citron */,
 			);
 		};
@@ -361,12 +361,12 @@
 		};
 		218B781B2E15C69E00F8B129 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 218B780B2E15C69D00F8B129 /* WoodworkingCalculator */;
+			target = 218B780B2E15C69D00F8B129 /* Wood Calc */;
 			targetProxy = 218B781A2E15C69E00F8B129 /* PBXContainerItemProxy */;
 		};
 		218B78252E15C69E00F8B129 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 218B780B2E15C69D00F8B129 /* WoodworkingCalculator */;
+			target = 218B780B2E15C69D00F8B129 /* Wood Calc */;
 			targetProxy = 218B78242E15C69E00F8B129 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -700,7 +700,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		218B782D2E15C69E00F8B129 /* Build configuration list for PBXNativeTarget "WoodworkingCalculator" */ = {
+		218B782D2E15C69E00F8B129 /* Build configuration list for PBXNativeTarget "Wood Calc" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				218B782E2E15C69E00F8B129 /* Debug */,
@@ -709,7 +709,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		218B78302E15C69E00F8B129 /* Build configuration list for PBXNativeTarget "WoodworkingCalculatorTests" */ = {
+		218B78302E15C69E00F8B129 /* Build configuration list for PBXNativeTarget "Wood Calc Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				218B78312E15C69E00F8B129 /* Debug */,
@@ -718,7 +718,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		218B78332E15C69E00F8B129 /* Build configuration list for PBXNativeTarget "WoodworkingCalculatorUITests" */ = {
+		218B78332E15C69E00F8B129 /* Build configuration list for PBXNativeTarget "Wood Calc UI Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				218B78342E15C69E00F8B129 /* Debug */,

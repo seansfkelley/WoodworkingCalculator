@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "218B780B2E15C69D00F8B129"
-               BuildableName = "WoodworkingCalculator.app"
-               BlueprintName = "WoodworkingCalculator"
+               BuildableName = "Wood Calc.app"
+               BlueprintName = "Wood Calc"
                ReferencedContainer = "container:WoodworkingCalculator.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -41,8 +41,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "218B78182E15C69E00F8B129"
-               BuildableName = "WoodworkingCalculatorTests.xctest"
-               BlueprintName = "WoodworkingCalculatorTests"
+               BuildableName = "Wood Calc Tests.xctest"
+               BlueprintName = "Wood Calc Tests"
                ReferencedContainer = "container:WoodworkingCalculator.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -52,8 +52,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "218B78222E15C69E00F8B129"
-               BuildableName = "WoodworkingCalculatorUITests.xctest"
-               BlueprintName = "WoodworkingCalculatorUITests"
+               BuildableName = "Wood Calc UI Tests.xctest"
+               BlueprintName = "Wood Calc UI Tests"
                ReferencedContainer = "container:WoodworkingCalculator.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -85,8 +85,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "218B780B2E15C69D00F8B129"
-            BuildableName = "WoodworkingCalculator.app"
-            BlueprintName = "WoodworkingCalculator"
+            BuildableName = "Wood Calc.app"
+            BlueprintName = "Wood Calc"
             ReferencedContainer = "container:WoodworkingCalculator.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -102,8 +102,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "218B780B2E15C69D00F8B129"
-            BuildableName = "WoodworkingCalculator.app"
-            BlueprintName = "WoodworkingCalculator"
+            BuildableName = "Wood Calc.app"
+            BlueprintName = "Wood Calc"
             ReferencedContainer = "container:WoodworkingCalculator.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
