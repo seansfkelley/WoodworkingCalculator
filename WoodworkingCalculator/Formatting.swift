@@ -60,17 +60,19 @@ private let unicodeSubscript: [Character: Character] = [
     "9": "₉",
 ]
 
-private func asSuperscript(_ int: Int) -> String {
-    return String(int).replacing(#/[0-9]/#, with: { match in [unicodeSuperscript[match.output.first!]!] })
-}
-
-private func asSubscript(_ int: Int) -> String {
-    return String(int).replacing(#/[0-9]/#, with: { match in [unicodeSubscript[match.output.first!]!] })
+extension Int {
+    var numerator: String {
+        return String(self).replacing(#/[0-9]/#, with: { match in [unicodeSuperscript[match.output.first!]!] })
+    }
+    
+    var denominator: String {
+        return String(self).replacing(#/[0-9]/#, with: { match in [unicodeSubscript[match.output.first!]!] })
+    }
 }
 
 extension Rational {
     var fancyDescription: String {
         let r = reduced
-        return r.den == 1 ? "\(r.num)" : "\(asSuperscript(r.num))⁄\(asSubscript(r.den))"
+        return r.den == 1 ? "\(r.num)" : "\(r.num.numerator)⁄\(r.den.denominator)"
     }
 }
