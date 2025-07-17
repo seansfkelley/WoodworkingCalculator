@@ -11,6 +11,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		216BB8482E29516400D2AF17 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 218B78042E15C69D00F8B129 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 216BB8412E29506400D2AF17;
+			remoteInfo = Citron;
+		};
 		218B781A2E15C69E00F8B129 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 218B78042E15C69D00F8B129 /* Project object */;
@@ -40,15 +47,6 @@
 		218B78742E1611BF00F8B129 /* Exceptions for "WoodworkingCalculator" folder in "WoodworkingCalculator" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Headless/.gitignore,
-				Headless/calculate.sh,
-				Headless/main,
-				Headless/main.swift,
-				Headless/Makefile,
-				Parser/.gitignore,
-				Parser/citron,
-				Parser/citron.c,
-				Parser/Makefile,
 				Parser/WoodworkingCalculatorGrammar.y,
 			);
 			target = 218B780B2E15C69D00F8B129 /* WoodworkingCalculator */;
@@ -56,6 +54,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		216BB8452E2950AB00D2AF17 /* Citron */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Citron;
+			sourceTree = "<group>";
+		};
 		218B780E2E15C69D00F8B129 /* WoodworkingCalculator */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -114,6 +117,7 @@
 			children = (
 				216BB80D2E28144400D2AF17 /* README.md */,
 				21005B242E20609100ED60F5 /* todo.md */,
+				216BB8452E2950AB00D2AF17 /* Citron */,
 				219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */,
 				218B780E2E15C69D00F8B129 /* WoodworkingCalculator */,
 				218B781C2E15C69E00F8B129 /* WoodworkingCalculatorTests */,
@@ -135,11 +139,31 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXLegacyTarget section */
+		216BB8412E29506400D2AF17 /* Citron */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "citron.c -o citron";
+			buildConfigurationList = 216BB8422E29506400D2AF17 /* Build configuration list for PBXLegacyTarget "Citron" */;
+			buildPhases = (
+			);
+			buildToolPath = clang;
+			buildWorkingDirectory = /Users/seankelley/code/WoodworkingCalculator/Citron;
+			dependencies = (
+			);
+			name = Citron;
+			packageProductDependencies = (
+			);
+			passBuildSettingsInEnvironment = 1;
+			productName = Citron;
+		};
+/* End PBXLegacyTarget section */
+
 /* Begin PBXNativeTarget section */
 		218B780B2E15C69D00F8B129 /* WoodworkingCalculator */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 218B782D2E15C69E00F8B129 /* Build configuration list for PBXNativeTarget "WoodworkingCalculator" */;
 			buildPhases = (
+				216BB85F2E29579000D2AF17 /* ShellScript */,
 				218B78082E15C69D00F8B129 /* Sources */,
 				218B78092E15C69D00F8B129 /* Frameworks */,
 				218B780A2E15C69D00F8B129 /* Resources */,
@@ -147,6 +171,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				216BB8492E29516400D2AF17 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				218B780E2E15C69D00F8B129 /* WoodworkingCalculator */,
@@ -215,6 +240,9 @@
 				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
+					216BB8412E29506400D2AF17 = {
+						CreatedOnToolsVersion = 16.4;
+					};
 					218B780B2E15C69D00F8B129 = {
 						CreatedOnToolsVersion = 16.4;
 						LastSwiftMigration = 1640;
@@ -249,6 +277,7 @@
 				218B780B2E15C69D00F8B129 /* WoodworkingCalculator */,
 				218B78182E15C69E00F8B129 /* WoodworkingCalculatorTests */,
 				218B78222E15C69E00F8B129 /* WoodworkingCalculatorUITests */,
+				216BB8412E29506400D2AF17 /* Citron */,
 			);
 		};
 /* End PBXProject section */
@@ -277,6 +306,29 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		216BB85F2E29579000D2AF17 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Citron/citron",
+				"$(SRCROOT)/WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.swift",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/zsh;
+			shellScript = "Citron/citron WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y -o WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.swift\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		218B78082E15C69D00F8B129 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -302,6 +354,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		216BB8492E29516400D2AF17 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 216BB8412E29506400D2AF17 /* Citron */;
+			targetProxy = 216BB8482E29516400D2AF17 /* PBXContainerItemProxy */;
+		};
 		218B781B2E15C69E00F8B129 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 218B780B2E15C69D00F8B129 /* WoodworkingCalculator */;
@@ -315,6 +372,33 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		216BB8432E29506400D2AF17 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = FYBZ352JMQ;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		216BB8442E29506400D2AF17 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = FYBZ352JMQ;
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 		218B782B2E15C69E00F8B129 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -598,6 +682,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		216BB8422E29506400D2AF17 /* Build configuration list for PBXLegacyTarget "Citron" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				216BB8432E29506400D2AF17 /* Debug */,
+				216BB8442E29506400D2AF17 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		218B78072E15C69D00F8B129 /* Build configuration list for PBXProject "WoodworkingCalculator" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

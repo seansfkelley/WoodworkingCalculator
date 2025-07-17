@@ -15,7 +15,7 @@ Specifically, it:
 
 ## Building
 
-I don't know how to Xcode properly. Before building the app in Xcode, you need to `cd WoodworkingCalculator/Parser && make`, which will compile and spit out the parser in Swift, which is necessary to build the app.
+There is a separate Xcode build target for [Citron](https://github.com/roop/citron/) and the grammar file it compiles. This is hardcoded to use `SDKROOT=macosx` so it works when the run target is iPhones. 
 
 ## Installing
 

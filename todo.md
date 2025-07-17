@@ -12,9 +12,7 @@ fractions and division
 appearance
 - 1 7/16 looks a lot like 17/16 -- more whitespace (two spaces)? dash character?
 - consider highlighting whitespace with light grey underscores somehow
-- improve visuals of wavy equals, right now it looks kind of like a mistake
 - color palette and then test dark mode
-- how does it behave on other device form factors?
 
 calculation features
 - support negative values?
@@ -27,4 +25,4 @@ calculation features
 
 best practices
 - add UI tests
-- figure out how to build citron and run it as part of the Xcode build
+
