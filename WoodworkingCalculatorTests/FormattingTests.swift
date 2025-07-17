@@ -1,9 +1,11 @@
 import Testing
-@testable import WoodworkingCalculator
+@testable import Wood_Calc
 
 struct FormattingTests {
     @Test("formatAsUsCustomary (inches)", arguments: [
         (Rational(0, 1), "0\""),
+        (Rational(1, 2), "1/2\""),
+        (Rational(1, -2), "-1/2\""),
         (Rational(6, 1), "6\""),
         (Rational(12, 1), "12\""),
         (Rational(48, 1), "48\""),
@@ -19,6 +21,8 @@ struct FormattingTests {
         (Rational(6, 1), "6\""),
         (Rational(12, 1), "1'"),
         (Rational(48, 1), "4'"),
+        (Rational(25, 2), "1' 1/2\""),
+        (Rational(-25, 2), "-1' 1/2\""),
         (Rational(13, 1), "1' 1\""),
         (Rational(49, 1), "4' 1\""),
         (Rational(99, 2), "4' 1 1/2\""),

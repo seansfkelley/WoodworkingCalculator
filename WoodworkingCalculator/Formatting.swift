@@ -4,8 +4,9 @@ enum UsCustomaryPrecision: Equatable {
 }
 
 func formatAsUsCustomary(_ rational: Rational, _ precision: UsCustomaryPrecision = .feet) -> String {
-    var n = rational.reduced.num
-    let d = rational.reduced.den
+    var n = abs(rational.reduced.num)
+    let d = abs(rational.reduced.den)
+    
     var parts: [String] = []
     
     if d == 1 {
@@ -30,7 +31,7 @@ func formatAsUsCustomary(_ rational: Rational, _ precision: UsCustomaryPrecision
         }
     }
     
-    return parts.joined(separator: " ")
+    return "\(rational.signum() == -1 ? "-" : "")\(parts.joined(separator: " "))"
 }
 
 private let unicodeSuperscript: [Character: Character] = [

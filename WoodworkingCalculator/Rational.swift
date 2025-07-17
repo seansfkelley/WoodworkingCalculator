@@ -24,6 +24,16 @@ struct Rational: Equatable, Hashable, CustomStringConvertible {
         return "\(self.num)/\(self.den)"
     }
     
+    func signum() -> Int {
+        if num.signum() == 0 {
+            return 0
+        } else if num.signum() * den.signum() == 1 {
+            return 1
+        } else {
+            return -1
+        }
+    }
+    
     static func == (left: Rational, right: Rational) -> Bool {
         let lreduced = left.reduced
         let rreduced = right.reduced

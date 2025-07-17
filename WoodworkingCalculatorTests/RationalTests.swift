@@ -1,7 +1,7 @@
 import Testing
 import Numerics
 
-@testable import WoodworkingCalculator
+@testable import Wood_Calc
 
 struct RationalTests {
     @Test("==", arguments: [
@@ -25,6 +25,16 @@ struct RationalTests {
         let actual = input.reduced
         #expect(actual.num == expected.num)
         #expect(actual.den == expected.den)
+    }
+    
+    @Test("signum", arguments: [
+        (Rational(1, 2), 1),
+        (Rational(0, 1), 0),
+        (Rational(-1, -2), 1),
+        (Rational(-1, 2), -1),
+        (Rational(1, -2), -1),
+    ]) func signum(input: Rational, expected: Int) {
+        #expect(input.signum() == expected)
     }
     
     @Test("description", arguments: [

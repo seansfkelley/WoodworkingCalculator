@@ -607,7 +607,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WoodworkingCalculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WoodworkingCalculator";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Wood Calc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Wood Calc";
 			};
 			name = Debug;
 		};
@@ -631,7 +631,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WoodworkingCalculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WoodworkingCalculator";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Wood Calc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Wood Calc";
 			};
 			name = Release;
 		};

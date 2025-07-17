@@ -1,5 +1,5 @@
 import Testing
-@testable import WoodworkingCalculator
+@testable import Wood_Calc
 
 struct WoodworkingCalculatorParserTests {
     @Test("parseMixedNumber", arguments: [
