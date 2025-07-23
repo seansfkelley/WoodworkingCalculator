@@ -117,9 +117,6 @@ enum EvaluatableCalculation: CustomStringConvertible, Equatable {
         //
         // If the expression is not already legal, this boolean expression attempts to manufacture
         // derivatives of it that would make the above cases legal and checks those too.
-        //
-        // I don't think this risks any false positives w/r/t the slash also functioning as an
-        // operator, but even if it doesn't, better too permissive than not permissive enough.
         return check(input)
             // rationals
             || (input.contains(/[0-9]$/) && check(input + "/1")) || (input.contains(#/\/$/#) && check(input + "1"))
@@ -188,10 +185,7 @@ private let lexer = CitronLexer<LexedTokenData>(rules: [
     .string("\"", (.void, .Inches)),
     .string("+", (.void, .Add)),
     .string("-", (.void, .Subtract)),
-    .string("*", (.void, .Multiply)),
-    .string("x", (.void, .Multiply)),
     .string("×", (.void, .Multiply)),
-    .string("/", (.void, .Divide)),
     .string("÷", (.void, .Divide)),
     .string("(", (.void, .LeftParen)),
     .string(")", (.void, .RightParen)),

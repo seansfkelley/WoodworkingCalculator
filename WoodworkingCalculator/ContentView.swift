@@ -89,6 +89,13 @@ class Input: ObservableObject {
     }
 }
 
+// n.b. this function only works with a valid prefix of a fraction.
+private func prettifyInput(_ input: String) -> String {
+    return input.replacing(/(\d+)\/(\d*)/, with: { match in
+        return "\(Int(match.1)!.numerator)⁄\(Int(match.2).map(\.denominator) ?? " ")"
+    })
+}
+
 struct ContentView: View {
     @State private var previous: String = ""
     @State private var isSettingsPresented: Bool = false
@@ -121,7 +128,7 @@ struct ContentView: View {
                 Settings()
                     .presentationDetents([.medium])
             }
-            Text(previous)
+            Text(prettifyInput(previous))
                 .frame(
                     minWidth: 0,
                     maxWidth:  .infinity,
@@ -160,21 +167,7 @@ struct ContentView: View {
                             .presentationCompactAdaptation(.popover)
                     }
                 }
-                // This is how you'd replace the space with another character with different styling.
-//                let formattedString: AttributedString = input.description
-//                    .split(separator: " ", omittingEmptySubsequences: false)
-//                    .reduce(into: AttributedString()) { accumulator, s in
-//                        if accumulator.characters.count > 0 {
-////                            var space = AttributedString(" ")
-////                            space.underlineStyle = .single
-////                            space.underlineColor = .lightGray
-//                            var space = AttributedString("_")
-//                            space.foregroundColor = .lightGray
-//                            accumulator.append(space)
-//                        }
-//                        accumulator.append(AttributedString(s))
-//                    }
-                Text(input.stringified)
+                Text(prettifyInput(input.stringified))
                     .frame(
                         minWidth: 0,
                         maxWidth:  .infinity,
@@ -206,32 +199,38 @@ struct ContentView: View {
                     isErrorPresented = false
                     input.set(.string(""))
                 })
+                CircleButton(.text("("), .gray) { append("(", replaceResult: true) }
+                CircleButton(.text(")"), .gray) { append(")", replaceResult: true) }
+                CircleButton(.image("divide"), .orange) { append("÷") }
+            }
+            HStack {
                 CircleButton(.text("'"), .gray) { append("'", replaceResult: true) }
                 CircleButton(.text("\""), .gray) { append("\"", replaceResult: true) }
-                CircleButton(.image("divide"), .orange) { append("/") }
+                CircleButton(.text("."), .gray) { append(".", replaceResult: true) }
+                CircleButton(.image("multiply"), .orange) { append("×") }
             }
             HStack {
                 CircleButton(.text("7"), .gray) { append("7", replaceResult: true) }
                 CircleButton(.text("8"), .gray) { append("8", replaceResult: true) }
                 CircleButton(.text("9"), .gray) { append("9", replaceResult: true) }
-                CircleButton(.image("multiply"), .orange) { append("×") }
+                CircleButton(.image("minus"), .orange) { append("-") }
             }
             HStack {
                 CircleButton(.text("4"), .gray) { append("4", replaceResult: true) }
                 CircleButton(.text("5"), .gray) { append("5", replaceResult: true) }
                 CircleButton(.text("6"), .gray) { append("6", replaceResult: true) }
-                CircleButton(.image("minus"), .orange) { append("-") }
+                CircleButton(.image("plus"), .orange) { append("+") }
             }
             HStack {
                 CircleButton(.text("1"), .gray) { append("1", replaceResult: true) }
                 CircleButton(.text("2"), .gray) { append("2", replaceResult: true) }
                 CircleButton(.text("3"), .gray) { append("3", replaceResult: true) }
-                CircleButton(.image("plus"), .orange) { append("+") }
+                CircleButton(.image("equal"), .orange) { evaluate() }
             }
             HStack {
-                CircleButton(.text("␣"), .gray) { append(" ", replaceResult: true) }
                 CircleButton(.text("0"), .gray) { append("0", replaceResult: true) }
-                CircleButton(.text("."), .gray) { append(".", replaceResult: true) }
+                CircleButton(.text("␣"), .gray) { append(" ", replaceResult: true) }
+                CircleButton(.text("⁄"), .gray) { append("/") }
                 CircleButton(.image("equal"), .orange) { evaluate() }
             }
             HStack {
@@ -289,7 +288,7 @@ struct CircleButton: View {
             }
         }
         .buttonStyle(.borderedProminent)
-        .buttonBorderShape(.circle)
+        .buttonBorderShape(.roundedRectangle(radius: .infinity))
         .tint(fill)
     }
 }
