@@ -1,4 +1,5 @@
 import SwiftUI
+import ExyteGrid
 
 class Input: ObservableObject {
     enum RawValue {
@@ -163,8 +164,8 @@ struct ContentView: View {
                                 .foregroundStyle(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                            .padding()
-                            .presentationCompactAdaptation(.popover)
+                        .padding()
+                        .presentationCompactAdaptation(.popover)
                     }
                 }
                 Text(prettifyInput(input.stringified))
@@ -179,65 +180,68 @@ struct ContentView: View {
                     .minimumScaleFactor(0.3)
                     .lineLimit(1)
             }
-            HStack {
-                // Branching inside the component instead of outside to make two distinct ones
-                // is a little inelegant but I specifically want to keep the button instance
-                // the same so the stateful on-press color-change animation doesn't abruptly
-                // end while you're actively long-pressing the button due to a change in identity.
-                CircleButton(.text(input.backspaceable ? "⌫" : "C"), .gray) {
-                    previous = ""
-                    isErrorPresented = false
-                    
-                    if input.backspaceable {
-                        input.backspace()
-                    } else {
-                        input.set(.string(""))
+            Grid(tracks: 4, spacing: 8) {
+                // n.b. GridGroup is only to work around limitations in SwiftUI's ViewBuilder
+                // closure typings, but I figured it doubled as a nice way to highlight the rows
+                GridGroup {
+                    // Branching inside the component instead of outside to make two distinct ones
+                    // is a little inelegant but I specifically want to keep the button instance
+                    // the same so the stateful on-press color-change animation doesn't abruptly
+                    // end while you're actively long-pressing the button due to a change in identity.
+                    CalculatorButton(.text(input.backspaceable ? "⌫" : "C"), .gray) {
+                        previous = ""
+                        isErrorPresented = false
+                        
+                        if input.backspaceable {
+                            input.backspace()
+                        } else {
+                            input.set(.string(""))
+                        }
                     }
+                    .simultaneousGesture(LongPressGesture(minimumDuration: 1).onEnded { _ in
+                        previous = ""
+                        isErrorPresented = false
+                        input.set(.string(""))
+                    })
+                    CalculatorButton(.text("("), .gray, contentOffset: CGPoint(x: -2, y: -2)) { append("(", replaceResult: true) }
+                    CalculatorButton(.text(")"), .gray, contentOffset: CGPoint(x: 2, y: -2)) { append(")", replaceResult: true) }
+                    CalculatorButton(.image("divide"), .orange) { append("÷") }
                 }
-                .simultaneousGesture(LongPressGesture(minimumDuration: 1).onEnded { _ in
-                    previous = ""
-                    isErrorPresented = false
-                    input.set(.string(""))
-                })
-                CircleButton(.text("("), .gray, contentOffset: CGPoint(x: -2, y: -2)) { append("(", replaceResult: true) }
-                CircleButton(.text(")"), .gray, contentOffset: CGPoint(x: 2, y: -2)) { append(")", replaceResult: true) }
-                CircleButton(.image("divide"), .orange) { append("÷") }
-            }
-            HStack {
-                CircleButton(.text("'"), .gray) { append("'", replaceResult: true) }
-                CircleButton(.text("\""), .gray) { append("\"", replaceResult: true) }
-                CircleButton(.text("."), .gray) { append(".", replaceResult: true) }
-                CircleButton(.image("multiply"), .orange) { append("×") }
-            }
-            HStack {
-                CircleButton(.text("7"), .gray) { append("7", replaceResult: true) }
-                CircleButton(.text("8"), .gray) { append("8", replaceResult: true) }
-                CircleButton(.text("9"), .gray) { append("9", replaceResult: true) }
-                CircleButton(.image("minus"), .orange) { append("-") }
-            }
-            HStack {
-                CircleButton(.text("4"), .gray) { append("4", replaceResult: true) }
-                CircleButton(.text("5"), .gray) { append("5", replaceResult: true) }
-                CircleButton(.text("6"), .gray) { append("6", replaceResult: true) }
-                CircleButton(.image("plus"), .orange) { append("+") }
-            }
-            HStack {
-                CircleButton(.text("1"), .gray) { append("1", replaceResult: true) }
-                CircleButton(.text("2"), .gray) { append("2", replaceResult: true) }
-                CircleButton(.text("3"), .gray) { append("3", replaceResult: true) }
-                CircleButton(.image("equal"), .orange) { evaluate() }
-            }
-            HStack {
-                CircleButton(.text("0"), .gray) { append("0", replaceResult: true) }
-                CircleButton(.text("␣"), .gray) { append(" ", replaceResult: true) }
-                CircleButton(.text("⁄"), .gray) { append("/") }
-                CircleButton(.image("equal"), .orange) { evaluate() }
-            }
-            HStack {
-                CircleButton(.text("ⁿ⁄₂"), .gray) { appendToleratingPrefix("/", "2") }
-                CircleButton(.text("ⁿ⁄₄"), .gray) { appendToleratingPrefix("/", "4") }
-                CircleButton(.text("ⁿ⁄₈"), .gray) { appendToleratingPrefix("/", "8") }
-                CircleButton(.text("ⁿ⁄₁₆"), .gray) { appendToleratingPrefix("/", "16") }
+                GridGroup {
+                    CalculatorButton(.text("'"), .gray) { append("'", replaceResult: true) }
+                    CalculatorButton(.text("\""), .gray) { append("\"", replaceResult: true) }
+                    CalculatorButton(.text("."), .gray) { append(".", replaceResult: true) }
+                    CalculatorButton(.image("multiply"), .orange) { append("×") }
+                }
+                GridGroup {
+                    CalculatorButton(.text("7"), .gray) { append("7", replaceResult: true) }
+                    CalculatorButton(.text("8"), .gray) { append("8", replaceResult: true) }
+                    CalculatorButton(.text("9"), .gray) { append("9", replaceResult: true) }
+                    CalculatorButton(.image("minus"), .orange) { append("-") }
+                }
+                GridGroup {
+                    CalculatorButton(.text("4"), .gray) { append("4", replaceResult: true) }
+                    CalculatorButton(.text("5"), .gray) { append("5", replaceResult: true) }
+                    CalculatorButton(.text("6"), .gray) { append("6", replaceResult: true) }
+                    CalculatorButton(.image("plus"), .orange) { append("+") }
+                }
+                GridGroup {
+                    CalculatorButton(.text("1"), .gray) { append("1", replaceResult: true) }
+                    CalculatorButton(.text("2"), .gray) { append("2", replaceResult: true) }
+                    CalculatorButton(.text("3"), .gray) { append("3", replaceResult: true) }
+                }
+                CalculatorButton(.image("equal"), .orange) { evaluate() }.gridSpan(row: 2)
+                GridGroup {
+                    CalculatorButton(.text("0"), .gray) { append("0", replaceResult: true) }
+                    CalculatorButton(.text("␣"), .gray) { append(" ", replaceResult: true) }
+                    CalculatorButton(.text("⁄"), .gray) { append("/") }
+                }
+                GridGroup {
+                    CalculatorButton(.text("ⁿ⁄₂"), .gray) { appendToleratingPrefix("/", "2") }
+                    CalculatorButton(.text("ⁿ⁄₄"), .gray) { appendToleratingPrefix("/", "4") }
+                    CalculatorButton(.text("ⁿ⁄₈"), .gray) { appendToleratingPrefix("/", "8") }
+                    CalculatorButton(.text("ⁿ⁄₁₆"), .gray) { appendToleratingPrefix("/", "16") }
+                }
             }
         }
         .padding()
@@ -256,7 +260,7 @@ struct ContentView: View {
     }
 }
 
-struct CircleButton: View {
+struct CalculatorButton: View {
     enum Content {
         case text(String)
         case image(String)

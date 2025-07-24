@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		216BB80C2E26BDFC00D2AF17 /* Numerics in Frameworks */ = {isa = PBXBuildFile; productRef = 216BB80B2E26BDFC00D2AF17 /* Numerics */; };
+		216BB8F12E32D28200D2AF17 /* ExyteGrid in Frameworks */ = {isa = PBXBuildFile; productRef = 216BB8F02E32D28200D2AF17 /* ExyteGrid */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				216BB8F12E32D28200D2AF17 /* ExyteGrid in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -178,6 +180,7 @@
 			);
 			name = "Wood Calc";
 			packageProductDependencies = (
+				216BB8F02E32D28200D2AF17 /* ExyteGrid */,
 			);
 			productName = WoodworkingCalculator;
 			productReference = 218B780C2E15C69D00F8B129 /* Wood Calc.app */;
@@ -268,6 +271,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				21005B1B2E20383900ED60F5 /* XCRemoteSwiftPackageReference "swift-numerics" */,
+				216BB8EF2E32D28200D2AF17 /* XCRemoteSwiftPackageReference "Grid" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 218B780D2E15C69D00F8B129 /* Products */;
@@ -738,6 +742,14 @@
 				minimumVersion = 1.0.3;
 			};
 		};
+		216BB8EF2E32D28200D2AF17 /* XCRemoteSwiftPackageReference "Grid" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/Grid";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -745,6 +757,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 21005B1B2E20383900ED60F5 /* XCRemoteSwiftPackageReference "swift-numerics" */;
 			productName = Numerics;
+		};
+		216BB8F02E32D28200D2AF17 /* ExyteGrid */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 216BB8EF2E32D28200D2AF17 /* XCRemoteSwiftPackageReference "Grid" */;
+			productName = ExyteGrid;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
