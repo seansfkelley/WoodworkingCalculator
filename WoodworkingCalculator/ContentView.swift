@@ -199,8 +199,8 @@ struct ContentView: View {
                     isErrorPresented = false
                     input.set(.string(""))
                 })
-                CircleButton(.text("("), .gray) { append("(", replaceResult: true) }
-                CircleButton(.text(")"), .gray) { append(")", replaceResult: true) }
+                CircleButton(.text("("), .gray, contentOffset: CGPoint(x: -2, y: -2)) { append("(", replaceResult: true) }
+                CircleButton(.text(")"), .gray, contentOffset: CGPoint(x: 2, y: -2)) { append(")", replaceResult: true) }
                 CircleButton(.image("divide"), .orange) { append("÷") }
             }
             HStack {
@@ -264,11 +264,13 @@ struct CircleButton: View {
     
     let content: Content
     let fill: Color
+    let contentOffset: CGPoint
     let action: () -> Void
     
-    init(_ content: Content, _ fill: Color, action: @escaping () -> Void) {
+    init(_ content: Content, _ fill: Color, contentOffset: CGPoint = CGPoint(), action: @escaping () -> Void) {
         self.content = content
         self.fill = fill
+        self.contentOffset = contentOffset
         self.action = action
     }
     
@@ -280,11 +282,13 @@ struct CircleButton: View {
                     .font(.system(size: 32))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .offset(x: contentOffset.x, y: contentOffset.y)
             case .image(let image):
                 Image(systemName: image)
                     .font(.system(size: 40))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .offset(x: contentOffset.x, y: contentOffset.y)
             }
         }
         .buttonStyle(.borderedProminent)
