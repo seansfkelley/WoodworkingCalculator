@@ -78,9 +78,10 @@ struct WoodworkingCalculatorParserTests {
     }
 }
 
+// Serialized: Citron is not thread-safe.
+@Suite(.serialized)
 struct EvaluatableCalculationTests {
-    // Serialized: Citron is not thread-safe.
-    @Test<[(String, EvaluatableCalculation, CalculationResult)]>("from", .serialized, arguments: [
+    @Test<[(String, EvaluatableCalculation, CalculationResult)]>("from", arguments: [
         (
             "1/2",
             .rational(Rational(1, 2)),
@@ -92,17 +93,22 @@ struct EvaluatableCalculationTests {
             .real(3.5),
         ),
         (
-            "1 + 2 * 3",
+            "1 + 2 × 3",
             .add(.rational(Rational(1, 1)), .multiply(.rational(Rational(2, 1)), .rational(Rational(3, 1)))),
             .rational(Rational(7, 1)),
         ),
         (
-            "(1 + 2) * 3",
+            "(1 + 2) × 3",
             .multiply(.add(.rational(Rational(1, 1)), .rational(Rational(2, 1))), .rational(Rational(3, 1))),
             .rational(Rational(9, 1)),
         ),
         (
-            "1' 3\" * 3.2",
+            "1 + 2 × 3 ÷ 4",
+            .add(.rational(Rational(1, 1)), .divide(.multiply(.rational(Rational(2, 1)), .rational(Rational(3, 1))), .rational(Rational(4, 1)))),
+            .rational(Rational(5, 2)),
+        ),
+        (
+            "1' 3\" × 3.2",
             .multiply(.rational(Rational(15, 1)), .real(3.2)),
             .real(48.0),
         ),
@@ -122,24 +128,23 @@ struct EvaluatableCalculationTests {
         #expect(evaluatable!.evaluate() == expectedResult)
     }
     
-    // Serialized: Citron is not thread-safe.
-    @Test("from (nil)", .serialized, arguments: [
+    @Test("from (nil)", arguments: [
         "1//2",
         "1++",
         "1 1",
         "1--",
+        "1*2",
     ]) func fromNil(input: String) throws {
         #expect(EvaluatableCalculation.from(input) == nil)
     }
     
-    // Serialized: Citron is not thread-safe.
-    @Test("isValidPrefix", .serialized, arguments: [
+    @Test("isValidPrefix", arguments: [
         "1",
         "1.",
         "1 1",
         "1 1/",
         "1+",
-        "1+2-3/4*",
+        "1+2-3/4×",
         "1+1",
         "1+-",
         "1'",
@@ -156,8 +161,7 @@ struct EvaluatableCalculationTests {
         #expect(EvaluatableCalculation.isValidPrefix(input))
     }
     
-    // Serialized: Citron is not thread-safe.
-    @Test("!isValidPrefix", .serialized, arguments: [
+    @Test("!isValidPrefix", arguments: [
         "+",
         "'",
         "\"",

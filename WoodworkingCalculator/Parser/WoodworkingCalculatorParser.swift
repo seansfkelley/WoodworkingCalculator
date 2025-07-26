@@ -16,12 +16,12 @@ enum EvaluatableCalculation: CustomStringConvertible, Equatable {
         switch (self) {
         case .rational(let r):
             if r.den == 1 {
-                return "\(r.num)"
+                return r.num.description
             } else {
                 return r.description
             }
         case .real(let r):
-            return "\(r)"
+            return r.description
         case .add(let left, let right):
             return "(\(left) + \(right))"
         case .subtract(let left, let right):
@@ -40,37 +40,41 @@ enum EvaluatableCalculation: CustomStringConvertible, Equatable {
         case .real(let r):
             return .real(r)
         case .add(let left, let right):
-            let l = left.evaluate()
-            let r = right.evaluate()
-            if case .rational(let lrational) = l, case .rational(let rrational) = r {
-                return .rational(lrational + rrational)
-            } else {
-                return .real(Double(l) + Double(r))
-            }
+            return EvaluatableCalculation.evaluateBinaryOperator(left, (+), (+), right)
         case .subtract(let left, let right):
-            let l = left.evaluate()
-            let r = right.evaluate()
-            if case .rational(let lrational) = l, case .rational(let rrational) = r {
-                return .rational(lrational - rrational)
-            } else {
-                return .real(Double(l) - Double(r))
-            }
+            return EvaluatableCalculation.evaluateBinaryOperator(left, (-), (-), right)
         case .multiply(let left, let right):
-            let l = left.evaluate()
-            let r = right.evaluate()
-            if case .rational(let lrational) = l, case .rational(let rrational) = r {
-                return .rational(lrational * rrational)
-            } else {
-                return .real(Double(l) * Double(r))
-            }
+            return EvaluatableCalculation.evaluateBinaryOperator(left, (*), (*), right)
         case .divide(let left, let right):
-            let l = left.evaluate()
-            let r = right.evaluate()
-            if case .rational(let lrational) = l, case .rational(let rrational) = r {
-                return .rational(lrational / rrational)
-            } else {
-                return .real(Double(l) / Double(r))
-            }
+            return EvaluatableCalculation.evaluateBinaryOperator(left, (/), (/), right)
+        }
+    }
+    
+    // This signature is pretty dumb and the implementation isn't much better, but it's the best
+    // way I could determine to DRY up the binary operator stuff. Generics don't seem to work,
+    // even with a dedicated "arithmetical" protocol that includes the four basic operators that
+    // I make Double and Rational conform to. The compiler still gets mad about ambiguous calls.
+    private static func evaluateBinaryOperator(
+        _ left: EvaluatableCalculation,
+        _ rationalOp: (Rational, Rational) -> Rational,
+        _ doubleOp: (Double, Double) -> Double,
+        _ right: EvaluatableCalculation
+    ) -> CalculationResult {
+        switch (left.evaluate(), right.evaluate()) {
+        case (.rational(let leftRational), .rational(let rightRational)):
+            return .rational(rationalOp(leftRational, rightRational))
+
+        // Fallthroughs don't work here, unfortunately, due to changes in the type of the binding
+        // pattern, so eat the cost of repetition.
+            
+        case (.real(let leftReal), .real(let rightReal)):
+            return .real(doubleOp(leftReal, rightReal))
+
+        case (.rational(let leftRational), .real(let rightReal)):
+            return .real(doubleOp(Double(leftRational), rightReal))
+
+        case (.real(let leftReal), .rational(let rightRational)):
+            return .real(doubleOp(leftReal, Double(rightRational)))
         }
     }
     
