@@ -36,7 +36,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		21005B242E20609100ED60F5 /* todo.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = todo.md; sourceTree = "<group>"; };
 		216BB80D2E28144400D2AF17 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		218B780C2E15C69D00F8B129 /* Wood Calc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wood Calc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78192E15C69E00F8B129 /* Wood Calc Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wood Calc Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -118,7 +117,6 @@
 			isa = PBXGroup;
 			children = (
 				216BB80D2E28144400D2AF17 /* README.md */,
-				21005B242E20609100ED60F5 /* todo.md */,
 				216BB8452E2950AB00D2AF17 /* Citron */,
 				219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */,
 				218B780E2E15C69D00F8B129 /* WoodworkingCalculator */,
@@ -650,6 +648,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = me.nkelley.WoodworkingCalculatorUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -657,7 +656,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
-				TEST_TARGET_NAME = WoodworkingCalculator;
+				TEST_TARGET_NAME = "Wood Calc";
 			};
 			name = Debug;
 		};
@@ -672,6 +671,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = me.nkelley.WoodworkingCalculatorUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -679,7 +679,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
-				TEST_TARGET_NAME = WoodworkingCalculator;
+				TEST_TARGET_NAME = "Wood Calc";
 			};
 			name = Release;
 		};

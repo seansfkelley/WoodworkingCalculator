@@ -17,6 +17,13 @@
   },
   "testTargets" : [
     {
+      "target" : {
+        "containerPath" : "container:WoodworkingCalculator.xcodeproj",
+        "identifier" : "218B78222E15C69E00F8B129",
+        "name" : "Wood Calc UI Tests"
+      }
+    },
+    {
       "parallelizable" : true,
       "target" : {
         "containerPath" : "container:WoodworkingCalculator.xcodeproj",

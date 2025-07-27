@@ -188,6 +188,7 @@ struct ContentView: View {
                     .minimumScaleFactor(0.3)
                     .lineLimit(1)
                     .textSelection(.enabled)
+                    .accessibilityIdentifier("readout")
             }
             Grid(tracks: 4, spacing: 8) {
                 // n.b. GridGroup is only to work around limitations in SwiftUI's ViewBuilder
