@@ -1,10 +1,3 @@
-//
-//  WoodworkingCalculatorUITests.swift
-//  WoodworkingCalculatorUITests
-//
-//  Created by Sean Kelley on 2025-07-02.
-//
-
 import XCTest
 
 final class WoodworkingCalculatorUITests: XCTestCase {

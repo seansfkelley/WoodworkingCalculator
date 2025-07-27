@@ -4,6 +4,6 @@ struct Constants {
         static let displayInchesOnlyDefault = false
         
         static let precisionKey = "precision"
-        static let precisionDefault = 64
+        static let precisionDefault = 32
     }
 }

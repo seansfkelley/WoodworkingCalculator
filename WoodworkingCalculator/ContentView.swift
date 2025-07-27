@@ -48,17 +48,13 @@ class Input: ObservableObject {
         }
     }
     
-    var backspaceable: Bool {
+    var willBackspaceSingleCharacter: Bool {
         return switch value {
         case .string(let s):
             !s.isEmpty
         case .result:
             false
         }
-    }
-    
-    func set(_ value: RawValue) {
-        self.value = value
     }
     
     func append(_ string: String, replaceResult: Bool = false) -> Bool {
@@ -69,7 +65,7 @@ class Input: ObservableObject {
                 }
             } else {
                 let s = stringified
-                if string != " " || s.last != " " {
+                if string != " " || (s.count > 0 && s.last != " ") {
                     return s + string
                 }
             }
@@ -85,8 +81,20 @@ class Input: ObservableObject {
     }
     
     func backspace() {
-        let s = stringified
-        value = .string(s.count == 0 ? "" : String(s.prefix(s.count - 1)))
+        value = switch (value) {
+        case .string(let s):
+            .string(s.count == 0 ? "" : String(s.prefix(s.count - 1)))
+        case .result:
+            .string("")
+        }
+    }
+    
+    func reset(_ to: RawValue = .string("")) {
+        if case let .string(s) = to, !EvaluatableCalculation.isValidPrefix(s)  {
+            // nothing
+        } else {
+            value = to
+        }
     }
 }
 
@@ -141,7 +149,7 @@ struct ContentView: View {
                 .foregroundStyle(.secondary)
                 .minimumScaleFactor(0.3)
                 .onTapGesture {
-                    input.set(.string(previous))
+                    input.reset(.string(previous))
                     previous = ""
                     isErrorPresented = false
                 }
@@ -183,26 +191,21 @@ struct ContentView: View {
             }
             Grid(tracks: 4, spacing: 8) {
                 // n.b. GridGroup is only to work around limitations in SwiftUI's ViewBuilder
-                // closure typings, but I figured it doubled as a nice way to highlight the rows
+                // closure typings, but I figured it doubled as a nice way to emphasize the rows.
                 GridGroup {
                     // Branching inside the component instead of outside to make two distinct ones
                     // is a little inelegant but I specifically want to keep the button instance
                     // the same so the stateful on-press color-change animation doesn't abruptly
-                    // end while you're actively long-pressing the button due to a change in identity.
-                    CalculatorButton(.text(input.backspaceable ? "⌫" : "C"), .gray) {
+                    // end while you're actively long-pressing the button due to changed identity.
+                    CalculatorButton(.text(input.willBackspaceSingleCharacter ? "⌫" : "C"), .gray) {
                         previous = ""
                         isErrorPresented = false
-                        
-                        if input.backspaceable {
-                            input.backspace()
-                        } else {
-                            input.set(.string(""))
-                        }
+                        input.backspace()
                     }
                     .simultaneousGesture(LongPressGesture(minimumDuration: 1).onEnded { _ in
                         previous = ""
                         isErrorPresented = false
-                        input.set(.string(""))
+                        input.reset()
                     })
                     CalculatorButton(.text("("), .gray, contentOffset: CGPoint(x: -2, y: -2)) { append("(", replaceResult: true) }
                     CalculatorButton(.text(")"), .gray, contentOffset: CGPoint(x: 2, y: -2)) { append(")", replaceResult: true) }
@@ -233,15 +236,15 @@ struct ContentView: View {
                 }
                 CalculatorButton(.image("equal"), .orange) { evaluate() }.gridSpan(row: 2)
                 GridGroup {
+                    CalculatorButton(.text("⁄"), .gray) { append("/") }
                     CalculatorButton(.text("0"), .gray) { append("0", replaceResult: true) }
                     CalculatorButton(.text("␣"), .gray) { append(" ", replaceResult: true) }
-                    CalculatorButton(.text("⁄"), .gray) { append("/") }
                 }
                 GridGroup {
-                    CalculatorButton(.text("ⁿ⁄₂"), .gray) { appendToleratingPrefix("/", "2") }
-                    CalculatorButton(.text("ⁿ⁄₄"), .gray) { appendToleratingPrefix("/", "4") }
-                    CalculatorButton(.text("ⁿ⁄₈"), .gray) { appendToleratingPrefix("/", "8") }
-                    CalculatorButton(.text("ⁿ⁄₁₆"), .gray) { appendToleratingPrefix("/", "16") }
+                    CalculatorButton(.text("⁄₂"), .gray) { appendToleratingPrefix("/", "2") }
+                    CalculatorButton(.text("⁄₄"), .gray) { appendToleratingPrefix("/", "4") }
+                    CalculatorButton(.text("⁄₈"), .gray) { appendToleratingPrefix("/", "8") }
+                    CalculatorButton(.text("⁄₁₆"), .gray) { appendToleratingPrefix("/", "16") }
                 }
             }
         }
@@ -256,7 +259,7 @@ struct ContentView: View {
         }
 
         previous = inputString
-        input.set(.result(result))
+        input.reset(.result(result))
         isErrorPresented = false
     }
 }
