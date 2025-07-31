@@ -99,10 +99,20 @@ class Input: ObservableObject {
 }
 
 // n.b. this function only works with a valid prefix of a fraction.
-private func prettifyInput(_ input: String) -> String {
-    return input.replacing(/(\d+)\/(\d*)/, with: { match in
+private func prettifyInput(_ input: String) -> AttributedString {
+    var prettified = AttributedString(input.replacing(/(\d+)\/(\d*)/, with: { match in
         return "\(Int(match.1)!.numerator)⁄\(Int(match.2).map(\.denominator) ?? " ")"
-    })
+    }))
+    
+    
+    if input.contains(/\ $/) {
+        prettified.removeSubrange(prettified.index(prettified.endIndex, offsetByCharacters: -1)...)
+        var suffix = AttributedString("𛲖")
+        suffix.foregroundColor = darkGray
+        prettified += suffix
+    }
+    return prettified
+        
 }
 
 private let darkGray = Color.gray.mix(with: .black, by: 0.25)
