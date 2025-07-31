@@ -261,7 +261,7 @@ struct ContentView: View {
             return
         }
 
-        previous = inputString
+        previous = inputString.trimmingCharacters(in: CharacterSet.whitespaces)
         input.reset(.result(result))
         isErrorPresented = false
     }
