@@ -22,3 +22,5 @@ There is a separate Xcode build target for [Citron](https://github.com/roop/citr
 ## Installing
 
 Not distributed on the App Store. Build and install it through the regular Xcode techniques, or AltStore.
+
+Use `./package.sh` to an unsigned `.ipa` suitable for sideloading. 
