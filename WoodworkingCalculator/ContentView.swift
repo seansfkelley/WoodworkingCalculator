@@ -57,23 +57,28 @@ class Input: ObservableObject {
         }
     }
     
-    func append(_ string: String, replaceResult: Bool = false) -> Bool {
-        let candidate: String? = {
-            if replaceResult, case .result = value {
-                if string != " " {
-                    return string
-                }
+    func append(
+        _ string: String,
+        canReplaceResult: Bool = false,
+        deletingSuffix charactersToTrim: Set<Character> = Set()
+    ) -> Bool {
+        let candidate = {
+            if canReplaceResult, case .result = value {
+                return string
             } else {
-                let s = stringified
-                if string != " " || (s.count > 0 && s.last != " ") {
-                    return s + string
+                var s = stringified
+                while s.count > 0 && charactersToTrim.contains(s.last.unsafelyUnwrapped) {
+                    s.removeLast()
                 }
+                return (s + string).replacing(/\ +/, with: " ")
             }
-            return nil
         }()
         
-        if candidate != nil && EvaluatableCalculation.isValidPrefix(candidate!) {
-            value = .string(candidate!)
+        if candidate.wholeMatch(of: /^\s*$/) == nil &&
+            candidate != stringified &&
+            EvaluatableCalculation.isValidPrefix(candidate)
+        {
+            value = .string(candidate)
             return true
         } else {
             return false
@@ -114,6 +119,7 @@ private func prettifyInput(_ input: String) -> String {
 }
 
 private let darkGray = Color.gray.mix(with: .black, by: 0.25)
+private let ignorableDenominatorShortcutPrefixes: Set<Character> = [" ", "/"]
 
 struct ContentView: View {
     @State private var previous: String = ""
@@ -121,16 +127,8 @@ struct ContentView: View {
     @State private var isErrorPresented: Bool = false
     @StateObject private var input: Input = Input()
     
-    private func append(_ string: String, replaceResult: Bool = false) {
-        if input.append(string, replaceResult: replaceResult) {
-            previous = ""
-        }
-    }
-    
-    private func appendToleratingPrefix(_ preexistingPrefix: String, _ suffix: String) {
-        if input.stringified.hasSuffix(preexistingPrefix) && input.append(suffix) {
-            previous = ""
-        } else if input.append(preexistingPrefix + suffix) {
+    private func append(_ string: String, canReplaceResult: Bool = false, deletingSuffix: Set<Character> = Set()) {
+        if input.append(string, canReplaceResult: canReplaceResult, deletingSuffix: deletingSuffix) {
             previous = ""
         }
     }
@@ -218,44 +216,58 @@ struct ContentView: View {
                         isErrorPresented = false
                         input.reset()
                     })
-                    CalculatorButton(.text("("), .gray, contentOffset: CGPoint(x: -2, y: -2)) { append("(", replaceResult: true) }
-                    CalculatorButton(.text(")"), .gray, contentOffset: CGPoint(x: 2, y: -2)) { append(")", replaceResult: true) }
+                    CalculatorButton(.text("("), .gray, contentOffset: CGPoint(x: -2, y: -2)) {
+                        append("(", canReplaceResult: true)
+                    }
+                    CalculatorButton(.text(")"), .gray, contentOffset: CGPoint(x: 2, y: -2)) {
+                        append(")")
+                    }
                     CalculatorButton(.image("divide"), .orange) { append("÷") }
                 }
                 GridGroup {
-                    CalculatorButton(.text("'"), .gray) { append("'", replaceResult: true) }
-                    CalculatorButton(.text("\""), .gray) { append("\"", replaceResult: true) }
-                    CalculatorButton(.text("."), .gray) { append(".", replaceResult: true) }
+                    CalculatorButton(.text("'"), .gray) { append("'", canReplaceResult: true) }
+                    CalculatorButton(.text("\""), .gray) { append("\"", canReplaceResult: true) }
+                    CalculatorButton(.text("."), .gray) { append(".", canReplaceResult: true) }
                     CalculatorButton(.image("multiply"), .orange) { append("×") }
                 }
                 GridGroup {
-                    CalculatorButton(.text("7"), darkGray) { append("7", replaceResult: true) }
-                    CalculatorButton(.text("8"), darkGray) { append("8", replaceResult: true) }
-                    CalculatorButton(.text("9"), darkGray) { append("9", replaceResult: true) }
+                    CalculatorButton(.text("7"), darkGray) { append("7", canReplaceResult: true) }
+                    CalculatorButton(.text("8"), darkGray) { append("8", canReplaceResult: true) }
+                    CalculatorButton(.text("9"), darkGray) { append("9", canReplaceResult: true) }
                     CalculatorButton(.image("minus"), .orange) { append("-") }
                 }
                 GridGroup {
-                    CalculatorButton(.text("4"), darkGray) { append("4", replaceResult: true) }
-                    CalculatorButton(.text("5"), darkGray) { append("5", replaceResult: true) }
-                    CalculatorButton(.text("6"), darkGray) { append("6", replaceResult: true) }
+                    CalculatorButton(.text("4"), darkGray) { append("4", canReplaceResult: true) }
+                    CalculatorButton(.text("5"), darkGray) { append("5", canReplaceResult: true) }
+                    CalculatorButton(.text("6"), darkGray) { append("6", canReplaceResult: true) }
                     CalculatorButton(.image("plus"), .orange) { append("+") }
                 }
                 GridGroup {
-                    CalculatorButton(.text("1"), darkGray) { append("1", replaceResult: true) }
-                    CalculatorButton(.text("2"), darkGray) { append("2", replaceResult: true) }
-                    CalculatorButton(.text("3"), darkGray) { append("3", replaceResult: true) }
+                    CalculatorButton(.text("1"), darkGray) { append("1", canReplaceResult: true) }
+                    CalculatorButton(.text("2"), darkGray) { append("2", canReplaceResult: true) }
+                    CalculatorButton(.text("3"), darkGray) { append("3", canReplaceResult: true) }
                 }
                 CalculatorButton(.image("equal"), .orange) { evaluate() }.gridSpan(row: 2)
                 GridGroup {
-                    CalculatorButton(.text("⁄"), .gray) { append("/") }
-                    CalculatorButton(.text("0"), darkGray) { append("0", replaceResult: true) }
-                    CalculatorButton(.text("␣"), .gray) { append(" ", replaceResult: true) }
+                    CalculatorButton(.text("⁄"), .gray) {
+                        append("/", deletingSuffix: ignorableDenominatorShortcutPrefixes)
+                    }
+                    CalculatorButton(.text("0"), darkGray) { append("0", canReplaceResult: true) }
+                    CalculatorButton(.text("␣"), .gray) { append(" ", canReplaceResult: true) }
                 }
                 GridGroup {
-                    CalculatorButton(.text("⁄₂"), .gray) { appendToleratingPrefix("/", "2") }
-                    CalculatorButton(.text("⁄₄"), .gray) { appendToleratingPrefix("/", "4") }
-                    CalculatorButton(.text("⁄₈"), .gray) { appendToleratingPrefix("/", "8") }
-                    CalculatorButton(.text("⁄₁₆"), .gray) { appendToleratingPrefix("/", "16") }
+                    CalculatorButton(.text("⁄₂"), .gray) {
+                        append("/2", deletingSuffix: ignorableDenominatorShortcutPrefixes)
+                    }
+                    CalculatorButton(.text("⁄₄"), .gray) {
+                        append("/4", deletingSuffix: ignorableDenominatorShortcutPrefixes)
+                    }
+                    CalculatorButton(.text("⁄₈"), .gray) {
+                        append("/8", deletingSuffix: ignorableDenominatorShortcutPrefixes)
+                    }
+                    CalculatorButton(.text("⁄₁₆"), .gray) {
+                        append("/16", deletingSuffix: ignorableDenominatorShortcutPrefixes)
+                    }
                 }
             }
         }

@@ -27,18 +27,47 @@ struct InputTests {
         #expect(input.stringified == "1 + 1")
     }
     
-    @Test func setToValidStringAndFormatsVerbatim() {
+    @Test func appendingToResult() {
+        input.reset(.result(.real(1.0)))
+        #expect(input.append("2") == false) // would not create a legal (prefix of an) expression
+        #expect(input.append("2", canReplaceResult: true) == true) // okay to replace with a legal (prefix of an) expression
+        #expect(input.stringified == "2")
+        
+        input.reset(.result(.real(1.0)))
+        #expect(input.append("+") == true)
+        #expect(input.stringified == "1\"+")
+        
+        input.reset(.result(.real(1.0)))
+        #expect(input.append(" ", canReplaceResult: true) == false) // no whitespace-only strings if trying to overwrite a result
+        #expect(input.stringified == "1\"")
+    }
+    
+    @Test func appendDeletingSuffix() {
+        input.reset(.string("1 "))
+        #expect(input.append("/4") == false) // sanity-check that this case doesn't work without deletingSuffix
+        #expect(input.stringified == "1 ")
+        #expect(input.append("/4", deletingSuffix: [" ", "/"]) == true)
+        #expect(input.stringified == "1/4")
+        
+        input.reset(.string("1/"))
+        #expect(input.append("/4") == false) // sanity-check that this case doesn't work without deletingSuffix
+        #expect(input.stringified == "1/")
+        #expect(input.append("/4", deletingSuffix: [" ", "/"]) == true)
+        #expect(input.stringified == "1/4")
+    }
+    
+    @Test func resetToValidStringAndFormatsVerbatim() {
         input.reset(.string("1  + 1 "))
         #expect(input.stringified == "1  + 1 ")
     }
     
-    @Test func setToRationalResultAndFormat() {
+    @Test func resetToRationalResultAndFormat() {
         input.reset(.result(.rational(Rational(1, 2))))
         #expect(input.stringified == "1/2\"")
         #expect(input.error == nil)
     }
     
-    @Test func setToRealResultAndFormatWithError() {
+    @Test func resetToRealResultAndFormatWithError() {
         input.reset(.result(.real(0.501)))
         #expect(input.stringified == "1/2\"")
         let (precision, error) = input.error!
