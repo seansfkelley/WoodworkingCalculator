@@ -105,6 +105,8 @@ private func prettifyInput(_ input: String) -> String {
     })
 }
 
+private let darkGray = Color.gray.mix(with: .black, by: 0.25)
+
 struct ContentView: View {
     @State private var previous: String = ""
     @State private var isSettingsPresented: Bool = false
@@ -219,26 +221,26 @@ struct ContentView: View {
                     CalculatorButton(.image("multiply"), .orange) { append("×") }
                 }
                 GridGroup {
-                    CalculatorButton(.text("7"), .gray) { append("7", replaceResult: true) }
-                    CalculatorButton(.text("8"), .gray) { append("8", replaceResult: true) }
-                    CalculatorButton(.text("9"), .gray) { append("9", replaceResult: true) }
+                    CalculatorButton(.text("7"), darkGray) { append("7", replaceResult: true) }
+                    CalculatorButton(.text("8"), darkGray) { append("8", replaceResult: true) }
+                    CalculatorButton(.text("9"), darkGray) { append("9", replaceResult: true) }
                     CalculatorButton(.image("minus"), .orange) { append("-") }
                 }
                 GridGroup {
-                    CalculatorButton(.text("4"), .gray) { append("4", replaceResult: true) }
-                    CalculatorButton(.text("5"), .gray) { append("5", replaceResult: true) }
-                    CalculatorButton(.text("6"), .gray) { append("6", replaceResult: true) }
+                    CalculatorButton(.text("4"), darkGray) { append("4", replaceResult: true) }
+                    CalculatorButton(.text("5"), darkGray) { append("5", replaceResult: true) }
+                    CalculatorButton(.text("6"), darkGray) { append("6", replaceResult: true) }
                     CalculatorButton(.image("plus"), .orange) { append("+") }
                 }
                 GridGroup {
-                    CalculatorButton(.text("1"), .gray) { append("1", replaceResult: true) }
-                    CalculatorButton(.text("2"), .gray) { append("2", replaceResult: true) }
-                    CalculatorButton(.text("3"), .gray) { append("3", replaceResult: true) }
+                    CalculatorButton(.text("1"), darkGray) { append("1", replaceResult: true) }
+                    CalculatorButton(.text("2"), darkGray) { append("2", replaceResult: true) }
+                    CalculatorButton(.text("3"), darkGray) { append("3", replaceResult: true) }
                 }
                 CalculatorButton(.image("equal"), .orange) { evaluate() }.gridSpan(row: 2)
                 GridGroup {
                     CalculatorButton(.text("⁄"), .gray) { append("/") }
-                    CalculatorButton(.text("0"), .gray) { append("0", replaceResult: true) }
+                    CalculatorButton(.text("0"), darkGray) { append("0", replaceResult: true) }
                     CalculatorButton(.text("␣"), .gray) { append(" ", replaceResult: true) }
                 }
                 GridGroup {
