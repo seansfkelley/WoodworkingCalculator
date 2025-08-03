@@ -288,7 +288,7 @@ struct ContentView: View {
             if oldPhase == .background &&
                 newPhase == .inactive &&
                 lastBackgroundTime != nil &&
-                Date().timeIntervalSince(lastBackgroundTime!) > 1 * 60 {
+                Date().timeIntervalSince(lastBackgroundTime!) > 30 * 60 {
                 input.reset()
                 previous = ""
                 isErrorPresented = false
