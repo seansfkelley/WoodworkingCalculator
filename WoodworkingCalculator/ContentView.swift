@@ -249,11 +249,11 @@ struct ContentView: View {
                 }
                 CalculatorButton(.image("equal"), .orange) { evaluate() }.gridSpan(row: 2)
                 GridGroup {
+                    CalculatorButton(.text("␣"), .gray) { append(" ", canReplaceResult: true) }
+                    CalculatorButton(.text("0"), darkGray) { append("0", canReplaceResult: true) }
                     CalculatorButton(.text("⁄"), .gray) {
                         append("/", deletingSuffix: ignorableDenominatorShortcutPrefixes)
                     }
-                    CalculatorButton(.text("0"), darkGray) { append("0", canReplaceResult: true) }
-                    CalculatorButton(.text("␣"), .gray) { append(" ", canReplaceResult: true) }
                 }
                 GridGroup {
                     CalculatorButton(.text("⁄₂"), .gray) {
