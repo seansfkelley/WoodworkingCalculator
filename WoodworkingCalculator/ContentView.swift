@@ -127,6 +127,10 @@ struct ContentView: View {
     @State private var isErrorPresented: Bool = false
     @StateObject private var input: Input = Input()
     
+    // Why does this have to be a @State? I can't just reassign it as a normal variable?
+    @State private var lastBackgroundTime: Date?
+    @Environment(\.scenePhase) private var scenePhase
+    
     private func append(_ string: String, canReplaceResult: Bool = false, deletingSuffix: Set<Character> = Set()) {
         if input.append(string, canReplaceResult: canReplaceResult, deletingSuffix: deletingSuffix) {
             previous = ""
@@ -272,6 +276,22 @@ struct ContentView: View {
             }
         }
         .padding()
+        .onChange(of: scenePhase, { _, newPhase in
+            switch (newPhase) {
+            case .active:
+                if lastBackgroundTime != nil && Date().timeIntervalSince(lastBackgroundTime!) > 1 * 60 {
+                    input.reset()
+                    previous = ""
+                    isErrorPresented = false
+                }
+            case .background:
+                lastBackgroundTime = Date()
+            case .inactive:
+                break // don't care
+            @unknown default:
+                break // don't care
+            }
+        })
     }
     
     private func evaluate() {
