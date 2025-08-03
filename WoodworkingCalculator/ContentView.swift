@@ -276,20 +276,27 @@ struct ContentView: View {
             }
         }
         .padding()
-        .onChange(of: scenePhase, { _, newPhase in
-            switch (newPhase) {
-            case .active:
-                if lastBackgroundTime != nil && Date().timeIntervalSince(lastBackgroundTime!) > 1 * 60 {
-                    input.reset()
-                    previous = ""
-                    isErrorPresented = false
-                }
-            case .background:
+        .onChange(of: scenePhase, { oldPhase, newPhase in
+            // It seems like when foregrounding/backgrounding the app, it always bounces through
+            // the inactive state. By clearing the state before we're fully active, we avoid a
+            // flash of the old state being visible when the app reopens.
+            //
+            // There still seems to be a brief fadeout, but I think this is from iOS smoothing the
+            // visual transition from a screenshot of the last-known state to what the app looks
+            // like at the time it's foregrounded. Polish would skip this transition if possible,
+            // but I'm not sure how.
+            if oldPhase == .background &&
+                newPhase == .inactive &&
+                lastBackgroundTime != nil &&
+                Date().timeIntervalSince(lastBackgroundTime!) > 1 * 60 {
+                input.reset()
+                previous = ""
+                isErrorPresented = false
+                isSettingsPresented = false
+            } else if newPhase == .background {
                 lastBackgroundTime = Date()
-            case .inactive:
-                break // don't care
-            @unknown default:
-                break // don't care
+            } else {
+                // don't care
             }
         })
     }
