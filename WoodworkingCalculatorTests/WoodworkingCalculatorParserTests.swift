@@ -11,6 +11,9 @@ struct WoodworkingCalculatorParserTests {
         ("1 / 2", nil),
         ("3-3/4", nil),
         ("3--3/4", nil),
+        ("1111111111111111111111111/2", nil),
+        ("1/1111111111111111111111111", nil),
+        ("1111111111111111111111111 1/2", nil),
     ]) func testParseMixedNumber(input: String, expected: Rational?) throws {
         let actual = parseMixedNumber(input)
         if expected == nil {
@@ -37,6 +40,7 @@ struct WoodworkingCalculatorParserTests {
         ("", nil),
         (" 1", nil),
         ("x", nil),
+        ("1111111111111111111111111.0", nil)
     ]) func testParseReal(input: String, expected: Double?) throws {
         let actual = parseReal(input)
         if expected == nil {
@@ -61,6 +65,7 @@ struct WoodworkingCalculatorParserTests {
         ("1.0", nil),
         (" 1", nil),
         ("x", nil),
+        ("1111111111111111111111111", nil),
     ]) func testParseInteger(input: String, expected: Int?) throws {
         let actual = parseInteger(input)
         if expected == nil {

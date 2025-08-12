@@ -153,7 +153,7 @@ internal enum Token {
 typealias LexedTokenData = (WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode)
 
 internal func parseMixedNumber(_ input: String) -> LexedTokenData? {
-    if let result = try? #/((?<whole>[0-9]+) +)?(?<num>[0-9]+)/(?<den>[0-9]+)/#.wholeMatch(in: input) {
+    if let result = try? #/((?<whole>[0-9]{1,10}) +)?(?<num>[0-9]{1,10})/(?<den>[0-9]{1,10})/#.wholeMatch(in: input) {
         let whole = if let i = result.whole { Int(i).unsafelyUnwrapped } else { 0 }
         let num = Int(result.num).unsafelyUnwrapped
         let den = Int(result.den).unsafelyUnwrapped
@@ -164,7 +164,7 @@ internal func parseMixedNumber(_ input: String) -> LexedTokenData? {
 }
 
 internal func parseReal(_ input: String) -> LexedTokenData? {
-    if let _ = try? #/([0-9]+)?\.[0-9]+/#.wholeMatch(in: input) {
+    if let _ = try? #/([0-9]{1,10})?\.[0-9]{1,10}/#.wholeMatch(in: input) {
         let real = Double(input).unsafelyUnwrapped
         return (.real(real), .Real)
     } else {
@@ -173,7 +173,7 @@ internal func parseReal(_ input: String) -> LexedTokenData? {
 }
 
 internal func parseInteger(_ input: String) -> LexedTokenData? {
-    if let result = try? #/(?<int>[0-9]+)\.?/#.wholeMatch(in: input) {
+    if let result = try? #/(?<int>[0-9]{1,10})\.?/#.wholeMatch(in: input) {
         let int = Int(result.int).unsafelyUnwrapped
         return (.integer(int), .Integer)
     } else {
