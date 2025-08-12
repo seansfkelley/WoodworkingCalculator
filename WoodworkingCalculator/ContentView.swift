@@ -160,6 +160,7 @@ struct ContentView: View {
                 .font(.system(size: 40, weight: .light))
                 .foregroundStyle(.secondary)
                 .minimumScaleFactor(0.3)
+                .truncationMode(.head)
                 .onTapGesture {
                     input.reset(.string(previous))
                     previous = ""
@@ -200,6 +201,7 @@ struct ContentView: View {
                     .minimumScaleFactor(0.3)
                     .lineLimit(1)
                     .textSelection(.enabled)
+                    .truncationMode(.head)
                     .accessibilityIdentifier("readout")
             }
             Grid(tracks: 4, spacing: 8) {
