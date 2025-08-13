@@ -157,9 +157,10 @@ struct ContentView: View {
                     maxHeight: 40,
                     alignment: .trailing
                 )
-                .font(.system(size: 40, weight: .light))
+                .font(.system(size: 40))
                 .foregroundStyle(.secondary)
-                .minimumScaleFactor(0.3)
+                .truncateWithFade(width: 0.1, startingAt: 0.1)
+                .lineLimit(1)
                 .truncationMode(.head)
                 .onTapGesture {
                     input.reset(.string(previous))
@@ -198,10 +199,11 @@ struct ContentView: View {
                         alignment: .trailing
                     )
                     .font(.system(size: 100, weight: .light))
+                    .truncateWithFade(width: 0.1, startingAt: 0.05)
                     .minimumScaleFactor(0.3)
                     .lineLimit(1)
-                    .textSelection(.enabled)
                     .truncationMode(.head)
+                    .textSelection(.enabled)
                     .accessibilityIdentifier("readout")
             }
             Grid(tracks: 4, spacing: 8) {
