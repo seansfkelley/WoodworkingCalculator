@@ -116,6 +116,8 @@ private func prettifyInput(_ input: String) -> String {
         .replacing(/([0-9]) ([0-9]|$)/, with: { match in
             return "\(match.1)\u{2002}\(match.2)"
         })
+        .replacing("c", with: "cm")
+        .replacing("i", with: "mm")
 }
 
 private let darkGray = Color.gray.mix(with: .black, by: 0.25)

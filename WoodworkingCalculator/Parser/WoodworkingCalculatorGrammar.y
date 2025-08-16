@@ -48,6 +48,26 @@ atom ::= Subtract LeftParen expression(x) RightParen. {
 }
 
 %nonterminal_type quantity EvaluatableCalculation
+quantity ::= integer(q) Meters. {
+    // Decimal ratio is exact, by definition of the US customary system: 1" = 25.4mm.
+    // https://en.wikipedia.org/wiki/United_States_customary_units#International_units
+    return .real(Double(q) / 0.0254)
+}
+quantity ::= real(q) Meters. {
+    return .real(q / 0.0254) // Ratio is exact. See above.
+}
+quantity ::= integer(q) Centimeters. {
+    return .real(Double(q) / 2.54) // Ratio is exact. See above.
+}
+quantity ::= real(q) Centimeters. {
+    return .real(q / 2.54) // Ratio is exact. See above.
+}
+quantity ::= integer(q) Millimeters. {
+    return .real(Double(q) / 25.4) // Ratio is exact. See above.
+}
+quantity ::= real(q) Millimeters. {
+    return .real(q / 25.4) // Ratio is exact. See above.
+}
 quantity ::= integer(f) Feet mixed_number(i) Inches. {
     return .rational(Rational((f * 12) * i.den + i.num, i.den))
 }
