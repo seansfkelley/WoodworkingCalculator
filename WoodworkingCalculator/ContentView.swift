@@ -48,6 +48,17 @@ class Input: ObservableObject {
         }
     }
     
+    var meters: Double? {
+        return switch value {
+        case .string:
+            nil
+        case .result(let r):
+            // Decimal ratio is exact, by definition of the US customary system: 1" = 25.4mm.
+            // https://en.wikipedia.org/wiki/United_States_customary_units#International_units
+            Double(r) * 0.0254
+        }
+    }
+    
     var willBackspaceSingleCharacter: Bool {
         return switch value {
         case .string(let s):
@@ -141,15 +152,39 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            Button(action: { isSettingsPresented.toggle() }) {
-                Image(systemName: "gear")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .font(.system(size: 32))
-                    .foregroundStyle(.orange)
-            }
-            .sheet(isPresented: $isSettingsPresented) {
-                Settings()
-                    .presentationDetents([.medium])
+            HStack {
+                Button(action: { isSettingsPresented.toggle() }) {
+                    Image(systemName: "gear")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .font(.system(size: 32))
+                        .foregroundStyle(.orange)
+                }
+                .sheet(isPresented: $isSettingsPresented) {
+                    Settings()
+                        .presentationDetents([.medium])
+                }
+                Spacer()
+                Menu {
+                    // Unfortunately it does not seem possible to right-align text in a Menu, so
+                    // we live with this rather awkward jagged-edge arrangement.
+                    if let meters = input.meters {
+                        // I tried to pull these out to constants but I literally could not figure
+                        // out what the type was supposed to be and Xcode was useless so just be
+                        // dense and rely on type inference.
+                        Text("in m: \(meters.formatted(.number.grouping(.never).precision(.fractionLength(3))))m")
+                        Text("in cm: \((meters * 100).formatted(.number.grouping(.never).precision(.fractionLength(2))))cm")
+                        Text("in mm: \((meters * 1000).formatted(.number.grouping(.never).precision(.fractionLength(2))))mm")
+                    } else {
+                        Button("insert \"m\"") { append("m") }
+                        Button("insert \"cm\"") { append("c") }
+                        Button("insert \"mm\"") { append("i") }
+                    }
+                } label: {
+                    Image(systemName: "ruler")
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .font(.system(size: 32))
+                        .foregroundStyle(.orange)
+                }
             }
             Text(prettifyInput(previous))
                 .frame(
