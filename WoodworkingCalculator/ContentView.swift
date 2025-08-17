@@ -177,24 +177,16 @@ struct ContentView: View {
                     // Unfortunately it does not seem possible to right-align text in a Menu, so
                     // we live with this rather awkward jagged-edge arrangement.
                     if let meters = input.meters {
-                        Label {
-                            Text("\(formatMetric(meters, precision: 3)) m")
-                        } icon: { MenuLabelIcon(.meters) }
-                        Label {
-                            Text("\(formatMetric(meters * 100, precision: 2)) cm")
-                        } icon: { MenuLabelIcon(.centimeters) }
-                        Label {
-                            Text("\(formatMetric(meters * 1000, precision: 2)) mm")
-                        } icon: { MenuLabelIcon(.millimeters) }
+                        Section("Metric Conversions") {
+                            Text("= \(formatMetric(meters, precision: 3)) m")
+                            Text("= \(formatMetric(meters * 100, precision: 2)) cm")
+                            Text("= \(formatMetric(meters * 1000, precision: 2)) mm")
+                        }
                     } else {
-                        Button(action: { append("m") }) {
-                            Label { Text("insert \"m\"") } icon: { MenuLabelIcon(.meters) }
-                        }
-                        Button(action: { append("c") }) {
-                            Label { Text("insert \"cm\"") } icon: { MenuLabelIcon(.centimeters) }
-                        }
-                        Button(action: { append("i") }) {
-                            Label { Text("insert \"mm\"") } icon: { MenuLabelIcon(.millimeters) }
+                        Section("Metric Operations") {
+                            Button(action: { append("m") }) { Text("insert \"m\"") }
+                            Button(action: { append("c") }) { Text("insert \"cm\"") }
+                            Button(action: { append("i") }) { Text("insert \"mm\"") }
                         }
                     }
                 } label: {
@@ -370,44 +362,6 @@ struct ContentView: View {
         previous = inputString.trimmingCharacters(in: CharacterSet.whitespaces)
         input.reset(.result(result))
         isErrorPresented = false
-    }
-}
-
-struct MenuLabelIcon: View {
-    enum Unit: String {
-        case meters = "m"
-        case centimeters = "cm"
-        case millimeters = "mm"
-    }
-    
-    let unit: Unit
-    
-    init(_ unit: Unit) {
-        self.unit = unit
-    }
-    
-    var body: some View {
-        renderViewToImage(
-            Circle()
-                .strokeBorder(.orange, lineWidth: 2.0)
-                .overlay(
-                    Text(self.unit.rawValue)
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(.orange)
-                )
-            .frame(width: 32, height: 32)
-        )
-    }
-    
-    @MainActor
-    private func renderViewToImage(_ view: some View) -> Image {
-        let renderer = ImageRenderer(content: view)
-        renderer.scale = UIScreen.main.scale
-        if let uiImage = renderer.uiImage {
-            return Image(uiImage: uiImage).renderingMode(.original)
-        } else {
-            return Image(systemName: "exclamationmark.triangle")
-        }
     }
 }
 
