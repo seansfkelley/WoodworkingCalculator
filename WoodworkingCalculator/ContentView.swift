@@ -171,13 +171,25 @@ struct ContentView: View {
                         // I tried to pull these out to constants but I literally could not figure
                         // out what the type was supposed to be and Xcode was useless so just be
                         // dense and rely on type inference.
-                        Text("in m: \(meters.formatted(.number.grouping(.never).precision(.fractionLength(3))))m")
-                        Text("in cm: \((meters * 100).formatted(.number.grouping(.never).precision(.fractionLength(2))))cm")
-                        Text("in mm: \((meters * 1000).formatted(.number.grouping(.never).precision(.fractionLength(2))))mm")
+                        Label {
+                            Text("\(meters.formatted(.number.grouping(.never).precision(.fractionLength(3))))m")
+                        } icon: { MenuLabelIcon(.meters) }
+                        Label {
+                            Text("\((meters * 100).formatted(.number.grouping(.never).precision(.fractionLength(2))))cm")
+                        } icon: { MenuLabelIcon(.centimeters) }
+                        Label {
+                            Text("\((meters * 1000).formatted(.number.grouping(.never).precision(.fractionLength(2))))mm")
+                        } icon: { MenuLabelIcon(.millimeters) }
                     } else {
-                        Button("insert \"m\"") { append("m") }
-                        Button("insert \"cm\"") { append("c") }
-                        Button("insert \"mm\"") { append("i") }
+                        Button(action: { append("m") }) {
+                            Label { Text("insert \"m\"") } icon: { MenuLabelIcon(.meters) }
+                        }
+                        Button(action: { append("c") }) {
+                            Label { Text("insert \"cm\"") } icon: { MenuLabelIcon(.centimeters) }
+                        }
+                        Button(action: { append("i") }) {
+                            Label { Text("insert \"mm\"") } icon: { MenuLabelIcon(.millimeters) }
+                        }
                     }
                 } label: {
                     Image(systemName: "ruler")
@@ -352,6 +364,44 @@ struct ContentView: View {
         previous = inputString.trimmingCharacters(in: CharacterSet.whitespaces)
         input.reset(.result(result))
         isErrorPresented = false
+    }
+}
+
+struct MenuLabelIcon: View {
+    enum Unit: String {
+        case meters = "m"
+        case centimeters = "cm"
+        case millimeters = "mm"
+    }
+    
+    let unit: Unit
+    
+    init(_ unit: Unit) {
+        self.unit = unit
+    }
+    
+    var body: some View {
+        renderViewToImage(
+            Circle()
+                .strokeBorder(.orange, lineWidth: 2.0)
+                .overlay(
+                    Text(self.unit.rawValue)
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.orange)
+                )
+            .frame(width: 32, height: 32)
+        )
+    }
+    
+    @MainActor
+    private func renderViewToImage(_ view: some View) -> Image {
+        let renderer = ImageRenderer(content: view)
+        renderer.scale = UIScreen.main.scale
+        if let uiImage = renderer.uiImage {
+            return Image(uiImage: uiImage).renderingMode(.original)
+        } else {
+            return Image(systemName: "exclamationmark.triangle")
+        }
     }
 }
 
