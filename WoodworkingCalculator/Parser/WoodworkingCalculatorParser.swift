@@ -157,6 +157,21 @@ internal enum Token {
 // modify it.
 typealias LexedTokenData = (WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode)
 
+enum NonNumericTokens: Character {
+    case feet = "'"
+    case inches = "\""
+    case meters = "m"
+    case centimeters = "c"
+    case millimeters = "i"
+    case add = "+"
+    case subtract = "-"
+    case multiply = "×"
+    case divide = "÷"
+    case fractionSlash = "/"
+    case leftParen = "("
+    case rightParen = ")"
+}
+
 internal func parseMixedNumber(_ input: String) -> LexedTokenData? {
     if let result = try? #/((?<whole>[0-9]{1,10}) +)?(?<num>[0-9]{1,10})/(?<den>[0-9]{1,10})/#.wholeMatch(in: input) {
         let whole = if let i = result.whole { Int(i).unsafelyUnwrapped } else { 0 }
@@ -196,9 +211,9 @@ private let lexer = CitronLexer<LexedTokenData>(rules: [
     .regexPattern("[0-9]+\\.?", parseInteger),
     // For ease of managing "atomic" append, backspace and validation, give single-character
     // aliases to the metric units that will be formatted for prettier display later.
-    .string("m", (.void, .Meters)),
-    .string("c", (.void, .Centimeters)),
-    .string("i", (.void, .Millimeters)),
+    .string(String(NonNumericTokens.meters.rawValue), (.void, .Meters)),
+    .string(String(NonNumericTokens.centimeters.rawValue), (.void, .Centimeters)),
+    .string(String(NonNumericTokens.millimeters.rawValue), (.void, .Millimeters)),
     .string("'", (.void, .Feet)),
     .string("\"", (.void, .Inches)),
     .string("+", (.void, .Add)),

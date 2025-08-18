@@ -153,6 +153,10 @@ struct ContentView: View {
     @State private var lastBackgroundTime: Date?
     @Environment(\.scenePhase) private var scenePhase
     
+    private func append(_ character: Character, canReplaceResult: Bool = false, deletingSuffix: Set<Character> = Set()) {
+        append(String(character), canReplaceResult: canReplaceResult, deletingSuffix: deletingSuffix)
+    }
+    
     private func append(_ string: String, canReplaceResult: Bool = false, deletingSuffix: Set<Character> = Set()) {
         if input.append(string, canReplaceResult: canReplaceResult, deletingSuffix: deletingSuffix) {
             previous = ""
@@ -184,7 +188,7 @@ struct ContentView: View {
                         }
                     } else {
                         Section("Metric Operations") {
-                            Button(action: { append("m") }) { Text("insert \"m\"") }
+                            Button(action: { append(NonNumericTokens.meters.rawValue) }) { Text("insert \"m\"") }
                             Button(action: { append("c") }) { Text("insert \"cm\"") }
                             Button(action: { append("i") }) { Text("insert \"mm\"") }
                         }
