@@ -10,8 +10,11 @@ Specifically, it:
   - Shortcuts for commonly-used fractions.
   - Accepts decimal, but will round the result to the nearest fraction.
 - Understands feet-and-inches notation.
-  - Use the ' and " keys if necessary.
+  - Use the ' and " keys when necessary.
   - Configurably output feet-and-inches or just inches, to taste.
+- Includes basic metric support, for your foreign tools or hardware.
+  - Input m/cm/mm values right alongside US customary ones.
+  - Show the result of any calculation in m/cm/mm.
 
 ### Screenshots
 
