@@ -1,3 +1,5 @@
+import Foundation
+
 enum UsCustomaryPrecision: Equatable {
     case feet
     case inches
@@ -32,6 +34,16 @@ func formatAsUsCustomary(_ rational: Rational, _ precision: UsCustomaryPrecision
     }
     
     return "\(rational.signum() == -1 ? "-" : "")\(parts.joined(separator: " "))"
+}
+
+func formatMetric(_ number: Double, precision: Int) -> String {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .decimal
+    formatter.usesGroupingSeparator = false
+    formatter.minimumFractionDigits = 0
+    formatter.maximumFractionDigits = precision
+    formatter.roundingMode = .halfUp
+    return formatter.string(from: NSNumber(value: number)) ?? number.formatted()
 }
 
 private let unicodeSuperscript: [Character: Character] = [

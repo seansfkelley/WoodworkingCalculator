@@ -30,6 +30,18 @@ struct FormattingTests {
         #expect(formatAsUsCustomary(input, .feet) == expected)
     }
     
+    @Test("formatMetric", arguments: [
+        (0.123, 0, "0"),
+        (0.12345, 2, "0.12"),
+        (0.1001, 3, "0.1"),
+        (0.04, 1, "0"),
+        (0.05, 1, "0.1"),
+        (0.06, 1, "0.1"),
+        (1000, 0, "1000"),
+    ]) func testFormatMetric(number: Double, precision: Int, expected: String) throws {
+        #expect(formatMetric(number, precision: precision) == expected)
+    }
+    
     @Test("fancyDescription", arguments: [
         (Rational(1, 2), "¹⁄₂"),
         (Rational(4, 2), "2"),

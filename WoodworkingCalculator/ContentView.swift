@@ -134,15 +134,6 @@ private func prettifyInput(_ input: String) -> String {
 private let darkGray = Color.gray.mix(with: .black, by: 0.25)
 private let ignorableDenominatorShortcutPrefixes: Set<Character> = [" ", "/"]
 
-func formatMetric(_ number: Double, precision: Int) -> String {
-    let formatter = NumberFormatter()
-    formatter.numberStyle = .decimal
-    formatter.usesGroupingSeparator = false
-    formatter.minimumFractionDigits = 0
-    formatter.maximumFractionDigits = precision
-    return formatter.string(from: NSNumber(value: number)) ?? number.formatted()
-}
-
 struct ContentView: View {
     @State private var previous: String = ""
     @State private var isSettingsPresented: Bool = false
@@ -180,7 +171,7 @@ struct ContentView: View {
                         Section("Metric Conversions") {
                             Text("= \(formatMetric(meters, precision: 3)) m")
                             Text("= \(formatMetric(meters * 100, precision: 2)) cm")
-                            Text("= \(formatMetric(meters * 1000, precision: 2)) mm")
+                            Text("= \(formatMetric(meters * 1000, precision: 1)) mm")
                         }
                     } else {
                         Section("Metric Operations") {
