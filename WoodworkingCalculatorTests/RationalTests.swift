@@ -46,9 +46,11 @@ struct RationalTests {
     }
     
     @Test("roundedToPrecision", arguments: [
-        (Rational(3, 32), 8, Rational(1, 8), 1 / 32),
+        (Rational(3, 32), 8, Rational(1, 8), 1.0 / 32),
+        (Rational(7, 64), 8, Rational(1, 8), 1.0 / 64),
+        (Rational(9, 64), 8, Rational(1, 8), -1.0 / 64),
         (Rational(1, 2), 4, Rational(1, 2), nil),
-        (Rational(3, 4), 6, Rational(2, 3), -1 / 12),
+        (Rational(3, 4), 6, Rational(2, 3), -1.0 / 12),
     ]) func roundedToPrecision(input: Rational, precision: Int, expected: Rational, expectedRemainder: Double?) {
         let actual = input.roundedToPrecision(precision)
         #expect(actual.0 == expected)
