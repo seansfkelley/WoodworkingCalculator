@@ -216,9 +216,18 @@ struct ContentView: View {
                     }
                     .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
                         VStack {
-                            Text("Approximation error \(String(format: "%+.3f", error))\"")
+                            Text("Rounding error: \(String(format: "%+.3f", error))\"")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Spacer()
+                            Text("""
+                                actual \
+                                \(error.sign == .plus ? "+" : "-") \
+                                \(String(format: "%.3f", abs(error)))\" \
+                                = \
+                                \(prettifyInput(input.stringified))
+                                """)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Divider()
                             Text("Rounded to the nearest 1/\(precision)\"")
                                 .font(.system(.callout))
                                 .foregroundStyle(.secondary)
