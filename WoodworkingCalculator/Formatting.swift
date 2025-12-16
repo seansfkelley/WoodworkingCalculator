@@ -6,8 +6,8 @@ enum UsCustomaryPrecision: Equatable {
 }
 
 func formatAsUsCustomary(_ rational: Rational, _ precision: UsCustomaryPrecision = .feet) -> String {
-    var n = abs(rational.reduced.num)
-    let d = abs(rational.reduced.den)
+    var n = abs(rational.num)
+    let d = abs(rational.den)
     
     var parts: [String] = []
     
@@ -27,9 +27,9 @@ func formatAsUsCustomary(_ rational: Rational, _ precision: UsCustomaryPrecision
         }
         
         if n > d {
-            parts.append("\(n / d) \(Rational(n % d, d))\"")
+            parts.append("\(n / d) \(UncheckedRational(n % d, d))\"")
         } else {
-            parts.append("\(Rational(n, d))\"")
+            parts.append("\(UncheckedRational(n, d))\"")
         }
     }
     
@@ -84,7 +84,6 @@ extension Int {
 
 extension Rational {
     var fancyDescription: String {
-        let r = reduced
-        return r.den == 1 ? "\(r.num)" : "\(r.num.numerator)⁄\(r.den.denominator)"
+        return den == 1 ? "\(num)" : "\(num.numerator)⁄\(den.denominator)"
     }
 }

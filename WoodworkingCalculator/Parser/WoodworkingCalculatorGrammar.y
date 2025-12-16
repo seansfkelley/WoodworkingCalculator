@@ -120,7 +120,7 @@ integer ::= Integer(x). {
     }
 }
 
-%nonterminal_type mixed_number Rational
+%nonterminal_type mixed_number UncheckedRational
 mixed_number ::= MixedNumber(x). {
     if case .rational(let r) = x {
         return r

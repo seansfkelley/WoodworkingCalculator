@@ -1,10 +1,14 @@
-struct UncheckedRational {
+struct UncheckedRational: CustomStringConvertible {
     let num: Int
     let den: Int
     
     init(_ num: Int, _ den: Int) {
         self.num = num
         self.den = den
+    }
+    
+    var description: String {
+        "\(num)/\(den)"
     }
     
     var checked: Result<Rational, DivisionByZeroError> {

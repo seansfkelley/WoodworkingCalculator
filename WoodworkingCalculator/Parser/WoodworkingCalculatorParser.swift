@@ -3,9 +3,9 @@ enum Quantity: Equatable {
     case real(Double)
 }
 
-enum EvaluatableCalculation: CustomStringConvertible, Equatable {
+enum EvaluatableCalculation: CustomStringConvertible {
     // n.b. all quantities are in inches (or fractions thereof)
-    case rational(Rational)
+    case rational(UncheckedRational)
     case real(Double)
     indirect case add(EvaluatableCalculation, EvaluatableCalculation)
     indirect case subtract(EvaluatableCalculation, EvaluatableCalculation)
@@ -24,8 +24,8 @@ enum EvaluatableCalculation: CustomStringConvertible, Equatable {
     }
     
     func evaluate() -> Result<Quantity, DivisionByZeroError> {
-        switch (self) {
-        case .rational(let r): .success(.rational(r))
+        switch self {
+        case .rational(let r): r.checked.map { .rational($0) }
         case .real(let r): .success(.real(r))
         case .add(let left, let right): Self.evaluateBinaryOperator(left, (+), (+), right)
         case .subtract(let left, let right): Self.evaluateBinaryOperator(left, (-), (-), right)
@@ -43,22 +43,27 @@ enum EvaluatableCalculation: CustomStringConvertible, Equatable {
         _ rationalOp: (Rational, Rational) -> Result<Rational, DivisionByZeroError>,
         _ doubleOp: (Double, Double) -> Double,
         _ right: EvaluatableCalculation
-    ) -> Result<Quantity, DivisionByZeroError> {        
-        switch (left.evaluate(), right.evaluate()) {
+    ) -> Result<Quantity, DivisionByZeroError> {
+        guard case .success(let l) = left.evaluate(), case .success(let r) = right.evaluate() else {
+            return .failure(DivisionByZeroError())
+        }
+        
+        
+        return switch (l, r) {
         case (.rational(let leftRational), .rational(let rightRational)):
-            .rational(rationalOp(leftRational, rightRational))
+            rationalOp(leftRational, rightRational).map { .rational($0) }
 
         // Fallthroughs don't work here, unfortunately, due to changes in the type of the binding
         // pattern, so eat the cost of repetition.
             
         case (.real(let leftReal), .real(let rightReal)):
-            .real(doubleOp(leftReal, rightReal))
+            .success(.real(doubleOp(leftReal, rightReal)))
 
         case (.rational(let leftRational), .real(let rightReal)):
-            .real(doubleOp(Double(leftRational), rightReal))
+            .success(.real(doubleOp(Double(leftRational), rightReal)))
 
         case (.real(let leftReal), .rational(let rightRational)):
-            .real(doubleOp(leftReal, Double(rightRational)))
+            .success(.real(doubleOp(leftReal, Double(rightRational))))
         }
     }
     

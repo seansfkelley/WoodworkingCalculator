@@ -358,10 +358,15 @@ struct ContentView: View {
         guard let result else {
             return
         }
-
-        previous = inputString.trimmingCharacters(in: CharacterSet.whitespaces)
-        input.reset(.result(result))
-        isErrorPresented = false
+        
+        switch result {
+        case .success(let answer):
+            previous = inputString.trimmingCharacters(in: CharacterSet.whitespaces)
+            input.reset(.result(answer))
+            isErrorPresented = false
+        case .failure:
+            // TODO
+        }
     }
 }
 
