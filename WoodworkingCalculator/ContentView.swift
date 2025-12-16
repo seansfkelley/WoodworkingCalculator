@@ -3,12 +3,12 @@ import ExyteGrid
 
 class Input: ObservableObject {
     enum RawValue {
-        case string(String)
+        case string(String, Error?)
         case result(Quantity)
     }
     
     @Published
-    private var value: RawValue = .string("")
+    private var value: RawValue = .string("", nil)
     @AppStorage(Constants.AppStorage.displayInchesOnlyKey)
     private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
     @AppStorage(Constants.AppStorage.precisionKey)
@@ -16,7 +16,7 @@ class Input: ObservableObject {
     
     var stringified: String {
         switch value {
-        case .string(let s):
+        case .string(let s, _):
             return s
         case .result(let r):
             let (rational, _) = switch r {
@@ -29,19 +29,26 @@ class Input: ObservableObject {
         }
     }
     
-    var error: (Int, Double)? {
+    var error: Error? {
+        switch value {
+        case .result: nil
+        case .string(_, let error): error
+        }
+    }
+    
+    var inaccuracy: (Int, Double)? {
         switch value {
         case .string:
             return nil
         case .result(let r):
-            let (_, error) = switch r {
+            let (_, inaccuracy) = switch r {
             case .rational(let r):
                 r.roundedToDenominator(precision)
             case .real(let r):
                 r.toNearestRational(withDenominator: precision)
             }
-            if let e = error {
-                return (precision, e)
+            if let inaccuracy {
+                return (precision, inaccuracy)
             } else {
                 return nil
             }
@@ -61,7 +68,7 @@ class Input: ObservableObject {
     
     var willBackspaceSingleCharacter: Bool {
         return switch value {
-        case .string(let s):
+        case .string(let s, _):
             !s.isEmpty
         case .result:
             false
@@ -89,7 +96,7 @@ class Input: ObservableObject {
             candidate != stringified &&
             EvaluatableCalculation.isValidPrefix(candidate)
         {
-            value = .string(candidate)
+            value = .string(candidate, nil)
             return true
         } else {
             return false
@@ -98,15 +105,15 @@ class Input: ObservableObject {
     
     func backspace() {
         value = switch (value) {
-        case .string(let s):
-            .string(s.count == 0 ? "" : String(s.prefix(s.count - 1)))
+        case .string(let s, _):
+            .string(s.count == 0 ? "" : String(s.prefix(s.count - 1)), nil)
         case .result:
-            .string("")
+            .string("", nil)
         }
     }
     
-    func reset(_ to: RawValue = .string("")) {
-        if case let .string(s) = to, !EvaluatableCalculation.isValidPrefix(s)  {
+    func reset(_ to: RawValue = .string("", nil)) {
+        if case .string(let s, _) = to, !EvaluatableCalculation.isValidPrefix(s) {
             // nothing
         } else {
             value = to
@@ -137,7 +144,9 @@ private let ignorableDenominatorShortcutPrefixes: Set<Character> = [" ", "/"]
 struct ContentView: View {
     @State private var previous: String = ""
     @State private var isSettingsPresented: Bool = false
+    @State private var isInaccuracyWarningPresented: Bool = false
     @State private var isErrorPresented: Bool = false
+    @State private var shakeError: Bool = false
     @StateObject private var input: Input = Input()
     
     // Why does this have to be a @State? I can't just reassign it as a normal variable?
@@ -147,6 +156,8 @@ struct ContentView: View {
     private func append(_ string: String, canReplaceResult: Bool = false, deletingSuffix: Set<Character> = Set()) {
         if input.append(string, canReplaceResult: canReplaceResult, deletingSuffix: deletingSuffix) {
             previous = ""
+            isInaccuracyWarningPresented = false
+            isErrorPresented = false
         }
     }
     
@@ -201,28 +212,46 @@ struct ContentView: View {
                 .lineLimit(1)
                 .truncationMode(.head)
                 .onTapGesture {
-                    input.reset(.string(previous))
+                    input.reset(.string(previous, nil))
                     previous = ""
+                    isInaccuracyWarningPresented = false
                     isErrorPresented = false
                 }
             HStack {
-                if let (precision, error) = input.error {
+                if input.error != nil {
                     Button(action: { isErrorPresented.toggle() }) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.system(size: 32))
+                            .foregroundStyle(.red)
+                            .padding(.vertical)
+                            .padding(.leading, 8)
+                            .offset(x: shakeError ? 20 : 0)
+                    }
+                    .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("This expression divides by zero.")
+                                .font(.system(.body))
+                        }
+                        .padding()
+                        .presentationCompactAdaptation(.popover)
+                    }
+                } else if let (precision, inaccuracy) = input.inaccuracy {
+                    Button(action: { isInaccuracyWarningPresented.toggle() }) {
                         Text("≈")
                             .font(.system(size: 40, weight: .bold))
                             .foregroundStyle(.orange)
                             .padding(.vertical)
                             .padding(.leading, 8)
                     }
-                    .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
+                    .popover(isPresented: $isInaccuracyWarningPresented, arrowEdge: .top) {
                         VStack {
-                            Text("Rounding error: \(String(format: "%+.3f", error))\"")
+                            Text("Rounding error: \(String(format: "%+.3f", inaccuracy))\"")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Spacer()
                             Text("""
                                 actual \
-                                \(error.sign == .plus ? "+" : "-") \
-                                \(String(format: "%.3f", abs(error)))\" \
+                                \(inaccuracy.sign == .plus ? "+" : "-") \
+                                \(String(format: "%.3f", abs(inaccuracy)))\" \
                                 = \
                                 \(prettifyInput(input.stringified))
                                 """)
@@ -263,11 +292,13 @@ struct ContentView: View {
                     // end while you're actively long-pressing the button due to changed identity.
                     CalculatorButton(.text(input.willBackspaceSingleCharacter ? "⌫" : "C"), .gray) {
                         previous = ""
+                        isInaccuracyWarningPresented = false
                         isErrorPresented = false
                         input.backspace()
                     }
                     .simultaneousGesture(LongPressGesture(minimumDuration: 1).onEnded { _ in
                         previous = ""
+                        isInaccuracyWarningPresented = false
                         isErrorPresented = false
                         input.reset()
                     })
@@ -327,7 +358,7 @@ struct ContentView: View {
             }
         }
         .padding()
-        .onChange(of: scenePhase, { oldPhase, newPhase in
+        .onChange(of: scenePhase) { oldPhase, newPhase in
             // It seems like when foregrounding/backgrounding the app, it always bounces through
             // the inactive state. By clearing the state before we're fully active, we avoid a
             // flash of the old state being visible when the app reopens.
@@ -342,6 +373,7 @@ struct ContentView: View {
                 Date().timeIntervalSince(lastBackgroundTime!) > 30 * 60 {
                 input.reset()
                 previous = ""
+                isInaccuracyWarningPresented = false
                 isErrorPresented = false
                 isSettingsPresented = false
             } else if newPhase == .background {
@@ -349,7 +381,15 @@ struct ContentView: View {
             } else {
                 // don't care
             }
-        })
+        }
+        .onChange(of: shakeError) { _, newValue in
+            // Adapted from https://stackoverflow.com/questions/72795306/how-can-make-a-shake-effect-in-swiftui
+            if newValue {
+                withAnimation(Animation.spring(response: 0.2, dampingFraction: 0.3, blendDuration: 0.2)) {
+                    shakeError = false
+                }
+            }
+        }
     }
     
     private func evaluate() {
@@ -363,10 +403,13 @@ struct ContentView: View {
         case .success(let answer):
             previous = inputString.trimmingCharacters(in: CharacterSet.whitespaces)
             input.reset(.result(answer))
-            isErrorPresented = false
-        case .failure:
-            print("TODO")
+        case .failure(let error):
+            input.reset(.string(inputString, error))
+            shakeError = true
         }
+        
+        isInaccuracyWarningPresented = false
+        isErrorPresented = false
     }
 }
 
