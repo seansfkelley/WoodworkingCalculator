@@ -1,1 +1,1 @@
-struct DivisionByZeroError: Error {}
+struct DivisionByZeroError: Error, Equatable {}

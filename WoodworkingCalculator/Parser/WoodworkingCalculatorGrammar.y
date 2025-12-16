@@ -38,13 +38,13 @@ atom ::= quantity(x). {
     return x
 }
 atom ::= Subtract quantity(x). {
-    return .subtract(.rational(Rational(0, 1)), x)
+    return .subtract(.rational(UncheckedRational(0, 1)), x)
 }
 atom ::= LeftParen expression(x) RightParen. {
     return x
 }
 atom ::= Subtract LeftParen expression(x) RightParen. {
-    return .subtract(.rational(Rational(0, 1)), x)
+    return .subtract(.rational(UncheckedRational(0, 1)), x)
 }
 
 %nonterminal_type quantity EvaluatableCalculation
@@ -69,16 +69,16 @@ quantity ::= real(q) Millimeters. {
     return .real(q / 25.4) // Ratio is exact. See above.
 }
 quantity ::= integer(f) Feet mixed_number(i) Inches. {
-    return .rational(Rational((f * 12) * i.den + i.num, i.den))
+    return .rational(UncheckedRational((f * 12) * i.den + i.num, i.den))
 }
 quantity ::= integer(f) Feet mixed_number(i). {
-    return .rational(Rational((f * 12) * i.den + i.num, i.den))
+    return .rational(UncheckedRational((f * 12) * i.den + i.num, i.den))
 }
 quantity ::= integer(f) Feet integer(i) Inches. {
-    return .rational(Rational(f * 12 + i, 1))
+    return .rational(UncheckedRational(f * 12 + i, 1))
 }
 quantity ::= integer(f) Feet integer(i). {
-    return .rational(Rational(f * 12 + i, 1))
+    return .rational(UncheckedRational(f * 12 + i, 1))
 }
 quantity ::= integer(f) Feet real(i) Inches. {
     return .real(Double(f * 12) + i)
@@ -87,7 +87,7 @@ quantity ::= integer(f) Feet real(i). {
     return .real(Double(f * 12) + i)
 }
 quantity ::= integer(f) Feet. {
-    return .rational(Rational(f * 12, 1))
+    return .rational(UncheckedRational(f * 12, 1))
 }
 quantity ::= real(f) Feet. {
     return .real(f * 12)
@@ -99,10 +99,10 @@ quantity ::= mixed_number(i). {
     return .rational(i)
 }
 quantity ::= integer(i) Inches. {
-    return .rational(Rational(i, 1))
+    return .rational(UncheckedRational(i, 1))
 }
 quantity ::= integer(i). {
-    return .rational(Rational(i, 1))
+    return .rational(UncheckedRational(i, 1))
 }
 quantity ::= real(i) Inches. {
     return .real(i)

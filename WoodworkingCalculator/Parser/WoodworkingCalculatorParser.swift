@@ -40,7 +40,7 @@ enum EvaluatableCalculation: CustomStringConvertible, Equatable {
     // I make Double and Rational conform to. The compiler still gets mad about ambiguous calls.
     private static func evaluateBinaryOperator(
         _ left: EvaluatableCalculation,
-        _ rationalOp: (Rational, Rational) -> Rational,
+        _ rationalOp: (Rational, Rational) -> Result<Rational, DivisionByZeroError>,
         _ doubleOp: (Double, Double) -> Double,
         _ right: EvaluatableCalculation
     ) -> Result<Quantity, DivisionByZeroError> {        
@@ -132,7 +132,7 @@ extension Double {
 internal enum Token {
     case void
     case integer(Int)
-    case rational(Rational)
+    case rational(UncheckedRational)
     case real(Double)
 }
 
@@ -146,7 +146,7 @@ internal func parseMixedNumber(_ input: String) -> LexedTokenData? {
         let whole = if let i = result.whole { Int(i).unsafelyUnwrapped } else { 0 }
         let num = Int(result.num).unsafelyUnwrapped
         let den = Int(result.den).unsafelyUnwrapped
-        return (.rational(Rational(whole * den + num, den)), .MixedNumber)
+        return (.rational(UncheckedRational(whole * den + num, den)), .MixedNumber)
     } else {
         return nil
     }

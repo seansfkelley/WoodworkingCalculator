@@ -376,7 +376,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
             func codeBlockForRule08(x: EvaluatableCalculation) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 40)
 
-    return .subtract(.rational(Rational(0, 1)), x)
+    return .subtract(.rational(UncheckedRational(0, 1)), x)
 
 #sourceLocation()
 }
@@ -398,7 +398,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
             func codeBlockForRule10(x: EvaluatableCalculation) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 46)
 
-    return .subtract(.rational(Rational(0, 1)), x)
+    return .subtract(.rational(UncheckedRational(0, 1)), x)
 
 #sourceLocation()
 }
@@ -477,7 +477,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
             func codeBlockForRule17(f: Int, i: Rational) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 71)
 
-    return .rational(Rational((f * 12) * i.den + i.num, i.den))
+    return .rational(UncheckedRational((f * 12) * i.den + i.num, i.den))
 
 #sourceLocation()
 }
@@ -489,7 +489,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
             func codeBlockForRule18(f: Int, i: Rational) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 74)
 
-    return .rational(Rational((f * 12) * i.den + i.num, i.den))
+    return .rational(UncheckedRational((f * 12) * i.den + i.num, i.den))
 
 #sourceLocation()
 }
@@ -501,7 +501,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
             func codeBlockForRule19(f: Int, i: Int) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 77)
 
-    return .rational(Rational(f * 12 + i, 1))
+    return .rational(UncheckedRational(f * 12 + i, 1))
 
 #sourceLocation()
 }
@@ -513,7 +513,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
             func codeBlockForRule20(f: Int, i: Int) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 80)
 
-    return .rational(Rational(f * 12 + i, 1))
+    return .rational(UncheckedRational(f * 12 + i, 1))
 
 #sourceLocation()
 }
@@ -549,7 +549,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
             func codeBlockForRule23(f: Int) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 89)
 
-    return .rational(Rational(f * 12, 1))
+    return .rational(UncheckedRational(f * 12, 1))
 
 #sourceLocation()
 }
@@ -593,7 +593,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
             func codeBlockForRule27(i: Int) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 101)
 
-    return .rational(Rational(i, 1))
+    return .rational(UncheckedRational(i, 1))
 
 #sourceLocation()
 }
@@ -604,7 +604,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
             func codeBlockForRule28(i: Int) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 104)
 
-    return .rational(Rational(i, 1))
+    return .rational(UncheckedRational(i, 1))
 
 #sourceLocation()
 }
