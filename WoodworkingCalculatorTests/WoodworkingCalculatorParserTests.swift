@@ -86,7 +86,7 @@ struct WoodworkingCalculatorParserTests {
 // Serialized: Citron is not thread-safe.
 @Suite(.serialized)
 struct EvaluatableCalculationTests {
-    @Test<[(String, EvaluatableCalculation, CalculationResult)]>("from", arguments: [
+    @Test<[(String, EvaluatableCalculation, Quantity)]>("from", arguments: [
         (
             "1/2",
             .rational(Rational(1, 2)),
@@ -127,7 +127,7 @@ struct EvaluatableCalculationTests {
             .subtract(.rational(Rational(1, 1)), .subtract(.rational(Rational(0, 1)), .rational(Rational(2, 1)))),
             .rational(Rational(3, 1)),
         )
-    ]) func from(input: String, expectedEvaluatable: EvaluatableCalculation, expectedResult: CalculationResult) throws {
+    ]) func from(input: String, expectedEvaluatable: EvaluatableCalculation, expectedResult: Quantity) throws {
         let evaluatable = EvaluatableCalculation.from(input)
         #expect(evaluatable == expectedEvaluatable)
         #expect(evaluatable!.evaluate() == expectedResult)

@@ -4,7 +4,7 @@ import ExyteGrid
 class Input: ObservableObject {
     enum RawValue {
         case string(String)
-        case result(CalculationResult)
+        case result(Quantity)
     }
     
     @Published

@@ -1,4 +1,4 @@
-enum CalculationResult: Equatable {
+enum Quantity: Equatable {
     case rational(Rational)
     case real(Double)
 }
@@ -14,39 +14,23 @@ enum EvaluatableCalculation: CustomStringConvertible, Equatable {
     
     var description: String {
         switch (self) {
-        case .rational(let r):
-            if r.den == 1 {
-                return r.num.description
-            } else {
-                return r.description
-            }
-        case .real(let r):
-            return r.description
-        case .add(let left, let right):
-            return "(\(left) + \(right))"
-        case .subtract(let left, let right):
-            return "(\(left) - \(right))"
-        case .multiply(let left, let right):
-            return "(\(left) × \(right))"
-        case .divide(let left, let right):
-            return "(\(left) ÷ \(right))"
+        case .rational(let r): r.den == 1 ? r.num.description : r.description
+        case .real(let r): r.description
+        case .add(let left, let right): "(\(left) + \(right))"
+        case .subtract(let left, let right): "(\(left) - \(right))"
+        case .multiply(let left, let right): "(\(left) × \(right))"
+        case .divide(let left, let right): "(\(left) ÷ \(right))"
         }
     }
     
-    func evaluate() -> CalculationResult {
+    func evaluate() -> Quantity {
         switch (self) {
-        case .rational(let r):
-            return .rational(r.reduced)
-        case .real(let r):
-            return .real(r)
-        case .add(let left, let right):
-            return EvaluatableCalculation.evaluateBinaryOperator(left, (+), (+), right)
-        case .subtract(let left, let right):
-            return EvaluatableCalculation.evaluateBinaryOperator(left, (-), (-), right)
-        case .multiply(let left, let right):
-            return EvaluatableCalculation.evaluateBinaryOperator(left, (*), (*), right)
-        case .divide(let left, let right):
-            return EvaluatableCalculation.evaluateBinaryOperator(left, (/), (/), right)
+        case .rational(let r): .rational(r.reduced)
+        case .real(let r): .real(r)
+        case .add(let left, let right): Self.evaluateBinaryOperator(left, (+), (+), right)
+        case .subtract(let left, let right): Self.evaluateBinaryOperator(left, (-), (-), right)
+        case .multiply(let left, let right): Self.evaluateBinaryOperator(left, (*), (*), right)
+        case .divide(let left, let right):  Self.evaluateBinaryOperator(left, (/), (/), right)
         }
     }
     
@@ -59,22 +43,22 @@ enum EvaluatableCalculation: CustomStringConvertible, Equatable {
         _ rationalOp: (Rational, Rational) -> Rational,
         _ doubleOp: (Double, Double) -> Double,
         _ right: EvaluatableCalculation
-    ) -> CalculationResult {
+    ) -> Quantity {
         switch (left.evaluate(), right.evaluate()) {
         case (.rational(let leftRational), .rational(let rightRational)):
-            return .rational(rationalOp(leftRational, rightRational))
+            .rational(rationalOp(leftRational, rightRational))
 
         // Fallthroughs don't work here, unfortunately, due to changes in the type of the binding
         // pattern, so eat the cost of repetition.
             
         case (.real(let leftReal), .real(let rightReal)):
-            return .real(doubleOp(leftReal, rightReal))
+            .real(doubleOp(leftReal, rightReal))
 
         case (.rational(let leftRational), .real(let rightReal)):
-            return .real(doubleOp(Double(leftRational), rightReal))
+            .real(doubleOp(Double(leftRational), rightReal))
 
         case (.real(let leftReal), .rational(let rightRational)):
-            return .real(doubleOp(leftReal, Double(rightRational)))
+            .real(doubleOp(leftReal, Double(rightRational)))
         }
     }
     
@@ -135,7 +119,7 @@ enum EvaluatableCalculation: CustomStringConvertible, Equatable {
 }
 
 extension Double {
-    init(_ result: CalculationResult) {
+    init(_ result: Quantity) {
         switch (result) {
         case .rational(let f):
             self = Double(f)

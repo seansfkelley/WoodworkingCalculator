@@ -20,23 +20,23 @@ struct Rational: Equatable, Hashable, CustomStringConvertible {
     
     func roundedToPrecision(_ precision: Int) -> (Rational, Double?) {
         if den <= precision && den % precision == 0 {
-            return (self, nil)
+            (self, nil)
         } else {
-            return Double(self).toNearestRational(withPrecision: precision)
+            Double(self).toNearestRational(withPrecision: precision)
         }
     }
     
     var description: String {
-        return "\(num)/\(den)"
+        "\(num)/\(den)"
     }
     
     func signum() -> Int {
         if num.signum() == 0 {
-            return 0
+            0
         } else if num.signum() * den.signum() == 1 {
-            return 1
+            1
         } else {
-            return -1
+            -1
         }
     }
     
@@ -47,29 +47,25 @@ struct Rational: Equatable, Hashable, CustomStringConvertible {
     }
     
     static func + (left: Rational, right: Rational) -> Rational {
-        return Rational(left.num * right.den + right.num * left.den, left.den * right.den).reduced
+        Rational(left.num * right.den + right.num * left.den, left.den * right.den).reduced
     }
     
     static func - (left: Rational, right: Rational) -> Rational {
-        return Rational(left.num * right.den - right.num * left.den, left.den * right.den).reduced
+        Rational(left.num * right.den - right.num * left.den, left.den * right.den).reduced
     }
     
     static func * (left: Rational, right: Rational) -> Rational {
-        return Rational(left.num * right.num, left.den * right.den).reduced
+        Rational(left.num * right.num, left.den * right.den).reduced
     }
     
     static func / (left: Rational, right: Rational) -> Rational {
-        return Rational(left.num * right.den, left.den * right.num).reduced
+        Rational(left.num * right.den, left.den * right.num).reduced
     }
 }
 
 private func gcd(_ a: Int, _ b: Int) -> Int {
-  let r = a % b
-  if r != 0 {
-    return gcd(b, r)
-  } else {
-    return b
-  }
+    let r = a % b
+    return r == 0 ? b : gcd(b, r)
 }
 
 extension Double {
@@ -84,14 +80,14 @@ extension Double {
         let upperError = Double(higherRational) - self
         let lowerError = self - Double(lowerRational)
         
-        if upperError <= epsilon {
-            return (higherRational, nil)
+        return if upperError <= epsilon {
+            (higherRational, nil)
         } else if lowerError <= epsilon {
-            return (lowerRational, nil)
+            (lowerRational, nil)
         } else if upperError < lowerError {
-            return (higherRational, upperError)
+            (higherRational, upperError)
         } else {
-            return (lowerRational, -lowerError)
+            (lowerRational, -lowerError)
         }
     }
 }
