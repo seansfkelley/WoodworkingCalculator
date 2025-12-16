@@ -1,11 +1,15 @@
 import Testing
 @testable import Wood_Calc
 
+private func rational(_ num: Int, _ den: Int) -> Rational {
+    try! UncheckedRational(num, den).checked.get()
+}
+
 struct WoodworkingCalculatorParserTests {
     @Test("parseMixedNumber", arguments: [
-        ("1/2", Rational(1, 2)),
-        ("3 3/4", Rational(15, 4)),
-        ("1  1/2", Rational(3, 2)),
+        ("1/2", UncheckedRational(1, 2)),
+        ("3 3/4", UncheckedRational(15, 4)),
+        ("1  1/2", UncheckedRational(3, 2)),
         ("1 /2", nil),
         ("1/ 2", nil),
         ("1 / 2", nil),
@@ -14,7 +18,7 @@ struct WoodworkingCalculatorParserTests {
         ("1111111111111111111111111/2", nil),
         ("1/1111111111111111111111111", nil),
         ("1111111111111111111111111 1/2", nil),
-    ]) func testParseMixedNumber(input: String, expected: Rational?) throws {
+    ]) func testParseMixedNumber(input: String, expected: UncheckedRational?) throws {
         let actual = parseMixedNumber(input)
         if expected == nil {
             #expect(actual == nil)
@@ -23,7 +27,8 @@ struct WoodworkingCalculatorParserTests {
         } else {
             #expect(actual!.1 == .MixedNumber)
             if case .rational(let actual) = actual!.0 {
-                #expect(actual == expected)
+                #expect(actual.num == expected!.num)
+                #expect(actual.den == expected!.den)
             } else {
                 Issue.record("Expected parsed value to be a .rational but it was not")
             }
@@ -89,8 +94,8 @@ struct EvaluatableCalculationTests {
     @Test<[(String, EvaluatableCalculation, Quantity)]>("from", arguments: [
         (
             "1/2",
-            .rational(Rational(1, 2)),
-            .rational(Rational(1, 2)),
+            .rational(UncheckedRational(1, 2)),
+            .rational(rational(1, 2)),
         ),
         (
             "3.5",
@@ -99,38 +104,40 @@ struct EvaluatableCalculationTests {
         ),
         (
             "1 + 2 × 3",
-            .add(.rational(Rational(1, 1)), .multiply(.rational(Rational(2, 1)), .rational(Rational(3, 1)))),
-            .rational(Rational(7, 1)),
+            .add(.rational(UncheckedRational(1, 1)), .multiply(.rational(UncheckedRational(2, 1)), .rational(UncheckedRational(3, 1)))),
+            .rational(rational(7, 1)),
         ),
         (
             "(1 + 2) × 3",
-            .multiply(.add(.rational(Rational(1, 1)), .rational(Rational(2, 1))), .rational(Rational(3, 1))),
-            .rational(Rational(9, 1)),
+            .multiply(.add(.rational(UncheckedRational(1, 1)), .rational(UncheckedRational(2, 1))), .rational(UncheckedRational(3, 1))),
+            .rational(rational(9, 1)),
         ),
         (
             "1 + 2 × 3 ÷ 4",
-            .add(.rational(Rational(1, 1)), .divide(.multiply(.rational(Rational(2, 1)), .rational(Rational(3, 1))), .rational(Rational(4, 1)))),
-            .rational(Rational(5, 2)),
+            .add(.rational(UncheckedRational(1, 1)), .divide(.multiply(.rational(UncheckedRational(2, 1)), .rational(UncheckedRational(3, 1))), .rational(UncheckedRational(4, 1)))),
+            .rational(rational(5, 2)),
         ),
         (
             "1' 3\" × 3.2",
-            .multiply(.rational(Rational(15, 1)), .real(3.2)),
+            .multiply(.rational(UncheckedRational(15, 1)), .real(3.2)),
             .real(48.0),
         ),
         (
             "-1",
-            .subtract(.rational(Rational(0, 1)), .rational(Rational(1, 1))),
-            .rational(Rational(-1, 1)),
+            .subtract(.rational(UncheckedRational(0, 1)), .rational(UncheckedRational(1, 1))),
+            .rational(rational(-1, 1)),
         ),
         (
             "1 -- 2",
-            .subtract(.rational(Rational(1, 1)), .subtract(.rational(Rational(0, 1)), .rational(Rational(2, 1)))),
-            .rational(Rational(3, 1)),
+            .subtract(.rational(UncheckedRational(1, 1)), .subtract(.rational(UncheckedRational(0, 1)), .rational(UncheckedRational(2, 1)))),
+            .rational(rational(3, 1)),
         )
     ]) func from(input: String, expectedEvaluatable: EvaluatableCalculation, expectedResult: Quantity) throws {
         let evaluatable = EvaluatableCalculation.from(input)
-        #expect(evaluatable == expectedEvaluatable)
-        #expect(evaluatable!.evaluate() == expectedResult)
+        // FIXME: I would like to do straight equality, but I don't want to give UncheckedRational
+        // an equality definition since it does not reduce to lowest terms, etc.
+        #expect(evaluatable?.description == expectedEvaluatable.description)
+        #expect(evaluatable!.evaluate() == .success(expectedResult))
     }
     
     @Test("from (nil)", arguments: [

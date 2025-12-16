@@ -1,6 +1,10 @@
 import Testing
 @testable import Wood_Calc
 
+private func rational(_ num: Int, _ den: Int) -> Rational {
+    try! UncheckedRational(num, den).checked.get()
+}
+
 // Serialized: Citron is not thread-safe.
 @Suite(.serialized)
 struct InputTests {
@@ -62,7 +66,7 @@ struct InputTests {
     }
     
     @Test func resetToRationalResultAndFormat() {
-        input.reset(.result(.rational(Rational(1, 2))))
+        input.reset(.result(.rational(rational(1, 2))))
         #expect(input.stringified == "1/2\"")
         #expect(input.error == nil)
     }
@@ -84,7 +88,7 @@ struct InputTests {
     
     @Test<[(Input.RawValue, Bool)]>(arguments: [
         (.result(.real(1.0)), false),
-        (.result(.rational(Rational(1, 2))), false),
+        (.result(.rational(rational(1, 2))), false),
         (.string(""), false),
         (.string("1+1"), true),
     ]) func willBackspaceSingleCharacter(value: Input.RawValue, expected: Bool) {
@@ -94,7 +98,7 @@ struct InputTests {
     
     @Test<[(Input.RawValue, String)]>(arguments: [
         (.result(.real(1.0)), ""),
-        (.result(.rational(Rational(1, 2))), ""),
+        (.result(.rational(rational(1, 2))), ""),
         (.string(""), ""),
         (.string("1+1"), "1+"),
     ]) func backspace(value: Input.RawValue, expected: String) {

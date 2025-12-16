@@ -3,8 +3,8 @@ import Numerics
 
 @testable import Wood_Calc
 
-func rational(_ num: Int, _ den: Int) throws -> Rational {
-    try UncheckedRational(num, den).checked.get()
+private func rational(_ num: Int, _ den: Int) -> Rational {
+    try! UncheckedRational(num, den).checked.get()
 }
 
 struct RationalTests {
@@ -43,19 +43,19 @@ struct RationalTests {
     }
     
     @Test("description", arguments: [
-        (rational(2, 4), "2/4"),
+        (rational(1, 2), "1/2"),
     ]) func description(input: Rational, expected: String) {
         #expect(input.description == expected)
     }
     
-    @Test("roundedToPrecision", arguments: [
+    @Test("roundedToDenominator", arguments: [
         (rational(3, 32), 8, rational(1, 8), 1.0 / 32),
         (rational(7, 64), 8, rational(1, 8), 1.0 / 64),
         (rational(9, 64), 8, rational(1, 8), -1.0 / 64),
         (rational(1, 2), 4, rational(1, 2), nil),
         (rational(3, 4), 6, rational(2, 3), -1.0 / 12),
-    ]) func roundedToPrecision(input: Rational, precision: Int, expected: Rational, expectedRemainder: Double?) {
-        let actual = input.roundedToPrecision(precision)
+    ]) func roundedToDenominator(input: Rational, denominator: Int, expected: Rational, expectedRemainder: Double?) {
+        let actual = input.roundedToDenominator(denominator)
         #expect(actual.0 == expected)
         if case .some(let actualRemainder) = actual.1, case .some(let expectedRemainder) = expectedRemainder {
             #expect(actualRemainder.isApproximatelyEqual(to: expectedRemainder))
@@ -69,8 +69,8 @@ struct RationalTests {
         (rational(1, 2) - rational(1, 4), rational(1, 4)),
         (rational(1, 2) * rational(3, 4), rational(3, 8)),
         (rational(1, 2) / rational(1, 4), rational(2, 1)),
-    ]) func arithmetic(left: Rational, right: Rational) {
-        #expect(left == right)
+    ]) func arithmetic(actual: Result<Rational, DivisionByZeroError>, expected: Rational) {
+        #expect(actual == .success(expected))
     }
     
     @Test("checked", arguments: [
@@ -94,8 +94,8 @@ struct DoubleTests {
         (33.0 / 32, 4, rational(1, 1), -1.0 / 32),
         // Hmm, might want to turn the precision up here? This seems a bit weird that there's 0 error, though it _is_ less than a thou.
         (1.0 / 65, 64, rational(1, 64), nil),
-    ]) func toNearestRational(input: Double, precision: Int, expected: Rational, expectedRemainder: Double?) {
-        let actual = input.toNearestRational(withPrecision: precision)
+    ]) func toNearestRational(input: Double, den: Int, expected: Rational, expectedRemainder: Double?) {
+        let actual = input.toNearestRational(withDenominator: den)
         #expect(actual.0 == expected)
         if case .some(let actualRemainder) = actual.1, case .some(let expectedRemainder) = expectedRemainder {
             #expect(actualRemainder.isApproximatelyEqual(to: expectedRemainder))

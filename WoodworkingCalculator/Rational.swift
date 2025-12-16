@@ -30,11 +30,11 @@ struct Rational: Equatable, Hashable, CustomStringConvertible {
         self.den = d
     }
     
-    func roundedToPrecision(_ precision: Int) -> (Rational, Double?) {
-        if den <= precision && den % precision == 0 {
+    func roundedToDenominator(_ denonimator: Int) -> (Rational, Double?) {
+        if den <= denonimator && den % denonimator == 0 {
             (self, nil)
         } else {
-            Double(self).toNearestRational(withPrecision: precision)
+            Double(self).toNearestRational(withDenominator: denonimator)
         }
     }
     
@@ -95,9 +95,10 @@ extension Double {
         self = Double(rational.num) / Double(rational.den)
     }
     
-    func toNearestRational(withPrecision: Int, epsilon: Double = 0.001) -> (Rational, Double?) {
-        let higherRational = Rational(Int((self * Double(withPrecision)).rounded(.up)), withPrecision)
-        let lowerRational = Rational(Int((self * Double(withPrecision)).rounded(.down)), withPrecision)
+    func toNearestRational(withDenominator precision: Int, epsilon: Double = 0.001) -> (Rational, Double?) {
+        let p = precision <= 0 ? 1 : precision
+        let higherRational = Rational(Int((self * Double(p)).rounded(.up)), p)
+        let lowerRational = Rational(Int((self * Double(p)).rounded(.down)), p)
         
         let upperError = Double(higherRational) - self
         let lowerError = self - Double(lowerRational)

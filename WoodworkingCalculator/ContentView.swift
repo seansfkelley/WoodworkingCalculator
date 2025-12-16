@@ -21,9 +21,9 @@ class Input: ObservableObject {
         case .result(let r):
             let (rational, _) = switch r {
             case .rational(let r):
-                r.roundedToPrecision(precision)
+                r.roundedToDenominator(precision)
             case .real(let r):
-                r.toNearestRational(withPrecision: precision)
+                r.toNearestRational(withDenominator: precision)
             }
             return formatAsUsCustomary(rational, displayInchesOnly ? .inches : .feet)
         }
@@ -36,9 +36,9 @@ class Input: ObservableObject {
         case .result(let r):
             let (_, error) = switch r {
             case .rational(let r):
-                r.roundedToPrecision(precision)
+                r.roundedToDenominator(precision)
             case .real(let r):
-                r.toNearestRational(withPrecision: precision)
+                r.toNearestRational(withDenominator: precision)
             }
             if let e = error {
                 return (precision, e)
@@ -365,7 +365,7 @@ struct ContentView: View {
             input.reset(.result(answer))
             isErrorPresented = false
         case .failure:
-            // TODO
+            print("TODO")
         }
     }
 }
