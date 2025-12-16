@@ -23,10 +23,10 @@ enum EvaluatableCalculation: CustomStringConvertible, Equatable {
         }
     }
     
-    func evaluate() -> Quantity {
+    func evaluate() -> Result<Quantity, DivisionByZeroError> {
         switch (self) {
-        case .rational(let r): .rational(r.reduced)
-        case .real(let r): .real(r)
+        case .rational(let r): .success(.rational(r))
+        case .real(let r): .success(.real(r))
         case .add(let left, let right): Self.evaluateBinaryOperator(left, (+), (+), right)
         case .subtract(let left, let right): Self.evaluateBinaryOperator(left, (-), (-), right)
         case .multiply(let left, let right): Self.evaluateBinaryOperator(left, (*), (*), right)
@@ -43,7 +43,7 @@ enum EvaluatableCalculation: CustomStringConvertible, Equatable {
         _ rationalOp: (Rational, Rational) -> Rational,
         _ doubleOp: (Double, Double) -> Double,
         _ right: EvaluatableCalculation
-    ) -> Quantity {
+    ) -> Result<Quantity, DivisionByZeroError> {        
         switch (left.evaluate(), right.evaluate()) {
         case (.rational(let leftRational), .rational(let rightRational)):
             .rational(rationalOp(leftRational, rightRational))

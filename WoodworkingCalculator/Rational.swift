@@ -1,4 +1,4 @@
-struct Rational: Equatable, Hashable, CustomStringConvertible {
+struct UncheckedRational {
     let num: Int
     let den: Int
     
@@ -7,15 +7,23 @@ struct Rational: Equatable, Hashable, CustomStringConvertible {
         self.den = den
     }
     
-    var reduced: Rational {
-        var n = num
-        var d = den
-        if (n.signum() == -1 && d.signum() == -1) || (n.signum() == 1 && d.signum() == -1) {
-            n = -n
-            d = -d
+    var checked: Result<Rational, DivisionByZeroError> {
+        if den == 0 {
+            .failure(DivisionByZeroError())
+        } else {
+            .success(Rational(num, den))
         }
-        let divisor = gcd(abs(n), abs(d))
-        return Rational(n / divisor, d / divisor)
+    }
+}
+
+struct Rational: Equatable, Hashable, CustomStringConvertible {
+    let num: Int
+    let den: Int
+    
+    fileprivate init(_ num: Int, _ den: Int) {
+        let (n, d) = reduce(num, den)
+        self.num = n
+        self.den = d
     }
     
     func roundedToPrecision(_ precision: Int) -> (Rational, Double?) {
@@ -41,27 +49,37 @@ struct Rational: Equatable, Hashable, CustomStringConvertible {
     }
     
     static func == (left: Rational, right: Rational) -> Bool {
-        let lreduced = left.reduced
-        let rreduced = right.reduced
-        return lreduced.num == rreduced.num && lreduced.den == rreduced.den
+        return left.num == right.num && left.den == right.den
     }
     
-    static func + (left: Rational, right: Rational) -> Rational {
-        Rational(left.num * right.den + right.num * left.den, left.den * right.den).reduced
+    static func + (left: Rational, right: Rational) -> Result<Rational, DivisionByZeroError> {
+        UncheckedRational(left.num * right.den + right.num * left.den, left.den * right.den).checked
     }
     
-    static func - (left: Rational, right: Rational) -> Rational {
-        Rational(left.num * right.den - right.num * left.den, left.den * right.den).reduced
+    static func - (left: Rational, right: Rational) -> Result<Rational, DivisionByZeroError> {
+        UncheckedRational(left.num * right.den - right.num * left.den, left.den * right.den).checked
     }
     
-    static func * (left: Rational, right: Rational) -> Rational {
-        Rational(left.num * right.num, left.den * right.den).reduced
+    static func * (left: Rational, right: Rational) -> Result<Rational, DivisionByZeroError> {
+        UncheckedRational(left.num * right.num, left.den * right.den).checked
     }
     
-    static func / (left: Rational, right: Rational) -> Rational {
-        Rational(left.num * right.den, left.den * right.num).reduced
+    static func / (left: Rational, right: Rational) -> Result<Rational, DivisionByZeroError> {
+        UncheckedRational(left.num * right.den, left.den * right.num).checked
     }
 }
+
+private func reduce(_ num: Int, _ den: Int) -> (Int, Int) {
+    var n = num
+    var d = den
+    if (n.signum() == -1 && d.signum() == -1) || (n.signum() == 1 && d.signum() == -1) {
+        n = -n
+        d = -d
+    }
+    let divisor = gcd(abs(n), abs(d))
+    return (n / divisor, d / divisor)
+}
+
 
 private func gcd(_ a: Int, _ b: Int) -> Int {
     let r = a % b
@@ -74,8 +92,8 @@ extension Double {
     }
     
     func toNearestRational(withPrecision: Int, epsilon: Double = 0.001) -> (Rational, Double?) {
-        let higherRational = Rational(Int((self * Double(withPrecision)).rounded(.up)), withPrecision).reduced
-        let lowerRational = Rational(Int((self * Double(withPrecision)).rounded(.down)), withPrecision).reduced
+        let higherRational = Rational(Int((self * Double(withPrecision)).rounded(.up)), withPrecision)
+        let lowerRational = Rational(Int((self * Double(withPrecision)).rounded(.down)), withPrecision)
         
         let upperError = Double(higherRational) - self
         let lowerError = self - Double(lowerRational)
