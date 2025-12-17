@@ -47,13 +47,13 @@ struct InputTests {
     }
     
     @Test func appendDeletingSuffix() {
-        input.reset(.string("1 "))
+        input.reset(.string("1 ", nil))
         #expect(input.append("/4") == false) // sanity-check that this case doesn't work without deletingSuffix
         #expect(input.stringified == "1 ")
         #expect(input.append("/4", deletingSuffix: [" ", "/"]) == true)
         #expect(input.stringified == "1/4")
         
-        input.reset(.string("1/"))
+        input.reset(.string("1/", nil))
         #expect(input.append("/4") == false) // sanity-check that this case doesn't work without deletingSuffix
         #expect(input.stringified == "1/")
         #expect(input.append("/4", deletingSuffix: [" ", "/"]) == true)
@@ -61,7 +61,7 @@ struct InputTests {
     }
     
     @Test func resetToValidStringAndFormatsVerbatim() {
-        input.reset(.string("1  + 1 "))
+        input.reset(.string("1  + 1 ", nil))
         #expect(input.stringified == "1  + 1 ")
     }
     
@@ -71,26 +71,33 @@ struct InputTests {
         #expect(input.error == nil)
     }
     
-    @Test func resetToRealResultAndFormatWithError() {
+    @Test func resetToRealResultAndFormatWithAccuracy() {
         input.reset(.result(.real(0.501)))
         #expect(input.stringified == "1/2\"")
-        let (precision, error) = input.error!
+        let (precision, accuracy) = input.inaccuracy!
         #expect(precision == Constants.AppStorage.precisionDefault)
-        #expect(error.isApproximatelyEqual(to: -0.001))
+        #expect(accuracy.isApproximatelyEqual(to: -0.001))
+    }
+    
+    @Test func resetToErroredResult() {
+        input.reset(.string("1/0", DivisionByZeroError()))
+        #expect(input.stringified == "1/0")
+        #expect(input.error! as? DivisionByZeroError == DivisionByZeroError())
     }
     
     @Test func settingToInvalidStringDoesNothing() {
-        input.reset(.string("1+1"))
+        input.reset(.string("1+1", nil))
         #expect(input.stringified == "1+1")
-        input.reset(.string("+++"))
+        input.reset(.string("+++", nil))
         #expect(input.stringified == "1+1")
     }
     
     @Test<[(Input.RawValue, Bool)]>(arguments: [
         (.result(.real(1.0)), false),
         (.result(.rational(rational(1, 2))), false),
-        (.string(""), false),
-        (.string("1+1"), true),
+        (.string("", nil), false),
+        (.string("1+1", nil), true),
+        (.string("1/0", DivisionByZeroError()), true),
     ]) func willBackspaceSingleCharacter(value: Input.RawValue, expected: Bool) {
         input.reset(value)
         #expect(input.willBackspaceSingleCharacter == expected)
@@ -99,8 +106,9 @@ struct InputTests {
     @Test<[(Input.RawValue, String)]>(arguments: [
         (.result(.real(1.0)), ""),
         (.result(.rational(rational(1, 2))), ""),
-        (.string(""), ""),
-        (.string("1+1"), "1+"),
+        (.string("", nil), ""),
+        (.string("1+1", nil), "1+"),
+        (.string("1/0", DivisionByZeroError()), "1/"),
     ]) func backspace(value: Input.RawValue, expected: String) {
         input.reset(value)
         input.backspace()
