@@ -122,7 +122,7 @@ class Input: ObservableObject {
 }
 
 // n.b. this function only works with a valid prefix of a fraction.
-private func prettifyInput(_ input: String) -> String {
+private func formatInputForDisplay(_ input: String) -> String {
     return input
         .replacing(/(\d+)\/(\d*)/, with: { match in
             return "\(Int(match.1)!.numerator)⁄\(Int(match.2).map(\.denominator) ?? " ")"
@@ -198,7 +198,7 @@ struct ContentView: View {
                         .foregroundStyle(.orange)
                 }
             }
-            Text(prettifyInput(previous))
+            Text(formatInputForDisplay(previous))
                 .frame(
                     minWidth: 0,
                     maxWidth:  .infinity,
@@ -253,7 +253,7 @@ struct ContentView: View {
                                 \(inaccuracy.sign == .plus ? "+" : "-") \
                                 \(String(format: "%.3f", abs(inaccuracy)))\" \
                                 = \
-                                \(prettifyInput(input.stringified))
+                                \(formatInputForDisplay(input.stringified))
                                 """)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Divider()
@@ -266,7 +266,7 @@ struct ContentView: View {
                         .presentationCompactAdaptation(.popover)
                     }
                 }
-                Text(prettifyInput(input.stringified))
+                Text(formatInputForDisplay(input.stringified))
                     .frame(
                         minWidth: 0,
                         maxWidth:  .infinity,

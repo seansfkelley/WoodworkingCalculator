@@ -72,7 +72,7 @@ enum EvaluatableCalculation: CustomStringConvertible {
     }
     
     // This function abuses the simplicity of the grammar whereby almost all tokens either:
-    //   - single characters (e.g. oeprators)
+    //   - single characters (e.g. operators)
     //   - repetitions of the same kind of character (e.g. integers)
     //   - in the same position as, and a superset of, another token meeting the above criteria (e.g.
     //     reals requiring a dot, but alternating with integers that _allow_ a dot)
