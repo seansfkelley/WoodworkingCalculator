@@ -18,9 +18,6 @@ enum TrimmableCharacterSet {
     }
 }
 
-private let replaceableUnit = /(in|ft|mm|cm|m)(!?[0-9]+)?/
-private let multiCharacterBackspaceableSuffix = /(in|ft|mm|cm|m)(!?[0-9]+)?$/
-
 struct ValidExpressionPrefix: Equatable {
     let value: String
 
@@ -44,7 +41,7 @@ struct ValidExpressionPrefix: Equatable {
     }
 
     var backspaced: ValidExpressionPrefix {
-        if let match = value.firstMatch(of: multiCharacterBackspaceableSuffix) {
+        if let match = value.firstMatch(of: /(in|ft|mm|cm|m)(\[-?[0-9]+\])?$/) {
             // FIXME: Don't like non-null assertion.
             .init(String(value.prefix(value.count - match.output.0.count)))!
         } else {
@@ -55,14 +52,10 @@ struct ValidExpressionPrefix: Equatable {
 
     var pretty: String {
         value
-            .replacing(/(in|ft|mm|cm|m)(!?[0-9]+)?/, with: { match in
+            .replacing(/(in|ft|mm|cm|m)(\[(-?[0-9]+)\])?/, with: { match in
                 let exponent: Int
                 if let raw = match.2 {
-                    if raw.starts(with: "!") {
-                        exponent = -Int(raw.suffix(from: raw.index(after: raw.startIndex)))!
-                    } else {
-                        exponent = Int(raw)!
-                    }
+                    exponent = Int(raw)!
                 } else {
                     exponent = 1
                 }

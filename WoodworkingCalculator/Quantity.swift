@@ -18,7 +18,7 @@ enum Quantity: Equatable {
 
     func toRational(withPrecision precision: Int) -> (Rational, Double?) {
         switch self {
-        case .rational(let value, _): (value, nil)
+        case .rational(let value, _): value.roundedToDenominator(precision)
         case .real(let value, _): value.toNearestRational(withDenominator: precision)
         }
     }

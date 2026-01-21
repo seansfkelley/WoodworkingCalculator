@@ -54,14 +54,9 @@ class InputValue: ObservableObject {
         case .draft:
             return nil
         case .result(let result):
-            let (inaccuracy, dimension) = switch result {
-            case .rational(let value, let dimension):
-                (value.roundedToDenominator(precision).1, dimension)
-            case .real(let value, let dimension):
-                (value.toNearestRational(withDenominator: precision).1, dimension)
-            }
+            let (_, inaccuracy) = result.toRational(withPrecision: precision)
             if let inaccuracy {
-                return (precision, inaccuracy, dimension)
+                return (precision, inaccuracy, result.dimension)
             } else {
                 return nil
             }

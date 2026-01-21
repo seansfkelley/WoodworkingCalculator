@@ -40,40 +40,21 @@ internal func parseInteger(_ input: String) -> LexedTokenData? {
     }
 }
 
-internal func parseDimension(_ input: String, _ code: WoodworkingCalculatorGrammar.CitronTokenCode) -> LexedTokenData? {
-    let exponent = if input.starts(with: "!") {
-        Int(input.suffix(from: input.index(after: input.startIndex))).map { -$0 }
-    } else if !input.isEmpty {
-        Int(input)
-    } else {
-        1
-    }
-
-    return if let exponent {
-        (.dimension(Dimension(exponent)), code)
+internal func parseDimension(_ input: String) -> LexedTokenData? {
+    if let parsed = Int(input[input.index(after: input.startIndex)..<input.index(before: input.endIndex)]) {
+        (.dimension(Dimension(parsed)), .Dimension)
     } else {
         nil
     }
 }
 
 let lexer = CitronLexer<LexedTokenData>(rules: [
-    .regexPattern("in((!?)[0-9]+)?", {
-        parseDimension(String($0.suffix(from: $0.index($0.startIndex, offsetBy: 2))), .DimensionedInches)
-    }),
-    .regexPattern("ft((!?)[0-9]+)?", {
-        parseDimension(String($0.suffix(from: $0.index($0.startIndex, offsetBy: 2))), .DimensionedFeet)
-    }),
-    .regexPattern("mm((!?)[0-9]+)?", {
-        parseDimension(String($0.suffix(from: $0.index($0.startIndex, offsetBy: 2))), .Millimeters)
-    }),
-    .regexPattern("cm((!?)[0-9]+)?", {
-        parseDimension(String($0.suffix(from: $0.index($0.startIndex, offsetBy: 2))), .Centimeters)
-    }),
-    .regexPattern("m((!?)[0-9]+)?", {
-        parseDimension(String($0.suffix(from: $0.index($0.startIndex, offsetBy: 1))), .Meters)
-    }),
+    .regexPattern("\\[-?[0-9]+\\]", parseDimension),
     .string("in", (.void, .Inches)),
     .string("ft", (.void, .Feet)),
+    .string("mm", (.void, .Millimeters)),
+    .string("cm", (.void, .Centimeters)),
+    .string("m", (.void, .Meters)),
     .regexPattern("([0-9]+ +)?[0-9]+/[0-9]+", parseMixedNumber),
     .regexPattern("([0-9]+)?\\.[0-9]+", parseReal),
     // Note that this permits a trailing dot, whereas the above does not. This makes it easier to
