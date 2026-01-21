@@ -3,9 +3,38 @@ import Foundation
 enum UsCustomaryPrecision: Equatable {
     case feet
     case inches
+    
+    var symbol: String {
+        switch self {
+        case .feet: "'"
+        case .inches: "\""
+        }
+    }
+
+    var abbreviation: String {
+        switch self {
+        case .feet: "ft"
+        case .inches: "in"
+        }
+    }
 }
 
 func formatAsUsCustomary(_ rational: Rational, _ dimension: Dimension, _ precision: UsCustomaryPrecision = .feet) -> String {
+    let unit: String
+
+    switch dimension.value {
+    case 0:
+        return rational.den == 1 ? "\(rational.num)" : "\(rational.num)/\(rational.den)"
+    case 1:
+        unit = precision.symbol
+    case 2:
+        unit = "sq \(precision.abbreviation)"
+    case 3:
+        unit = "cu \(precision.abbreviation)"
+    default:
+        unit = "\(precision.abbreviation)^\(dimension.value)"
+    }
+
     var n = abs(rational.num)
     let d = abs(rational.den)
     
@@ -13,23 +42,23 @@ func formatAsUsCustomary(_ rational: Rational, _ dimension: Dimension, _ precisi
     
     if d == 1 {
         if n >= 12 && precision == .feet {
-            parts.append("\(n / 12)'")
+            parts.append("\(n / 12)\(unit)")
             n = n % 12;
         }
         
         if parts.isEmpty || n > 0 {
-            parts.append("\(n)\"")
+            parts.append("\(n)\(unit)")
         }
     } else {
         if n >= 12 * d && precision == .feet {
-            parts.append("\(n / (12 * d))'");
+            parts.append("\(n / (12 * d))\(unit)");
             n = n % (12 * d);
         }
         
         if n > d {
-            parts.append("\(n / d) \(UncheckedRational(n % d, d))\"")
+            parts.append("\(n / d) \(UncheckedRational(n % d, d))\(unit)")
         } else {
-            parts.append("\(UncheckedRational(n, d))\"")
+            parts.append("\(UncheckedRational(n, d))\(unit)")
         }
     }
     
@@ -79,11 +108,5 @@ extension Int {
     
     var denominator: String {
         return String(self).replacing(#/[0-9]/#, with: { match in [unicodeSubscript[match.output.first!]!] })
-    }
-}
-
-extension Rational {
-    var fancyDescription: String {
-        return den == 1 ? "\(num)" : "\(num.numerator)⁄\(den.denominator)"
     }
 }

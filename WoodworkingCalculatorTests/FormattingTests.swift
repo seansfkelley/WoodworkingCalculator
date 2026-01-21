@@ -45,11 +45,4 @@ struct FormattingTests {
     ]) func testFormatMetric(number: Double, precision: Int, expected: String) throws {
         #expect(formatMetric(number, precision: precision) == expected)
     }
-    
-    @Test("fancyDescription", arguments: [
-        (rational(1, 2), "¹⁄₂"),
-        (rational(4, 2), "2"),
-    ]) func fancyDescription(input: Rational, expected: String) throws {
-        #expect(input.fancyDescription == expected)
-    }
 }
