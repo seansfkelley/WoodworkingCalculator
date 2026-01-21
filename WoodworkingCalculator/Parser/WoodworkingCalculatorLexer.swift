@@ -40,6 +40,9 @@ internal func parseInteger(_ input: String) -> LexedTokenData? {
 }
 
 let lexer = CitronLexer<LexedTokenData>(rules: [
+    .string("mm", (.void, .Millimeters)),
+    .string("cm", (.void, .Centimeters)),
+    .string("m", (.void, .Meters)),
     .regexPattern("([0-9]+ +)?[0-9]+/[0-9]+", parseMixedNumber),
     .regexPattern("([0-9]+)?\\.[0-9]+", parseReal),
     // Note that this permits a trailing dot, whereas the above does not. This makes it easier to
@@ -47,11 +50,6 @@ let lexer = CitronLexer<LexedTokenData>(rules: [
     // when the real datatype is not actually necessary to represent the quantity, should someone
     // leave a trailing dot.
     .regexPattern("[0-9]+\\.?", parseInteger),
-    // For ease of managing "atomic" append, backspace and validation, give single-character
-    // aliases to the metric units that will be formatted for prettier display later.
-    .string("m", (.void, .Meters)),
-    .string("c", (.void, .Centimeters)),
-    .string("i", (.void, .Millimeters)),
     .string("'", (.void, .Feet)),
     .string("\"", (.void, .Inches)),
     .string("+", (.void, .Add)),

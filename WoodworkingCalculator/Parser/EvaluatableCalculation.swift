@@ -79,10 +79,8 @@ enum EvaluatableCalculation: CustomStringConvertible {
     // rationals require two distinct numbers separated by a slash, which is a minimum of three
     // keystrokes in a row.
     //
-    // In the case of metric quantities, the grammar is specifically designed to be based on
-    // single-character pseudo-units, because we treat the supported units as totally independent
-    // and there is no concept of an SI prefix. This means we don't need to special-case validity
-    // checks for them here, because you can't input only part of a unit (e.g. only "c" from "cm").
+    // In the case of unit indicators, they are treated as atomic units. There is no concept of SI
+    // prefixes, and you can't enter or backspace to a partial unit.
     static func isValidPrefix(_ input: String) -> Bool {
         func check(_ s: String) -> Bool {
             do {

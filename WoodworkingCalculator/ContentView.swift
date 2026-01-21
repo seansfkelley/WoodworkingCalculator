@@ -5,17 +5,15 @@ import ExyteGrid
 private func formatInputForDisplay(_ input: String) -> String {
     return input
         .replacing(/(\d+)\/(\d*)/, with: { match in
-            return "\(Int(match.1)!.numerator)⁄\(Int(match.2).map(\.denominator) ?? " ")"
+            "\(Int(match.1)!.numerator)⁄\(Int(match.2).map(\.denominator) ?? " ")"
         })
         // Note that this one _specifically_ uses 0-9 instead of \d, because we want to match only
         // those digits that have not been replaced by the above (partial, full) fractionalization
         // because those digits represent in-progress mixed numbers: that is, those with a
         // numerator but no fraction slash.
         .replacing(/([0-9]) ([0-9]|$)/, with: { match in
-            return "\(match.1)\u{2002}\(match.2)"
+            "\(match.1)\u{2002}\(match.2)"
         })
-        .replacing("c", with: "cm")
-        .replacing("i", with: "mm")
 }
 
 private func formatInputForDisplay(_ input: String, appendingTrailingParentheses: Bool) -> AttributedString {
@@ -83,8 +81,8 @@ struct ContentView: View {
                     } else {
                         Section("Metric Operations") {
                             Button(action: { append("m") }) { Text("insert \"m\"") }
-                            Button(action: { append("c") }) { Text("insert \"cm\"") }
-                            Button(action: { append("i") }) { Text("insert \"mm\"") }
+                            Button(action: { append("cm") }) { Text("insert \"cm\"") }
+                            Button(action: { append("mm") }) { Text("insert \"mm\"") }
                         }
                     }
                 } label: {
@@ -182,15 +180,11 @@ struct ContentView: View {
                 // n.b. GridGroup is only to work around limitations in SwiftUI's ViewBuilder
                 // closure typings, but I figured it doubled as a nice way to emphasize the rows.
                 GridGroup {
-                    // Branching inside the component instead of outside to make two distinct ones
-                    // is a little inelegant but I specifically want to keep the button instance
-                    // the same so the stateful on-press color-change animation doesn't abruptly
-                    // end while you're actively long-pressing the button due to changed identity.
-                    CalculatorButton(.text(input.willBackspaceSingleCharacter ? "⌫" : "C"), .gray) {
+                    CalculatorButton(.text(input.backspaced.buttonText), .gray) {
                         previous = ""
                         isInaccuracyWarningPresented = false
                         isErrorPresented = false
-                        input.backspace()
+                        input.reset(input.backspaced.rawValue)
                     }
                     .simultaneousGesture(LongPressGesture(minimumDuration: 1).onEnded { _ in
                         previous = ""

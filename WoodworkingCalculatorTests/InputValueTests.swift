@@ -103,26 +103,18 @@ struct InputValueTests {
         #expect(input.stringified == "1+1")
     }
 
-    @Test<[(InputValue.RawValue, Bool)]>(arguments: [
-        (.result(.real(1.0)), false),
-        (.result(.rational(rational(1, 2))), false),
-        (.string("", nil), false),
-        (.string("1+1", nil), true),
-        (.string("1/0", DivisionByZeroError()), true),
-    ]) func willBackspaceSingleCharacter(value: InputValue.RawValue, expected: Bool) {
+    @Test<[(InputValue.RawValue, InputValue.BackspaceResult)]>(arguments: [
+        (.result(.real(1.0)), .clear),
+        (.result(.rational(rational(1, 2))), .clear),
+        (.string("", nil), .string("")),
+        (.string("1+1", nil), .string("1+")),
+        (.string("1 ", nil), .string("1")),
+        (.string("1/0", DivisionByZeroError()), .string("1/")),
+        (.string("1m", nil), .string("1")),
+        (.string("1cm", nil), .string("1")),
+        (.string("1mm", nil), .string("1")),
+    ]) func backspaced(value: InputValue.RawValue, expected: InputValue.BackspaceResult) {
         input.reset(value)
-        #expect(input.willBackspaceSingleCharacter == expected)
-    }
-
-    @Test<[(InputValue.RawValue, String)]>(arguments: [
-        (.result(.real(1.0)), ""),
-        (.result(.rational(rational(1, 2))), ""),
-        (.string("", nil), ""),
-        (.string("1+1", nil), "1+"),
-        (.string("1/0", DivisionByZeroError()), "1/"),
-    ]) func backspace(value: InputValue.RawValue, expected: String) {
-        input.reset(value)
-        input.backspace()
-        #expect(input.stringified == expected)
+        #expect(input.backspaced == expected)
     }
 }

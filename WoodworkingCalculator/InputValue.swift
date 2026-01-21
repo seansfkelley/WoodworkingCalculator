@@ -1,12 +1,33 @@
 import Foundation
 import SwiftUI
 
+private let multiCharacterBackspaceableSuffix = /(mm|cm)$/
+
 class InputValue: ObservableObject {
     enum RawValue {
         case string(String, Error?)
         case result(Quantity)
     }
-    
+
+    enum BackspaceResult: Equatable {
+        case clear
+        case string(String)
+
+        var rawValue: RawValue {
+            switch self {
+            case .clear: .string("", nil)
+            case .string(let s): .string(s, nil)
+            }
+        }
+
+        var buttonText: String {
+            switch self {
+            case .clear: "C"
+            case .string: "⌫"
+            }
+        }
+    }
+
     @Published
     private var value: RawValue = .string("", nil)
     @AppStorage(Constants.AppStorage.displayInchesOnlyKey)
@@ -65,13 +86,17 @@ class InputValue: ObservableObject {
             Double(r) * 0.0254
         }
     }
-    
-    var willBackspaceSingleCharacter: Bool {
-        return switch value {
+
+    var backspaced: BackspaceResult {
+        switch value {
         case .string(let s, _):
-            !s.isEmpty
+            if let match = s.firstMatch(of: multiCharacterBackspaceableSuffix) {
+                .string(String(s.prefix(s.count - match.output.0.count)))
+            } else {
+                .string(s.count == 0 ? "" : String(s.prefix(s.count - 1)))
+            }
         case .result:
-            false
+            .clear
         }
     }
 
@@ -100,15 +125,6 @@ class InputValue: ObservableObject {
             return true
         } else {
             return false
-        }
-    }
-    
-    func backspace() {
-        value = switch (value) {
-        case .string(let s, _):
-            .string(s.count == 0 ? "" : String(s.prefix(s.count - 1)), nil)
-        case .result:
-            .string("", nil)
         }
     }
     
