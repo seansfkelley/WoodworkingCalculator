@@ -1,16 +1,32 @@
 import SwiftUI
 import ExyteGrid
 
-// n.b. this function only works with a valid prefix of a fraction.
 private func formatInputForDisplay(_ input: String) -> String {
     return input
-        .replacing(/(\d+)\/(\d*)/, with: { match in
-            "\(Int(match.1)!.numerator)⁄\(Int(match.2).map(\.denominator) ?? " ")"
+        .replacing(/(in|ft|mm|cm|m)(!?[0-9]+)?/, with: { match in
+            let exponent: Int
+            if let raw = match.2 {
+                if raw.starts(with: "!") {
+                    exponent = -Int(raw.suffix(from: raw.index(after: raw.startIndex)))!
+                } else {
+                    exponent = Int(raw)!
+                }
+            } else {
+                exponent = 1
+            }
+            let unit: String
+            if match.1 == "in" && exponent == 1 {
+                unit = "\""
+            } else if match.1 == "ft" && exponent == 1 {
+                unit = "'"
+            } else {
+                unit = String(match.1)
+            }
+            return "\(unit)\(exponent == 1 ? "" : exponent.superscript)"
         })
-        // Note that this one _specifically_ uses 0-9 instead of \d, because we want to match only
-        // those digits that have not been replaced by the above (partial, full) fractionalization
-        // because those digits represent in-progress mixed numbers: that is, those with a
-        // numerator but no fraction slash.
+        .replacing(/([0-9]+)\/([0-9]*)/, with: { match in
+            "\(Int(match.1)!.superscript)⁄\(Int(match.2).map(\.subscript) ?? " ")"
+        })
         .replacing(/([0-9]) ([0-9]|$)/, with: { match in
             "\(match.1)\u{2002}\(match.2)"
         })
@@ -200,8 +216,8 @@ struct ContentView: View {
                     CalculatorButton(.image("divide"), .orange) { append("÷") }
                 }
                 GridGroup {
-                    CalculatorButton(.text("'"), .gray) { append("'", canReplaceResult: true) }
-                    CalculatorButton(.text("\""), .gray) { append("\"", canReplaceResult: true) }
+                    CalculatorButton(.text("'"), .gray) { append("ft") }
+                    CalculatorButton(.text("\""), .gray) { append("in") }
                     CalculatorButton(.text("."), .gray) { append(".", canReplaceResult: true) }
                     CalculatorButton(.image("multiply"), .orange) { append("×") }
                 }

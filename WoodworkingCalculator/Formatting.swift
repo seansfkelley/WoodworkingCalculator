@@ -5,18 +5,20 @@ enum UsCustomaryPrecision: Equatable {
     case inches
 }
 
+// Format into the internal string representation that is suitable to pass through the parser to
+// get the equivalent result. Does NOT do pretty-printing, like with fractions.
 func formatAsUsCustomary(_ rational: Rational, _ dimension: Dimension, _ precision: UsCustomaryPrecision = .feet) -> String {
-    if dimension.value == 0 {
-        return rational.den == 1
-            ? "\(rational.signum() == -1 ? "-" : "")\(rational.num)"
-            : "\(rational.signum() == -1 ? "-" : "")\(rational.num)/\(rational.den)"
-    }
-    
-    let feetUnit = dimension.value == 1 ? "'" : "ft\(dimension.value.numerator)"
-    let inchUnit = dimension.value == 1 ? "\"" : "in\(dimension.value.numerator)"
-
     var n = abs(rational.num)
     let d = abs(rational.den)
+
+    if dimension.value == 0 {
+        return rational.den == 1
+            ? "\(rational.signum() == -1 ? "-" : "")\(n)"
+            : "\(rational.signum() == -1 ? "-" : "")\(n)/\(d)"
+    }
+    
+    let feetUnit = "ft\(dimension.value)"
+    let inchUnit = "in\(dimension.value)"
 
     // This is shit, and should stay in integers the whole time. It also doesn't handle negatives
     // properly at all -- what do we want to do about that?
@@ -88,11 +90,11 @@ private let unicodeSubscript: [Character: Character] = [
 ]
 
 extension Int {
-    var numerator: String {
-        String(self).replacing(#/[0-9\-]/#, with: { match in [unicodeSuperscript[match.output.first!]!] })
+    var superscript: String {
+        String(self).replacing(/[0-9\-]/, with: { [unicodeSuperscript[$0.output.first!]!] })
     }
     
-    var denominator: String {
-        String(self).replacing(#/[0-9\-]/#, with: { match in [unicodeSubscript[match.output.first!]!] })
+    var `subscript`: String {
+        String(self).replacing(/[0-9\-]/, with: { [unicodeSubscript[$0.output.first!]!] })
     }
 }

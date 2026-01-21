@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-private let multiCharacterBackspaceableSuffix = /(mm|cm)$/
+private let multiCharacterBackspaceableSuffix = /(in|ft|mm|cm|m)(!?[0-9]+)?$/
 
 class InputValue: ObservableObject {
     enum RawValue {
@@ -110,7 +110,7 @@ class InputValue: ObservableObject {
                 return string
             } else {
                 var s = stringified
-                while s.count > 0 && charactersToTrim.contains(s.last.unsafelyUnwrapped) {
+                while s.count > 0 && charactersToTrim.contains(s.last!) {
                     s.removeLast()
                 }
                 return (s + string).replacing(/\ +/, with: " ")
