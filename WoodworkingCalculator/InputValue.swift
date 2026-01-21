@@ -40,13 +40,13 @@ class InputValue: ObservableObject {
         case .string(let s, _):
             return s
         case .result(let r):
-            let (rational, _) = switch r {
-            case .rational(let r):
-                r.roundedToDenominator(precision)
-            case .real(let r):
-                r.toNearestRational(withDenominator: precision)
+            let (rational, dimension) = switch r {
+            case .rational(let value, let dimension):
+                (value.roundedToDenominator(precision).0, dimension)
+            case .real(let value, let dimension):
+                (value.toNearestRational(withDenominator: precision).0, dimension)
             }
-            return formatAsUsCustomary(rational, displayInchesOnly ? .inches : .feet)
+            return formatAsUsCustomary(rational, dimension, displayInchesOnly ? .inches : .feet)
         }
     }
 
@@ -57,19 +57,19 @@ class InputValue: ObservableObject {
         }
     }
     
-    var inaccuracy: (Int, Double)? {
+    var inaccuracy: (Int, Double, Dimension)? {
         switch value {
         case .string:
             return nil
         case .result(let r):
-            let (_, inaccuracy) = switch r {
-            case .rational(let r):
-                r.roundedToDenominator(precision)
-            case .real(let r):
-                r.toNearestRational(withDenominator: precision)
+            let (inaccuracy, dimension) = switch r {
+            case .rational(let value, let dimension):
+                (value.roundedToDenominator(precision).1, dimension)
+            case .real(let value, let dimension):
+                (value.toNearestRational(withDenominator: precision).1, dimension)
             }
             if let inaccuracy {
-                return (precision, inaccuracy)
+                return (precision, inaccuracy, dimension)
             } else {
                 return nil
             }

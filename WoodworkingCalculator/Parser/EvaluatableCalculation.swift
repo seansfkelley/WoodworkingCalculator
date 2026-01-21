@@ -1,7 +1,7 @@
 enum EvaluatableCalculation: CustomStringConvertible {
     // n.b. all quantities are in inches (or fractions thereof)
-    case rational(UncheckedRational)
-    case real(Double)
+    case rational(UncheckedRational, Dimension)
+    case real(Double, Dimension)
     indirect case add(EvaluatableCalculation, EvaluatableCalculation)
     indirect case subtract(EvaluatableCalculation, EvaluatableCalculation)
     indirect case multiply(EvaluatableCalculation, EvaluatableCalculation)
@@ -9,8 +9,8 @@ enum EvaluatableCalculation: CustomStringConvertible {
     
     var description: String {
         switch (self) {
-        case .rational(let r): r.den == 1 ? r.num.description : r.description
-        case .real(let r): r.description
+        case .rational(let value, let dim): "\(value.den == 1 ? value.num.description : value.description)\(dim)"
+        case .real(let value, let dim): "\(value.description)\(dim)"
         case .add(let left, let right): "(\(left) + \(right))"
         case .subtract(let left, let right): "(\(left) - \(right))"
         case .multiply(let left, let right): "(\(left) × \(right))"
@@ -20,12 +20,12 @@ enum EvaluatableCalculation: CustomStringConvertible {
     
     func evaluate() -> Result<Quantity, EvaluationError> {
         switch self {
-        case .rational(let r): r.checked.map { .rational($0) }
-        case .real(let r): .success(.real(r))
-        case .add(let left, let right): Self.evaluateBinaryOperator(left, (+), (+), right)
-        case .subtract(let left, let right): Self.evaluateBinaryOperator(left, (-), (-), right)
-        case .multiply(let left, let right): Self.evaluateBinaryOperator(left, (*), (*), right)
-        case .divide(let left, let right):  Self.evaluateBinaryOperator(left, (/), (/), right)
+        case .rational(let value, let dim): value.checked.map { .rational($0, dim) }
+        case .real(let value, let dim): .success(.real(value, dim))
+        case .add(let left, let right): Self.evaluateBinaryOperator(left, (+), (+), right, (+))
+        case .subtract(let left, let right): Self.evaluateBinaryOperator(left, (-), (-), right, (-))
+        case .multiply(let left, let right): Self.evaluateBinaryOperator(left, (*), (*), right, (*))
+        case .divide(let left, let right):  Self.evaluateBinaryOperator(left, (/), (/), right, (/))
         }
     }
     
@@ -37,7 +37,8 @@ enum EvaluatableCalculation: CustomStringConvertible {
         _ left: EvaluatableCalculation,
         _ rationalOp: (Rational, Rational) -> Result<Rational, EvaluationError>,
         _ doubleOp: (Double, Double) -> Double,
-        _ right: EvaluatableCalculation
+        _ right: EvaluatableCalculation,
+        _ combineDimensions: (Dimension, Dimension) -> Result<Dimension, EvaluationError>,
     ) -> Result<Quantity, EvaluationError> {
         let l: Quantity
         let r: Quantity
@@ -53,20 +54,22 @@ enum EvaluatableCalculation: CustomStringConvertible {
         }
 
         return switch (l, r) {
-        case (.rational(let leftRational), .rational(let rightRational)):
-            rationalOp(leftRational, rightRational).map { .rational($0) }
+        case (.rational(let leftRational, let leftDim), .rational(let rightRational, let rightDim)):
+            combineDimensions(leftDim, rightDim).flatMap { dimension in
+                rationalOp(leftRational, rightRational).map { .rational($0, dimension) }
+            }
 
         // Fallthroughs don't work here, unfortunately, due to changes in the type of the binding
         // pattern, so eat the cost of repetition.
             
-        case (.real(let leftReal), .real(let rightReal)):
-            .success(.real(doubleOp(leftReal, rightReal)))
+        case (.real(let leftReal, let leftDim), .real(let rightReal, let rightDim)):
+            combineDimensions(leftDim, rightDim).map { .real(doubleOp(leftReal, rightReal), $0) }
 
-        case (.rational(let leftRational), .real(let rightReal)):
-            .success(.real(doubleOp(Double(leftRational), rightReal)))
+        case (.rational(let leftRational, let leftDim), .real(let rightReal, let rightDim)):
+            combineDimensions(leftDim, rightDim).map { .real(doubleOp(Double(leftRational), rightReal), $0) }
 
-        case (.real(let leftReal), .rational(let rightRational)):
-            .success(.real(doubleOp(leftReal, Double(rightRational))))
+        case (.real(let leftReal, let leftDim), .rational(let rightRational, let rightDim)):
+            combineDimensions(leftDim, rightDim).map { .real(doubleOp(leftReal, Double(rightRational)), $0) }
         }
     }
     

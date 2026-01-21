@@ -21,35 +21,35 @@ multiplicative ::= atom(x). { x }
 // rational instead of dropping down into floating-point.
 %nonterminal_type atom EvaluatableCalculation
 atom ::= quantity(x). { x }
-atom ::= Subtract quantity(x). { .subtract(.rational(UncheckedRational(0, 1)), x) }
+atom ::= Subtract quantity(x). { .subtract(.rational(UncheckedRational(0, 1), .unassigned), x) }
 atom ::= LeftParen expression(x) RightParen. { x }
-atom ::= Subtract LeftParen expression(x) RightParen. { .subtract(.rational(UncheckedRational(0, 1)), x) }
+atom ::= Subtract LeftParen expression(x) RightParen. { .subtract(.rational(UncheckedRational(0, 1), .unassigned), x) }
 
 %nonterminal_type quantity EvaluatableCalculation
 quantity ::= integer(q) Meters. {
     // Decimal ratio is exact, by definition of the US customary system: 1" = 25.4mm.
     // https://en.wikipedia.org/wiki/United_States_customary_units#International_units
-    return .real(Double(q) / 0.0254)
+    .real(Double(q) / 0.0254, .assigned(1))
 }
-quantity ::= real(q) Meters. { .real(q / 0.0254) }
-quantity ::= integer(q) Centimeters. { .real(Double(q) / 2.54) }
-quantity ::= real(q) Centimeters. { .real(q / 2.54) }
-quantity ::= integer(q) Millimeters. { .real(Double(q) / 25.4) }
-quantity ::= real(q) Millimeters. { .real(q / 25.4) }
-quantity ::= integer(f) Feet mixed_number(i) Inches. { .rational(UncheckedRational((f * 12) * i.den + i.num, i.den)) }
-quantity ::= integer(f) Feet mixed_number(i). { .rational(UncheckedRational((f * 12) * i.den + i.num, i.den)) }
-quantity ::= integer(f) Feet integer(i) Inches. { .rational(UncheckedRational(f * 12 + i, 1)) }
-quantity ::= integer(f) Feet integer(i). { .rational(UncheckedRational(f * 12 + i, 1)) }
-quantity ::= integer(f) Feet real(i) Inches. { .real(Double(f * 12) + i) }
-quantity ::= integer(f) Feet real(i). { .real(Double(f * 12) + i) }
-quantity ::= integer(f) Feet. { .rational(UncheckedRational(f * 12, 1)) }
-quantity ::= real(f) Feet. { .real(f * 12) }
-quantity ::= mixed_number(i) Inches. { .rational(i) }
-quantity ::= mixed_number(i). { .rational(i) }
-quantity ::= integer(i) Inches. { .rational(UncheckedRational(i, 1)) }
-quantity ::= integer(i). { .rational(UncheckedRational(i, 1)) }
-quantity ::= real(i) Inches. { .real(i) }
-quantity ::= real(i). { .real(i) }
+quantity ::= real(q) Meters. { .real(q / 0.0254, .assigned(1)) }
+quantity ::= integer(q) Centimeters. { .real(Double(q) / 2.54, .assigned(1)) }
+quantity ::= real(q) Centimeters. { .real(q / 2.54, .assigned(1)) }
+quantity ::= integer(q) Millimeters. { .real(Double(q) / 25.4, .assigned(1)) }
+quantity ::= real(q) Millimeters. { .real(q / 25.4, .assigned(1)) }
+quantity ::= integer(f) Feet mixed_number(i) Inches. { .rational(UncheckedRational((f * 12) * i.den + i.num, i.den), .assigned(1)) }
+quantity ::= integer(f) Feet mixed_number(i). { .rational(UncheckedRational((f * 12) * i.den + i.num, i.den), .assigned(1)) }
+quantity ::= integer(f) Feet integer(i) Inches. { .rational(UncheckedRational(f * 12 + i, 1), .assigned(1)) }
+quantity ::= integer(f) Feet integer(i). { .rational(UncheckedRational(f * 12 + i, 1), .assigned(1)) }
+quantity ::= integer(f) Feet real(i) Inches. { .real(Double(f * 12) + i, .assigned(1)) }
+quantity ::= integer(f) Feet real(i). { .real(Double(f * 12) + i, .assigned(1)) }
+quantity ::= integer(f) Feet. { .rational(UncheckedRational(f * 12, 1), .assigned(1)) }
+quantity ::= real(f) Feet. { .real(f * 12, .assigned(1)) }
+quantity ::= mixed_number(i) Inches. { .rational(i, .assigned(1)) }
+quantity ::= mixed_number(i). { .rational(i, .unassigned) }
+quantity ::= integer(i) Inches. { .rational(UncheckedRational(i, 1), .assigned(1)) }
+quantity ::= integer(i). { .rational(UncheckedRational(i, 1), .unassigned) }
+quantity ::= real(i) Inches. { .real(i, .assigned(1)) }
+quantity ::= real(i). { .real(i, .unassigned) }
 
 %nonterminal_type integer Int
 integer ::= Integer(x). {

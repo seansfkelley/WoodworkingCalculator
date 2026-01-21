@@ -5,7 +5,7 @@ enum UsCustomaryPrecision: Equatable {
     case inches
 }
 
-func formatAsUsCustomary(_ rational: Rational, _ precision: UsCustomaryPrecision = .feet) -> String {
+func formatAsUsCustomary(_ rational: Rational, _ dimension: Dimension, _ precision: UsCustomaryPrecision = .feet) -> String {
     var n = abs(rational.num)
     let d = abs(rational.den)
     

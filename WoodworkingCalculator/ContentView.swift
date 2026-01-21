@@ -122,14 +122,13 @@ struct ContentView: View {
                             .offset(x: shakeError ? 20 : 0)
                     }
                     .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(error.localizedDescription)
-                                .font(.system(.body))
-                        }
-                        .padding()
-                        .presentationCompactAdaptation(.popover)
+                        Text(error.localizedDescription)
+                            .font(.system(.body))
+                            .padding()
+                            .fixedSize(horizontal: false, vertical: true)
+                            .presentationCompactAdaptation(.popover)
                     }
-                } else if let (precision, inaccuracy) = input.inaccuracy {
+                } else if let (precision, inaccuracy, dimension) = input.inaccuracy {
                     Button(action: { isInaccuracyWarningPresented.toggle() }) {
                         Text("≈")
                             .font(.system(size: 40, weight: .bold))
