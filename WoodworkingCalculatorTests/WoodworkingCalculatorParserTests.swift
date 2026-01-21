@@ -140,13 +140,28 @@ struct EvaluatableCalculationTests {
         ),
         (
             "1 ÷ 0",
-            .divide(.rational(UncheckedRational(1, 0)), .rational(UncheckedRational(0, 0))),
+            .divide(.rational(UncheckedRational(1, 1)), .rational(UncheckedRational(0, 1))),
             .failure(DivisionByZeroError())
         ),
         (
-            "1 / (1 - 1)",
-            .divide(.rational(UncheckedRational(1, 0)), .subtract(.rational(UncheckedRational(1, 0)), .rational(UncheckedRational(1, 0)))),
+            "1 ÷ (1 - 1)",
+            .divide(.rational(UncheckedRational(1, 1)), .subtract(.rational(UncheckedRational(1, 1)), .rational(UncheckedRational(1, 1)))),
             .failure(DivisionByZeroError())
+        ),
+        (
+            "(1)",
+            .rational(UncheckedRational(1, 1)),
+            .success(.rational(rational(1, 1))),
+        ),
+        (
+            "(1 + 2",
+            .add(.rational(UncheckedRational(1, 1)), .rational(UncheckedRational(2, 1))),
+            .success(.rational(rational(3, 1))),
+        ),
+        (
+            "((((1 + 1) + 1",
+            .add(.add(.rational(UncheckedRational(1, 1)), .rational(UncheckedRational(1, 1))), .rational(UncheckedRational(1, 1))),
+            .success(.rational(rational(3, 1))),
         ),
     ]) func from(input: String, expectedEvaluatable: EvaluatableCalculation, expectedResult: Result<Quantity, DivisionByZeroError>) throws {
         let evaluatable = EvaluatableCalculation.from(input)
@@ -157,11 +172,16 @@ struct EvaluatableCalculationTests {
     }
     
     @Test("from (nil)", arguments: [
+        "1+",
         "1//2",
         "1++",
         "1 1",
         "1--",
-        "1*2",
+        "1*2", // not the right character for multiplication
+        "()",
+        ")",
+        "(1+",
+        "1 / (1 + 1)", // slash is for fractions, not division
     ]) func fromNil(input: String) throws {
         #expect(EvaluatableCalculation.from(input) == nil)
     }
@@ -185,6 +205,11 @@ struct EvaluatableCalculationTests {
         "1.1",
         " ",
         "-",
+        "(",
+        "(1",
+        "1+(",
+        "(1+",
+        "(1)",
     ]) func isValidPrefix(input: String) throws {
         #expect(EvaluatableCalculation.isValidPrefix(input))
     }
@@ -197,6 +222,8 @@ struct EvaluatableCalculationTests {
         "1''",
         "..",
         "--",
+        "()",
+        ")",
     ]) func notIsValidPrefix(input: String) throws {
         #expect(!EvaluatableCalculation.isValidPrefix(input))
     }

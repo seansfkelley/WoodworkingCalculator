@@ -68,7 +68,7 @@ enum EvaluatableCalculation: CustomStringConvertible {
     }
     
     static func from(_ input: String) -> EvaluatableCalculation? {
-        return try? parse(input)
+        return try? parse(input, autoterminatingParentheticals: true)
     }
     
     // This function abuses the simplicity of the grammar whereby almost all tokens either:
@@ -91,7 +91,7 @@ enum EvaluatableCalculation: CustomStringConvertible {
     static func isValidPrefix(_ input: String) -> Bool {
         func check(_ s: String) -> Bool {
             do {
-                _ = try parse(s)
+                _ = try parse(s, autoterminatingParentheticals: false)
                 return true
             } catch is CitronParserUnexpectedEndOfInputError {
                 return true
@@ -199,10 +199,24 @@ private let lexer = CitronLexer<LexedTokenData>(rules: [
     .regexPattern("\\s", { _ in nil })
 ])
 
-private func parse(_ input: String) throws -> EvaluatableCalculation {
+private func parse(_ input: String, autoterminatingParentheticals: Bool) throws -> EvaluatableCalculation {
     let parser = WoodworkingCalculatorGrammar()
+    var missingRightParens = 0
+    
     try lexer.tokenize(input) { (t, c) in
+        if c == .LeftParen {
+            missingRightParens += 1
+        } else if c == .RightParen {
+            missingRightParens -= 1
+        }
         try parser.consume(token: t, code: c)
     }
+
+    if autoterminatingParentheticals {
+        for _ in 0..<missingRightParens {
+            try parser.consume(token: .void, code: .RightParen)
+        }
+    }
+    
     return try parser.endParsing()
 }
