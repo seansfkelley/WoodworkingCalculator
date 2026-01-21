@@ -1,4 +1,4 @@
-struct Dimension: Equatable, CustomStringConvertible {
+struct Dimension: Equatable {
     // 0 = unassigned (will adopt whatever it is combined with)
     // 1 = unitless
     // 2 = length
@@ -12,10 +12,6 @@ struct Dimension: Equatable, CustomStringConvertible {
     
     static let unitless = Dimension(0)
     static let length = Dimension(1)
-
-    var description: String {
-        value == 0 ? "" : "^\(value)"
-    }
 
     static func + (lhs: Dimension, rhs: Dimension) -> Result<Dimension, EvaluationError> {
         switch (lhs.value, rhs.value) {
