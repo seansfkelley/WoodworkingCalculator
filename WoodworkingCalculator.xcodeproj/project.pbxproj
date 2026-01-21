@@ -41,7 +41,6 @@
 		218B78192E15C69E00F8B129 /* Wood Calc Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wood Calc Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78232E15C69E00F8B129 /* Wood Calc UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wood Calc UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = WoodworkingCalculator.xctestplan; sourceTree = "<group>"; };
-		21C111472E3BD8B3007EB628 /* package.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = package.sh; sourceTree = "<group>"; };
 		21C111482E3BDAB1007EB628 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -119,7 +118,6 @@
 			isa = PBXGroup;
 			children = (
 				21C111482E3BDAB1007EB628 /* .gitignore */,
-				21C111472E3BD8B3007EB628 /* package.sh */,
 				216BB80D2E28144400D2AF17 /* README.md */,
 				216BB8452E2950AB00D2AF17 /* Citron */,
 				219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */,
