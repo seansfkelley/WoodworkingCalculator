@@ -73,7 +73,7 @@ struct InputValueTests {
 
     @Test func resetToRealResultAndFormatWithAccuracy() {
         input.setValue(to: .result(.real(0.501, .length)))
-        #expect(input.draft.value == "1/2\"")
+        #expect(input.draft.value == "1/2in1")
         let (precision, accuracy, dimension) = input.inaccuracy!
         #expect(precision == Constants.AppStorage.precisionDefault)
         #expect(accuracy.isApproximatelyEqual(to: -0.001))

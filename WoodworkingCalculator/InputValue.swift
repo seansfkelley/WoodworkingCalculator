@@ -95,7 +95,7 @@ class InputValue: ObservableObject {
         let candidate = if canReplaceResult, case .result = value {
             ValidExpressionPrefix(suffix)
         } else {
-            draft.append(suffix)
+            draft.append(suffix, trimmingSuffix: trimmingSuffix)
         }
         
         if let candidate, candidate.value.wholeMatch(of: /^\s*$/) == nil && candidate != draft
