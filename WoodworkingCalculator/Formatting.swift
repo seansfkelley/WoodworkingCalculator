@@ -12,8 +12,8 @@ func formatAsUsCustomary(_ rational: Rational, _ dimension: Dimension, _ precisi
             : "\(rational.signum() == -1 ? "-" : "")\(rational.num)/\(rational.den)"
     }
     
-    let feetUnit = dimension.value == 1 ? "'" : "'\(dimension.value.numerator)"
-    let inchUnit = dimension.value == 1 ? "\"" : "\"\(dimension.value.numerator)"
+    let feetUnit = dimension.value == 1 ? "'" : "ft\(dimension.value.numerator)"
+    let inchUnit = dimension.value == 1 ? "\"" : "in\(dimension.value.numerator)"
 
     var n = abs(rational.num)
     let d = abs(rational.den)
