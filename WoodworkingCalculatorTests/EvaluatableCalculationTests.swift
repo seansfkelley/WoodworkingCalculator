@@ -79,6 +79,11 @@ struct EvaluatableCalculationTests {
             .add(.add(.rational(UncheckedRational(1, 1)), .rational(UncheckedRational(1, 1))), .rational(UncheckedRational(1, 1))),
             .success(.rational(rational(3, 1))),
         ),
+        (
+            "10cm",
+            .real(10.0 / 2.54),
+            .success(.real(10.0 / 2.54)),
+        ),
     ]) func from(input: String, expectedEvaluatable: EvaluatableCalculation, expectedResult: Result<Quantity, DivisionByZeroError>) throws {
         let evaluatable = EvaluatableCalculation.from(input)
         // FIXME: I would like to do straight equality, but I don't want to give UncheckedRational
