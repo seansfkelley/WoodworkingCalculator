@@ -29,8 +29,8 @@ struct ContentView: View {
     @State private var lastBackgroundTime: Date?
     @Environment(\.scenePhase) private var scenePhase
     
-    private func append(_ string: String, canReplaceResult: Bool = false, deletingSuffix: Set<Character> = Set()) {
-        if input.append(string, canReplaceResult: canReplaceResult, deletingSuffix: deletingSuffix) {
+    private func append(_ string: String, canReplaceResult: Bool = false, trimmingSuffix: TrimmableCharacterSet? = nil) {
+        if input.append(string, canReplaceResult: canReplaceResult, trimmingSuffix: trimmingSuffix) {
             previous = nil
             isInaccuracyWarningPresented = false
             isErrorPresented = false
@@ -208,23 +208,13 @@ struct ContentView: View {
                 GridGroup {
                     CalculatorButton(.text("␣"), .gray) { append(" ", canReplaceResult: true) }
                     CalculatorButton(.text("0"), darkGray) { append("0", canReplaceResult: true) }
-                    CalculatorButton(.text("⁄"), .gray) {
-                        append("/", deletingSuffix: ignorableDenominatorShortcutPrefixes)
-                    }
+                    CalculatorButton(.text("⁄"), .gray) { append("/", trimmingSuffix: .whitespaceAndFractionSlash) }
                 }
                 GridGroup {
-                    CalculatorButton(.text("⁄₂"), .gray) {
-                        append("/2", deletingSuffix: ignorableDenominatorShortcutPrefixes)
-                    }
-                    CalculatorButton(.text("⁄₄"), .gray) {
-                        append("/4", deletingSuffix: ignorableDenominatorShortcutPrefixes)
-                    }
-                    CalculatorButton(.text("⁄₈"), .gray) {
-                        append("/8", deletingSuffix: ignorableDenominatorShortcutPrefixes)
-                    }
-                    CalculatorButton(.text("⁄₁₆"), .gray) {
-                        append("/16", deletingSuffix: ignorableDenominatorShortcutPrefixes)
-                    }
+                    CalculatorButton(.text("⁄₂"), .gray) { append("/2", trimmingSuffix: .whitespaceAndFractionSlash) }
+                    CalculatorButton(.text("⁄₄"), .gray) { append("/4", trimmingSuffix: .whitespaceAndFractionSlash) }
+                    CalculatorButton(.text("⁄₈"), .gray) { append("/8", trimmingSuffix: .whitespaceAndFractionSlash) }
+                    CalculatorButton(.text("⁄₁₆"), .gray) { append("/16", trimmingSuffix: .whitespaceAndFractionSlash) }
                 }
             }
         }

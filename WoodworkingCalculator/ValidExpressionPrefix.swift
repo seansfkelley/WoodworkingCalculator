@@ -5,6 +5,19 @@ enum PreferredUnit: Equatable {
     case inches
 }
 
+// Exists because there are multi-character sequences that include trimmable characters, so we want
+// to make sure that when we are requested to trim, _we_ are in charge of performing the trimming so
+// that a valid result comes out the other side.
+enum TrimmableCharacterSet {
+    case whitespaceAndFractionSlash
+
+    internal var set: Set<Character> {
+        switch self {
+        case .whitespaceAndFractionSlash: Set([" ", "/"])
+        }
+    }
+}
+
 private let replaceableUnit = /(in|ft|mm|cm|m)(!?[0-9]+)?/
 private let multiCharacterBackspaceableSuffix = /(in|ft|mm|cm|m)(!?[0-9]+)?$/
 
@@ -69,6 +82,16 @@ struct ValidExpressionPrefix: Equatable {
             .replacing(/([0-9]) ([0-9]|$)/, with: { match in
                 "\(match.1)\u{2002}\(match.2)"
             })
+    }
+
+    func append(_ suffix: String, trimmingSuffix trimmableCharacters: TrimmableCharacterSet? = nil) -> ValidExpressionPrefix? {
+        var string = value
+        if let trimmableSet = trimmableCharacters?.set {
+            while string.count > 0 && trimmableSet.contains(string.last!) {
+                string.removeLast()
+            }
+        }
+        return .init((string + suffix).replacing(/\ +/, with: " "))
     }
 }
 

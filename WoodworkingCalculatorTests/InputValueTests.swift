@@ -48,15 +48,15 @@ struct InputValueTests {
 
     @Test func appendDeletingSuffix() throws {
         input.setValue(to: .draft(.init("1 ")!, nil))
-        try #require(input.append("/4") == false) // sanity-check that this case doesn't work without deletingSuffix
+        try #require(input.append("/4") == false) // sanity-check that this case doesn't work without trimmingSuffix
         #expect(input.draft.value == "1 ")
-        try #require(input.append("/4", deletingSuffix: [" ", "/"]) == true)
+        try #require(input.append("/4", trimmingSuffix: .whitespaceAndFractionSlash) == true)
         #expect(input.draft.value == "1/4")
 
         input.setValue(to: .draft(.init("1/")!, nil))
-        try #require(input.append("/4") == false) // sanity-check that this case doesn't work without deletingSuffix
+        try #require(input.append("/4") == false) // sanity-check that this case doesn't work without trimmingSuffix
         #expect(input.draft.value == "1/")
-        try #require(input.append("/4", deletingSuffix: [" ", "/"]) == true)
+        try #require(input.append("/4", trimmingSuffix: .whitespaceAndFractionSlash) == true)
         #expect(input.draft.value == "1/4")
     }
 

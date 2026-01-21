@@ -90,24 +90,17 @@ class InputValue: ObservableObject {
     func append(
         _ suffix: String,
         canReplaceResult: Bool = false,
-        deletingSuffix charactersToTrim: Set<Character> = Set()
+        trimmingSuffix: TrimmableCharacterSet? = nil,
     ) -> Bool {
-        let candidate = {
-            if canReplaceResult, case .result = value {
-                return suffix
-            } else {
-                var string = draft.value
-                while string.count > 0 && charactersToTrim.contains(string.last!) {
-                    string.removeLast()
-                }
-                return (string + suffix).replacing(/\ +/, with: " ")
-            }
-        }()
+        let candidate = if canReplaceResult, case .result = value {
+            ValidExpressionPrefix(suffix)
+        } else {
+            draft.append(suffix)
+        }
         
-        if let newDraft = ValidExpressionPrefix(candidate),
-           candidate.wholeMatch(of: /^\s*$/) == nil && newDraft != draft
+        if let candidate, candidate.value.wholeMatch(of: /^\s*$/) == nil && candidate != draft
         {
-            value = .draft(newDraft, nil)
+            value = .draft(candidate, nil)
             return true
         } else {
             return false
