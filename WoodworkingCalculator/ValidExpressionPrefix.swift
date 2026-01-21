@@ -5,6 +5,7 @@ enum PreferredUnit: Equatable {
     case inches
 }
 
+private let replaceableUnit = /(in|ft|mm|cm|m)(!?[0-9]+)?/
 private let multiCharacterBackspaceableSuffix = /(in|ft|mm|cm|m)(!?[0-9]+)?$/
 
 struct ValidExpressionPrefix: Equatable {

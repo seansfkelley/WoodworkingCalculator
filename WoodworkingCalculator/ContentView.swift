@@ -56,9 +56,9 @@ struct ContentView: View {
                     // we live with this rather awkward jagged-edge arrangement.
                     if let meters = input.meters {
                         Section("Metric Conversions") {
-                            Text("= \(formatMetric(meters, precision: 3)) m")
-                            Text("= \(formatMetric(meters * 100, precision: 2)) cm")
-                            Text("= \(formatMetric(meters * 1000, precision: 1)) mm")
+                            Text("= \(meters.formatAsDecimal(toPlaces: 3)) m")
+                            Text("= \((meters * 100).formatAsDecimal(toPlaces: 2)) cm")
+                            Text("= \((meters * 1000).formatAsDecimal(toPlaces: 1)) mm")
                         }
                     } else {
                         Section("Metric Operations") {

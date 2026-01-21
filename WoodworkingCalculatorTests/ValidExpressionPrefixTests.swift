@@ -6,8 +6,8 @@ private func rational(_ num: Int, _ den: Int) -> Rational {
     try! UncheckedRational(num, den).checked.get()
 }
 
-struct FormattingTests {
-    @Test<[(Rational, Dimension, String)]>("formatAsUsCustomary (inches)", arguments: [
+struct ValidExpressionPrefixTests {
+    @Test<[(Rational, Dimension, String)]>("pretty (inches)", arguments: [
         (rational(0, 1), .length, "0in1"),
         (rational(1, 2), .length, "1/2in1"),
         (rational(1, -2), .length, "-1/2in1"),
@@ -21,7 +21,7 @@ struct FormattingTests {
         #expect(formatAsUsCustomary(rational, dimension, .inches) == expected)
     }
 
-    @Test<[(Rational, Dimension, String)]>("formatAsUsCustomary (feet and inches)", arguments: [
+    @Test<[(Rational, Dimension, String)]>("pretty (feet and inches)", arguments: [
         (rational(0, 1), .length, "0in1"),
         (rational(6, 1), .length, "6in1"),
         (rational(12, 1), .length, "1ft1"),
