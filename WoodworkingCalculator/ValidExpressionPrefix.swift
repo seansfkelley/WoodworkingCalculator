@@ -16,16 +16,17 @@ struct ValidExpressionPrefix: Equatable {
     }
 
     init?(_ string: String) {
-        value = string
         guard EvaluatableCalculation.isValidPrefix(string) else {
             return nil
         }
+        value = string
     }
 
-    init(_ quantity: Quantity, as preferredUnit: PreferredUnit) {
-        value = switch quantity {
-        case .rational(let rational, let dimension): formatRational(rational, dimension, preferredUnit)
-        case .real(let real, let dimension): formatDecimal(real, dimension, preferredUnit)
+    init(_ quantity: Quantity, as preferredUnit: PreferredUnit, precision: Int) {
+        value = if quantity.dimension.value == 0 {
+            formatDecimal(quantity.toReal(), quantity.dimension, preferredUnit)
+        } else {
+            formatRational(quantity.toRational(withPrecision: precision).0, quantity.dimension, preferredUnit)
         }
     }
 

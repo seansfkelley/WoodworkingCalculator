@@ -17,7 +17,7 @@ struct ValidExpressionPrefixTests {
         (.rational(rational(49, 1), .length), "49in1", "49\""),
         (.rational(rational(99, 2), .length), "49 1/2in1", "49 ¹⁄₂\""),
     ]) func testFormatAsUsCustomaryInches(quantity: Quantity, raw: String, pretty: String) throws {
-        let actual = ValidExpressionPrefix(quantity, as: .inches)
+        let actual = ValidExpressionPrefix(quantity, as: .inches, precision: 0)
         #expect(actual.value == raw)
         #expect(actual.pretty == pretty)
     }
@@ -33,7 +33,7 @@ struct ValidExpressionPrefixTests {
         (.rational(rational(49, 1), .length), "4ft1 1in1", "4' 1\""),
         (.rational(rational(99, 2), .length), "4ft1 1 1/2in1", "4' 1 ¹⁄₂\""),
     ]) func testFormatAsUsCustomaryFeet(quantity: Quantity, raw: String, pretty: String) throws {
-        let actual = ValidExpressionPrefix(quantity, as: .feet)
+        let actual = ValidExpressionPrefix(quantity, as: .feet, precision: 0)
         #expect(actual.value == raw)
         #expect(actual.pretty == pretty)
     }

@@ -36,7 +36,9 @@ class InputValue: ObservableObject {
     var draft: ValidExpressionPrefix {
         switch value {
         case .draft(let draft, _): draft
-        case .result(let result): displayInchesOnly ? .init(result, as: .inches) : .init(result, as: .feet)
+        case .result(let result): displayInchesOnly
+            ? .init(result, as: .inches, precision: precision)
+            : .init(result, as: .feet, precision: precision)
         }
     }
 
@@ -70,10 +72,10 @@ class InputValue: ObservableObject {
         return switch value {
         case .draft:
             nil
-        case .result(let result):
+        case .result(let quantity):
             // Decimal ratio is exact, by definition of the US customary system: 1" = 25.4mm.
             // https://en.wikipedia.org/wiki/United_States_customary_units#International_units
-            Double(result) * 0.0254
+            quantity.toReal() * 0.0254
         }
     }
 
@@ -86,26 +88,26 @@ class InputValue: ObservableObject {
 
     @discardableResult
     func append(
-        _ string: String,
+        _ suffix: String,
         canReplaceResult: Bool = false,
         deletingSuffix charactersToTrim: Set<Character> = Set()
     ) -> Bool {
         let candidate = {
             if canReplaceResult, case .result = value {
-                return string
+                return suffix
             } else {
                 var string = draft.value
                 while string.count > 0 && charactersToTrim.contains(string.last!) {
                     string.removeLast()
                 }
-                return (string + string).replacing(/\ +/, with: " ")
+                return (string + suffix).replacing(/\ +/, with: " ")
             }
         }()
         
-        if candidate.wholeMatch(of: /^\s*$/) == nil,
-            let draft = ValidExpressionPrefix(candidate)
+        if let newDraft = ValidExpressionPrefix(candidate),
+           candidate.wholeMatch(of: /^\s*$/) == nil && newDraft != draft
         {
-            value = .draft(draft, nil)
+            value = .draft(newDraft, nil)
             return true
         } else {
             return false

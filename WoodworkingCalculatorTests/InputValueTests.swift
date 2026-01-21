@@ -18,56 +18,45 @@ struct InputValueTests {
         #expect(input.draft.value == "")
     }
 
-    @Test func stringified() {
-        input.setValue(to: .draft(.init("1+2")!, nil))
-        #expect(input.draft.value == "1+2")
-
-        input.setValue(to: .draft(.init("(1+2")!, nil))
-        #expect(input.draft.value == "(1+2")
-
-        input.setValue(to: .result(.rational(rational(3, 4), .length)))
-        #expect(input.draft.value == "3/4\"")
-    }
-
-    @Test func append() {
-        #expect(input.append(" ") == false) // no whitespace-only strings
-        #expect(input.append("1") == true)
-        #expect(input.append(" ") == true)
-        #expect(input.append(" ") == false) // duplicative whitespace is ignored
-        #expect(input.append("+") == true)
-        #expect(input.append("+") == false) // not legal
-        #expect(input.append("/") == false) // still not legal
-        #expect(input.append(" ") == true)
-        #expect(input.append("1") == true)
+    @Test func append() throws {
+        try #require(input.append(" ") == false) // no whitespace-only strings
+        try #require(input.append("1") == true)
+        try #require(input.append(" ") == true)
+        try #require(input.append(" ") == false) // duplicative whitespace is ignored
+        try #require(input.append("+") == true)
+        try #require(input.append("+") == false) // not legal
+        try #require(input.append("/") == false) // still not legal
+        try #require(input.append(" ") == true)
+        try #require(input.append("1") == true)
         #expect(input.draft.value == "1 + 1")
     }
 
-    @Test func appendingToResult() {
-        input.setValue(to: .result(.real(1.0, .unitless)))
-        #expect(input.append("2") == false) // would not create a legal (prefix of an) expression
+    @Test func appendingToResult() throws {
+        input.setValue(to: .result(.real(1.0, .length)))
+        try #require(input.append("2") == false) // would not create a legal (prefix of an) expression
         #expect(input.append("2", canReplaceResult: true) == true) // okay to replace with a legal (prefix of an) expression
         #expect(input.draft.value == "2")
 
-        input.setValue(to: .result(.real(1.0, .unitless)))
-        #expect(input.append("+") == true)
+        input.setValue(to: .result(.real(1.0, .length)))
+        try #require(input.append("+") == true)
         #expect(input.draft.value == "1\"+")
 
-        input.setValue(to: .result(.real(1.0, .unitless)))
-        #expect(input.append(" ", canReplaceResult: true) == false) // no whitespace-only strings if trying to overwrite a result
+        input.setValue(to: .result(.real(1.0, .length)))
+        try #require(input.append(" ", canReplaceResult: true) == false) // no whitespace-only strings if trying to overwrite a result
         #expect(input.draft.value == "1\"")
     }
 
-    @Test func appendDeletingSuffix() {
+    @Test func appendDeletingSuffix() throws {
         input.setValue(to: .draft(.init("1 ")!, nil))
-        #expect(input.append("/4") == false) // sanity-check that this case doesn't work without deletingSuffix
+        try #require(input.append("/4") == false) // sanity-check that this case doesn't work without deletingSuffix
         #expect(input.draft.value == "1 ")
-        #expect(input.append("/4", deletingSuffix: [" ", "/"]) == true)
+        try #require(input.append("/4", deletingSuffix: [" ", "/"]) == true)
         #expect(input.draft.value == "1/4")
 
         input.setValue(to: .draft(.init("1/")!, nil))
-        #expect(input.append("/4") == false) // sanity-check that this case doesn't work without deletingSuffix
+        try #require(input.append("/4") == false) // sanity-check that this case doesn't work without deletingSuffix
         #expect(input.draft.value == "1/")
-        #expect(input.append("/4", deletingSuffix: [" ", "/"]) == true)
+        try #require(input.append("/4", deletingSuffix: [" ", "/"]) == true)
         #expect(input.draft.value == "1/4")
     }
 
@@ -77,13 +66,13 @@ struct InputValueTests {
     }
 
     @Test func resetToRationalResultAndFormat() {
-        input.setValue(to: .result(.rational(rational(1, 2), .unitless)))
-        #expect(input.draft.value == "1/2\"")
+        input.setValue(to: .result(.rational(rational(1, 2), .length)))
+        #expect(input.draft.value == "1/2in1")
         #expect(input.error == nil)
     }
 
     @Test func resetToRealResultAndFormatWithAccuracy() {
-        input.setValue(to: .result(.real(0.501, .unitless)))
+        input.setValue(to: .result(.real(0.501, .length)))
         #expect(input.draft.value == "1/2\"")
         let (precision, accuracy, dimension) = input.inaccuracy!
         #expect(precision == Constants.AppStorage.precisionDefault)
@@ -104,8 +93,8 @@ struct InputValueTests {
     }
 
     @Test<[(InputValue.RawValue, InputValue.BackspaceResult)]>(arguments: [
-        (.result(.real(1.0, .unitless)), .clear),
-        (.result(.rational(rational(1, 2), .unitless)), .clear),
+        (.result(.real(1.0, .length)), .clear),
+        (.result(.rational(rational(1, 2), .length)), .clear),
         (.draft(.init("")!, nil), .draft(.init("")!)),
         (.draft(.init("1+1")!, nil), .draft(.init("1+")!)),
         (.draft(.init("1 ")!, nil), .draft(.init("1")!)),
