@@ -1,6 +1,6 @@
 %class_name WoodworkingCalculatorGrammar
 
-%token_type Token
+%token_type WoodworkingCalculatorToken
 
 %nonterminal_type equation EvaluatableCalculation
 equation ::= expression(e). { e }

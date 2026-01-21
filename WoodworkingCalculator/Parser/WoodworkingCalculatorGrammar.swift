@@ -72,7 +72,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
         }
     }
 
-    typealias CitronToken = Token
+    typealias CitronToken = WoodworkingCalculatorToken
 
     enum CitronSymbol {
         case yyBaseOfStack
@@ -574,7 +574,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
                 return .yy8(try codeBlockForRule30(i: i))
             }
         case 31: /* integer ::= Integer(x) */
-            func codeBlockForRule31(x: Token) throws -> Int {
+            func codeBlockForRule31(x: WoodworkingCalculatorToken) throws -> Int {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 55)
 
     if case .integer(let int) = x {
@@ -589,7 +589,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
                 return .yy2(try codeBlockForRule31(x: x))
             }
         case 32: /* mixed_number ::= MixedNumber(x) */
-            func codeBlockForRule32(x: Token) throws -> UncheckedRational {
+            func codeBlockForRule32(x: WoodworkingCalculatorToken) throws -> UncheckedRational {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 64)
 
     if case .rational(let r) = x {
@@ -604,7 +604,7 @@ class WoodworkingCalculatorGrammar: CitronParser {
                 return .yy15(try codeBlockForRule32(x: x))
             }
         case 33: /* real ::= Real(x) */
-            func codeBlockForRule33(x: Token) throws -> Double {
+            func codeBlockForRule33(x: WoodworkingCalculatorToken) throws -> Double {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 73)
 
     if case .real(let real) = x {
