@@ -121,6 +121,10 @@ enum EvaluatableCalculation: CustomStringConvertible {
             // reals
             || (input.contains(/\.$/) && check(input + "0"))
     }
+
+    static func countMissingTrailingParens(_ input: String) -> Int {
+        input.count(where: { $0 == "(" }) - input.count(where: { $0 == ")" })
+    }
 }
 
 extension Double {

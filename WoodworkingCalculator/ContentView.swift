@@ -138,6 +138,22 @@ private func formatInputForDisplay(_ input: String) -> String {
         .replacing("i", with: "mm")
 }
 
+private func formatInputForDisplay(_ input: String, appendingTrailingParentheses: Bool) -> AttributedString {
+    let formattedInput = formatInputForDisplay(input)
+    var attributedString = AttributedString(formattedInput)
+    
+    if appendingTrailingParentheses {
+        let missingParentheses = EvaluatableCalculation.countMissingTrailingParens(input)
+        if missingParentheses > 0 {
+            var trailingParens = AttributedString(String(repeating: ")", count: missingParentheses))
+            trailingParens.foregroundColor = .secondary
+            attributedString.append(trailingParens)
+        }
+    }
+    
+    return attributedString
+}
+
 private let darkGray = Color.gray.mix(with: .black, by: 0.25)
 private let ignorableDenominatorShortcutPrefixes: Set<Character> = [" ", "/"]
 
@@ -266,7 +282,7 @@ struct ContentView: View {
                         .presentationCompactAdaptation(.popover)
                     }
                 }
-                Text(formatInputForDisplay(input.stringified))
+                Text(formatInputForDisplay(input.stringified, appendingTrailingParentheses: true))
                     .frame(
                         minWidth: 0,
                         maxWidth:  .infinity,
@@ -394,14 +410,16 @@ struct ContentView: View {
     
     private func evaluate() {
         let inputString = input.stringified
-        let result = EvaluatableCalculation.from(inputString)?.evaluate()
+        let missingParens = EvaluatableCalculation.countMissingTrailingParens(inputString)
+        let formattedInputString = inputString.trimmingCharacters(in: CharacterSet.whitespaces) + String(repeating: ")", count: missingParens)
+        let result = EvaluatableCalculation.from(formattedInputString)?.evaluate()
         guard let result else {
             return
         }
         
         switch result {
         case .success(let answer):
-            previous = inputString.trimmingCharacters(in: CharacterSet.whitespaces)
+            previous = formattedInputString
             input.reset(.result(answer))
         case .failure(let error):
             input.reset(.string(inputString, error))

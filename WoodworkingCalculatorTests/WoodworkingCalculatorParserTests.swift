@@ -170,7 +170,7 @@ struct EvaluatableCalculationTests {
         #expect(evaluatable?.description == expectedEvaluatable.description)
         #expect(evaluatable!.evaluate() == expectedResult)
     }
-    
+
     @Test("from (nil)", arguments: [
         "1+",
         "1//2",
@@ -185,7 +185,7 @@ struct EvaluatableCalculationTests {
     ]) func fromNil(input: String) throws {
         #expect(EvaluatableCalculation.from(input) == nil)
     }
-    
+
     @Test("isValidPrefix", arguments: [
         "1",
         "1.",
@@ -213,7 +213,7 @@ struct EvaluatableCalculationTests {
     ]) func isValidPrefix(input: String) throws {
         #expect(EvaluatableCalculation.isValidPrefix(input))
     }
-    
+
     @Test("!isValidPrefix", arguments: [
         "+",
         "'",
@@ -226,5 +226,20 @@ struct EvaluatableCalculationTests {
         ")",
     ]) func notIsValidPrefix(input: String) throws {
         #expect(!EvaluatableCalculation.isValidPrefix(input))
+    }
+
+    @Test("countMissingTrailingParens", arguments: [
+        ("", 0),
+        ("(1)", 0),
+        ("(1)+(2)", 0),
+        ("(", 1),
+        ("((", 2),
+        ("(1+2", 1),
+        ("(1+(2", 2),
+        (")", -1),
+        ("))", -2),
+        ("(1))", -1),
+    ]) func countMissingTrailingParens(input: String, expected: Int) throws {
+        #expect(EvaluatableCalculation.countMissingTrailingParens(input) == expected)
     }
 }
