@@ -36,20 +36,10 @@ struct Dimension: Equatable, CustomStringConvertible {
     }
     
     static func * (lhs: Dimension, rhs: Dimension) -> Result<Dimension, EvaluationError> {
-        switch (lhs.value, rhs.value) {
-        case (0, let other), (let other, 0):
-            .success(Dimension(other))
-        case (let left, let right):
-            .success(Dimension(left + right))
-        }
+        .success(Dimension(lhs.value + rhs.value))
     }
     
     static func / (lhs: Dimension, rhs: Dimension) -> Result<Dimension, EvaluationError> {
-        switch (lhs.value, rhs.value) {
-        case (0, let other), (let other, 0):
-            .success(Dimension(other))
-        case (let left, let right):
-            .success(Dimension(left - right))
-        }
+        .success(Dimension(lhs.value - rhs.value))
     }
 }
