@@ -25,7 +25,7 @@ struct InputValueTests {
         input.reset(.string("(1+2", nil))
         #expect(input.stringified == "(1+2")
 
-        input.reset(.result(.rational(rational(3, 4))))
+        input.reset(.result(.rational(rational(3, 4), .unitless)))
         #expect(input.stringified == "3/4\"")
     }
 
@@ -43,16 +43,16 @@ struct InputValueTests {
     }
 
     @Test func appendingToResult() {
-        input.reset(.result(.real(1.0)))
+        input.reset(.result(.real(1.0, .unitless)))
         #expect(input.append("2") == false) // would not create a legal (prefix of an) expression
         #expect(input.append("2", canReplaceResult: true) == true) // okay to replace with a legal (prefix of an) expression
         #expect(input.stringified == "2")
 
-        input.reset(.result(.real(1.0)))
+        input.reset(.result(.real(1.0, .unitless)))
         #expect(input.append("+") == true)
         #expect(input.stringified == "1\"+")
 
-        input.reset(.result(.real(1.0)))
+        input.reset(.result(.real(1.0, .unitless)))
         #expect(input.append(" ", canReplaceResult: true) == false) // no whitespace-only strings if trying to overwrite a result
         #expect(input.stringified == "1\"")
     }
@@ -77,23 +77,23 @@ struct InputValueTests {
     }
 
     @Test func resetToRationalResultAndFormat() {
-        input.reset(.result(.rational(rational(1, 2))))
+        input.reset(.result(.rational(rational(1, 2), .unitless)))
         #expect(input.stringified == "1/2\"")
         #expect(input.error == nil)
     }
 
     @Test func resetToRealResultAndFormatWithAccuracy() {
-        input.reset(.result(.real(0.501)))
+        input.reset(.result(.real(0.501, .unitless)))
         #expect(input.stringified == "1/2\"")
-        let (precision, accuracy) = input.inaccuracy!
+        let (precision, accuracy, dimension) = input.inaccuracy!
         #expect(precision == Constants.AppStorage.precisionDefault)
         #expect(accuracy.isApproximatelyEqual(to: -0.001))
     }
 
     @Test func resetToErroredResult() {
-        input.reset(.string("1/0", DivisionByZeroError()))
+        input.reset(.string("1/0", .divisionByZero))
         #expect(input.stringified == "1/0")
-        #expect(input.error! as? DivisionByZeroError == DivisionByZeroError())
+        #expect(input.error! as? EvaluationError == .divisionByZero)
     }
 
     @Test func settingToInvalidStringDoesNothing() {
@@ -104,12 +104,12 @@ struct InputValueTests {
     }
 
     @Test<[(InputValue.RawValue, InputValue.BackspaceResult)]>(arguments: [
-        (.result(.real(1.0)), .clear),
-        (.result(.rational(rational(1, 2))), .clear),
+        (.result(.real(1.0, .unitless)), .clear),
+        (.result(.rational(rational(1, 2), .unitless)), .clear),
         (.string("", nil), .string("")),
         (.string("1+1", nil), .string("1+")),
         (.string("1 ", nil), .string("1")),
-        (.string("1/0", DivisionByZeroError()), .string("1/")),
+        (.string("1/0", .divisionByZero), .string("1/")),
         (.string("1m", nil), .string("1")),
         (.string("1cm", nil), .string("1")),
         (.string("1mm", nil), .string("1")),

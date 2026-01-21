@@ -69,15 +69,15 @@ struct RationalTests {
         (rational(1, 2) - rational(1, 4), rational(1, 4)),
         (rational(1, 2) * rational(3, 4), rational(3, 8)),
         (rational(1, 2) / rational(1, 4), rational(2, 1)),
-    ]) func arithmetic(actual: Result<Rational, DivisionByZeroError>, expected: Rational) {
+    ]) func arithmetic(actual: Result<Rational, EvaluationError>, expected: Rational) {
         #expect(actual == .success(expected))
     }
     
     @Test("checked", arguments: [
         (UncheckedRational(1, 1), Result.success(rational(1, 1))),
-        (UncheckedRational(1, 0), Result.failure(DivisionByZeroError())),
+        (UncheckedRational(1, 0), Result.failure(EvaluationError.divisionByZero)),
     ])
-    func checked(input: UncheckedRational, expected: Result<Rational, DivisionByZeroError>) {
+    func checked(input: UncheckedRational, expected: Result<Rational, EvaluationError>) {
         #expect(input.checked == expected)
     }
 }
