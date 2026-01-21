@@ -5,7 +5,7 @@ private let multiCharacterBackspaceableSuffix = /(mm|cm)$/
 
 class InputValue: ObservableObject {
     enum RawValue {
-        case string(String, Error?)
+        case string(String, EvaluationError?)
         case result(Quantity)
     }
 

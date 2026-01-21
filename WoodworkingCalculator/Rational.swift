@@ -7,13 +7,11 @@ struct UncheckedRational: CustomStringConvertible {
         self.den = den
     }
     
-    var description: String {
-        "\(num)/\(den)"
-    }
+    var description: String { "\(num)/\(den)" }
     
-    var checked: Result<Rational, DivisionByZeroError> {
+    var checked: Result<Rational, EvaluationError> {
         if den == 0 {
-            .failure(DivisionByZeroError())
+            .failure(.divisionByZero)
         } else {
             .success(Rational(num, den))
         }
@@ -56,19 +54,19 @@ struct Rational: Equatable, Hashable, CustomStringConvertible {
         return left.num == right.num && left.den == right.den
     }
     
-    static func + (left: Rational, right: Rational) -> Result<Rational, DivisionByZeroError> {
+    static func + (left: Rational, right: Rational) -> Result<Rational, EvaluationError> {
         UncheckedRational(left.num * right.den + right.num * left.den, left.den * right.den).checked
     }
     
-    static func - (left: Rational, right: Rational) -> Result<Rational, DivisionByZeroError> {
+    static func - (left: Rational, right: Rational) -> Result<Rational, EvaluationError> {
         UncheckedRational(left.num * right.den - right.num * left.den, left.den * right.den).checked
     }
     
-    static func * (left: Rational, right: Rational) -> Result<Rational, DivisionByZeroError> {
+    static func * (left: Rational, right: Rational) -> Result<Rational, EvaluationError> {
         UncheckedRational(left.num * right.num, left.den * right.den).checked
     }
     
-    static func / (left: Rational, right: Rational) -> Result<Rational, DivisionByZeroError> {
+    static func / (left: Rational, right: Rational) -> Result<Rational, EvaluationError> {
         UncheckedRational(left.num * right.den, left.den * right.num).checked
     }
 }

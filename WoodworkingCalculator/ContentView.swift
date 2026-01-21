@@ -112,7 +112,7 @@ struct ContentView: View {
                     isErrorPresented = false
                 }
             HStack {
-                if input.error != nil {
+                if let error = input.error {
                     Button(action: { isErrorPresented.toggle() }) {
                         Image(systemName: "exclamationmark.triangle")
                             .font(.system(size: 32))
@@ -123,7 +123,7 @@ struct ContentView: View {
                     }
                     .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("This expression divides by zero.")
+                            Text(error.localizedDescription)
                                 .font(.system(.body))
                         }
                         .padding()

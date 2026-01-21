@@ -18,7 +18,7 @@ enum EvaluatableCalculation: CustomStringConvertible {
         }
     }
     
-    func evaluate() -> Result<Quantity, DivisionByZeroError> {
+    func evaluate() -> Result<Quantity, EvaluationError> {
         switch self {
         case .rational(let r): r.checked.map { .rational($0) }
         case .real(let r): .success(.real(r))
@@ -35,15 +35,23 @@ enum EvaluatableCalculation: CustomStringConvertible {
     // I make Double and Rational conform to. The compiler still gets mad about ambiguous calls.
     private static func evaluateBinaryOperator(
         _ left: EvaluatableCalculation,
-        _ rationalOp: (Rational, Rational) -> Result<Rational, DivisionByZeroError>,
+        _ rationalOp: (Rational, Rational) -> Result<Rational, EvaluationError>,
         _ doubleOp: (Double, Double) -> Double,
         _ right: EvaluatableCalculation
-    ) -> Result<Quantity, DivisionByZeroError> {
-        guard case .success(let l) = left.evaluate(), case .success(let r) = right.evaluate() else {
-            return .failure(DivisionByZeroError())
+    ) -> Result<Quantity, EvaluationError> {
+        let l: Quantity
+        let r: Quantity
+
+        switch left.evaluate() {
+        case .success(let quantity): l = quantity
+        case .failure(let error): return .failure(error)
         }
-        
-        
+
+        switch right.evaluate() {
+        case .success(let quantity): r = quantity
+        case .failure(let error): return .failure(error)
+        }
+
         return switch (l, r) {
         case (.rational(let leftRational), .rational(let rightRational)):
             rationalOp(leftRational, rightRational).map { .rational($0) }

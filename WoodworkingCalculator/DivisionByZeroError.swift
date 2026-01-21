@@ -1,1 +1,0 @@
-struct DivisionByZeroError: Error, Equatable {}
