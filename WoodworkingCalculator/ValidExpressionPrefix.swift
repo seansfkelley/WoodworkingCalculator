@@ -54,7 +54,7 @@ struct ValidExpressionPrefix: Equatable {
         value
             .replacing(/(in|ft|mm|cm|m)(\[(-?[0-9]+)\])?/, with: { match in
                 let exponent: Int
-                if let raw = match.2 {
+                if let raw = match.3 {
                     exponent = Int(raw)!
                 } else {
                     exponent = 1
@@ -98,8 +98,8 @@ private func formatRational(_ rational: Rational, _ dimension: Dimension, _ pref
             : "\(rational.signum() == -1 ? "-" : "")\(n)/\(d)"
     }
 
-    let feetUnit = "ft\(dimension.value)"
-    let inchUnit = "in\(dimension.value)"
+    let feetUnit = "ft[\(dimension.value)]"
+    let inchUnit = "in[\(dimension.value)]"
 
     // This is shit, and should stay in integers the whole time. It also doesn't handle negatives
     // properly at all -- what do we want to do about that?
