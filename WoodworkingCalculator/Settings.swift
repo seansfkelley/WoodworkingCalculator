@@ -8,9 +8,10 @@ struct Settings: View {
         Form {
             Section {
                 Picker(selection: $precision, label: Text("Precision")) {
-//                    Text("¹⁄₁₆").tag(16)
-//                    Text("¹⁄₃₂").tag(32)
-//                    Text("¹⁄₆₄").tag(64)
+                    Text("1\"").tag(1)
+                    Text("1/2\"").tag(2)
+                    Text("1/4\"").tag(4)
+                    Text("1/8\"").tag(8)
                     Text("1/16\"").tag(16)
                     Text("1/32\"").tag(32)
                     Text("1/64\"").tag(64)
