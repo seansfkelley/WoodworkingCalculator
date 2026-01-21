@@ -1,68 +1,58 @@
 import Foundation
 import SwiftUI
 
-private let multiCharacterBackspaceableSuffix = /(in|ft|mm|cm|m)(!?[0-9]+)?$/
-
 class InputValue: ObservableObject {
     enum RawValue {
-        case string(String, EvaluationError?)
+        case draft(ValidExpressionPrefix, EvaluationError?)
         case result(Quantity)
     }
 
     enum BackspaceResult: Equatable {
         case clear
-        case string(String)
+        case draft(ValidExpressionPrefix)
 
         var rawValue: RawValue {
             switch self {
-            case .clear: .string("", nil)
-            case .string(let s): .string(s, nil)
+            case .clear: .draft(.init(), nil)
+            case .draft(let draft): .draft(draft, nil)
             }
         }
 
         var buttonText: String {
             switch self {
             case .clear: "C"
-            case .string: "⌫"
+            case .draft: "⌫"
             }
         }
     }
 
     @Published
-    private var value: RawValue = .string("", nil)
+    private var value: RawValue = .draft(.init(), nil)
     @AppStorage(Constants.AppStorage.displayInchesOnlyKey)
     private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
     @AppStorage(Constants.AppStorage.precisionKey)
     private var precision: Int = Constants.AppStorage.precisionDefault
 
-    var stringified: String {
+    var draft: ValidExpressionPrefix {
         switch value {
-        case .string(let s, _):
-            return s
-        case .result(let r):
-            let (rational, dimension) = switch r {
-            case .rational(let value, let dimension):
-                (value.roundedToDenominator(precision).0, dimension)
-            case .real(let value, let dimension):
-                (value.toNearestRational(withDenominator: precision).0, dimension)
-            }
-            return formatAsUsCustomary(rational, dimension, displayInchesOnly ? .inches : .feet)
+        case .draft(let draft, _): draft
+        case .result(let result): displayInchesOnly ? .init(result, as: .inches) : .init(result, as: .feet)
         }
     }
 
     var error: Error? {
         switch value {
         case .result: nil
-        case .string(_, let error): error
+        case .draft(_, let error): error
         }
     }
     
     var inaccuracy: (Int, Double, Dimension)? {
         switch value {
-        case .string:
+        case .draft:
             return nil
-        case .result(let r):
-            let (inaccuracy, dimension) = switch r {
+        case .result(let result):
+            let (inaccuracy, dimension) = switch result {
             case .rational(let value, let dimension):
                 (value.roundedToDenominator(precision).1, dimension)
             case .real(let value, let dimension):
@@ -78,28 +68,23 @@ class InputValue: ObservableObject {
     
     var meters: Double? {
         return switch value {
-        case .string:
+        case .draft:
             nil
-        case .result(let r):
+        case .result(let result):
             // Decimal ratio is exact, by definition of the US customary system: 1" = 25.4mm.
             // https://en.wikipedia.org/wiki/United_States_customary_units#International_units
-            Double(r) * 0.0254
+            Double(result) * 0.0254
         }
     }
 
     var backspaced: BackspaceResult {
         switch value {
-        case .string(let s, _):
-            if let match = s.firstMatch(of: multiCharacterBackspaceableSuffix) {
-                .string(String(s.prefix(s.count - match.output.0.count)))
-            } else {
-                .string(s.count == 0 ? "" : String(s.prefix(s.count - 1)))
-            }
-        case .result:
-            .clear
+        case .draft(let draft, _): .draft(draft.backspaced)
+        case .result: .clear
         }
     }
 
+    @discardableResult
     func append(
         _ string: String,
         canReplaceResult: Bool = false,
@@ -109,30 +94,31 @@ class InputValue: ObservableObject {
             if canReplaceResult, case .result = value {
                 return string
             } else {
-                var s = stringified
-                while s.count > 0 && charactersToTrim.contains(s.last!) {
-                    s.removeLast()
+                var string = draft.value
+                while string.count > 0 && charactersToTrim.contains(string.last!) {
+                    string.removeLast()
                 }
-                return (s + string).replacing(/\ +/, with: " ")
+                return (string + string).replacing(/\ +/, with: " ")
             }
         }()
         
-        if candidate.wholeMatch(of: /^\s*$/) == nil &&
-            candidate != stringified &&
-            EvaluatableCalculation.isValidPrefix(candidate)
+        if candidate.wholeMatch(of: /^\s*$/) == nil,
+            let draft = ValidExpressionPrefix(candidate)
         {
-            value = .string(candidate, nil)
+            value = .draft(draft, nil)
             return true
         } else {
             return false
         }
     }
-    
-    func reset(_ to: RawValue = .string("", nil)) {
-        if case .string(let s, _) = to, !EvaluatableCalculation.isValidPrefix(s) {
-            // nothing
-        } else {
+
+    @discardableResult
+    func setValue(to: RawValue? = .draft(.init(), nil)) -> Bool {
+        if let to {
             value = to
+            return true
+        } else {
+            return false
         }
     }
 }

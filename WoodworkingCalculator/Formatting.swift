@@ -1,13 +1,8 @@
 import Foundation
 
-enum UsCustomaryPrecision: Equatable {
-    case feet
-    case inches
-}
-
 // Format into the internal string representation that is suitable to pass through the parser to
 // get the equivalent result. Does NOT do pretty-printing, like with fractions.
-func formatAsUsCustomary(_ rational: Rational, _ dimension: Dimension, _ precision: UsCustomaryPrecision = .feet) -> String {
+func formatAsUsCustomary(_ rational: Rational, _ dimension: Dimension, _ precision: PreferredUnit = .feet) -> String {
     var n = abs(rational.num)
     let d = abs(rational.den)
 

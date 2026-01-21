@@ -1,50 +1,16 @@
 import SwiftUI
 import ExyteGrid
 
-private func formatInputForDisplay(_ input: String) -> String {
-    return input
-        .replacing(/(in|ft|mm|cm|m)(!?[0-9]+)?/, with: { match in
-            let exponent: Int
-            if let raw = match.2 {
-                if raw.starts(with: "!") {
-                    exponent = -Int(raw.suffix(from: raw.index(after: raw.startIndex)))!
-                } else {
-                    exponent = Int(raw)!
-                }
-            } else {
-                exponent = 1
-            }
-            let unit: String
-            if match.1 == "in" && exponent == 1 {
-                unit = "\""
-            } else if match.1 == "ft" && exponent == 1 {
-                unit = "'"
-            } else {
-                unit = String(match.1)
-            }
-            return "\(unit)\(exponent == 1 ? "" : exponent.superscript)"
-        })
-        .replacing(/([0-9]+)\/([0-9]*)/, with: { match in
-            "\(Int(match.1)!.superscript)⁄\(Int(match.2).map(\.subscript) ?? " ")"
-        })
-        .replacing(/([0-9]) ([0-9]|$)/, with: { match in
-            "\(match.1)\u{2002}\(match.2)"
-        })
-}
+private func appendTrailingParentheses(to string: String) -> AttributedString {
+    var attributedString = AttributedString(string)
 
-private func formatInputForDisplay(_ input: String, appendingTrailingParentheses: Bool) -> AttributedString {
-    let formattedInput = formatInputForDisplay(input)
-    var attributedString = AttributedString(formattedInput)
-    
-    if appendingTrailingParentheses {
-        let missingParentheses = EvaluatableCalculation.countMissingTrailingParens(input)
-        if missingParentheses > 0 {
-            var trailingParens = AttributedString(String(repeating: ")", count: missingParentheses))
-            trailingParens.foregroundColor = .secondary
-            attributedString.append(trailingParens)
-        }
+    let missingParentheses = EvaluatableCalculation.countMissingTrailingParens(string)
+    if missingParentheses > 0 {
+        var trailingParens = AttributedString(String(repeating: ")", count: missingParentheses))
+        trailingParens.foregroundColor = .secondary
+        attributedString.append(trailingParens)
     }
-    
+
     return attributedString
 }
 
@@ -52,7 +18,7 @@ private let darkGray = Color.gray.mix(with: .black, by: 0.25)
 private let ignorableDenominatorShortcutPrefixes: Set<Character> = [" ", "/"]
 
 struct ContentView: View {
-    @State private var previous = ""
+    @State private var previous: ValidExpressionPrefix?
     @State private var isSettingsPresented = false
     @State private var isInaccuracyWarningPresented = false
     @State private var isErrorPresented = false
@@ -65,7 +31,7 @@ struct ContentView: View {
     
     private func append(_ string: String, canReplaceResult: Bool = false, deletingSuffix: Set<Character> = Set()) {
         if input.append(string, canReplaceResult: canReplaceResult, deletingSuffix: deletingSuffix) {
-            previous = ""
+            previous = nil
             isInaccuracyWarningPresented = false
             isErrorPresented = false
         }
@@ -108,7 +74,7 @@ struct ContentView: View {
                         .foregroundStyle(.orange)
                 }
             }
-            Text(formatInputForDisplay(previous))
+            Text(previous?.pretty ?? "")
                 .frame(
                     minWidth: 0,
                     maxWidth:  .infinity,
@@ -122,8 +88,8 @@ struct ContentView: View {
                 .lineLimit(1)
                 .truncationMode(.head)
                 .onTapGesture {
-                    input.reset(.string(previous, nil))
-                    previous = ""
+                    input.setValue(to: previous.map { .draft($0, nil) })
+                    previous = nil
                     isInaccuracyWarningPresented = false
                     isErrorPresented = false
                 }
@@ -162,7 +128,7 @@ struct ContentView: View {
                                 \(inaccuracy.sign == .plus ? "+" : "-") \
                                 \(String(format: "%.3f", abs(inaccuracy)))\" \
                                 = \
-                                \(formatInputForDisplay(input.stringified))
+                                \(input.draft.pretty)
                                 """)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Divider()
@@ -175,7 +141,7 @@ struct ContentView: View {
                         .presentationCompactAdaptation(.popover)
                     }
                 }
-                Text(formatInputForDisplay(input.stringified, appendingTrailingParentheses: true))
+                Text(appendTrailingParentheses(to: input.draft.pretty))
                     .frame(
                         minWidth: 0,
                         maxWidth:  .infinity,
@@ -196,16 +162,16 @@ struct ContentView: View {
                 // closure typings, but I figured it doubled as a nice way to emphasize the rows.
                 GridGroup {
                     CalculatorButton(.text(input.backspaced.buttonText), .gray) {
-                        previous = ""
+                        previous = nil
                         isInaccuracyWarningPresented = false
                         isErrorPresented = false
-                        input.reset(input.backspaced.rawValue)
+                        input.setValue(to: input.backspaced.rawValue)
                     }
                     .simultaneousGesture(LongPressGesture(minimumDuration: 1).onEnded { _ in
-                        previous = ""
+                        previous = nil
                         isInaccuracyWarningPresented = false
                         isErrorPresented = false
-                        input.reset()
+                        input.setValue(to: nil)
                     })
                     CalculatorButton(.text("("), .gray, contentOffset: CGPoint(x: -2, y: -2)) {
                         append("(", canReplaceResult: true)
@@ -276,8 +242,8 @@ struct ContentView: View {
                 newPhase == .inactive &&
                 lastBackgroundTime != nil &&
                 Date().timeIntervalSince(lastBackgroundTime!) > 30 * 60 {
-                input.reset()
-                previous = ""
+                input.setValue(to: nil)
+                previous = nil
                 isInaccuracyWarningPresented = false
                 isErrorPresented = false
                 isSettingsPresented = false
@@ -298,7 +264,7 @@ struct ContentView: View {
     }
     
     private func evaluate() {
-        let inputString = input.stringified
+        let inputString = input.draft.value
         let missingParens = EvaluatableCalculation.countMissingTrailingParens(inputString)
         let formattedInputString = inputString.trimmingCharacters(in: CharacterSet.whitespaces) + String(repeating: ")", count: missingParens)
         let result = EvaluatableCalculation.from(formattedInputString)?.evaluate()
@@ -308,10 +274,10 @@ struct ContentView: View {
         
         switch result {
         case .success(let answer):
-            previous = formattedInputString
-            input.reset(.result(answer))
+            previous = .init(formattedInputString)
+            input.setValue(to: .result(answer))
         case .failure(let error):
-            input.reset(.string(inputString, error))
+            input.setValue(to: .draft(input.draft, error))
             shakeError = true
         }
         
