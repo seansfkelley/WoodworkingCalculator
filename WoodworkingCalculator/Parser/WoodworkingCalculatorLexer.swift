@@ -6,9 +6,6 @@ internal enum WoodworkingCalculatorToken {
     case real(Double)
 }
 
-// n.b. this is a pair because the lexer has to be able to forward the token code (type),
-// along with the payload, to the parser. The token code is controlled by citron, so we can't
-// modify it.
 typealias LexedTokenData = (WoodworkingCalculatorParser.CitronToken, WoodworkingCalculatorParser.CitronTokenCode)
 
 internal func parseMixedNumber(_ input: String) -> LexedTokenData? {

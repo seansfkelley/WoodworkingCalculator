@@ -142,7 +142,15 @@ private func formatDecimal(_ real: Double, _ dimension: Dimension, _ preferredUn
     formatter.minimumFractionDigits = 0
     formatter.maximumFractionDigits = 3
     formatter.roundingMode = .halfUp
-    let formattedString = formatter.string(from: NSNumber(value: real)) ?? real.formatted()
+    
+    // Convert from inches to feet for higher dimensions when preferred unit is feet
+    let convertedValue = if preferredUnit == .feet && dimension.value > 1 {
+        real / pow(12.0, Double(dimension.value))
+    } else {
+        real
+    }
+    
+    let formattedString = formatter.string(from: NSNumber(value: convertedValue)) ?? convertedValue.formatted()
     return switch dimension.value {
     case 0: formattedString
     case 1: "\(formattedString)\(preferredUnit.symbol)"
