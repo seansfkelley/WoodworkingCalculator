@@ -110,7 +110,7 @@ struct ContentView: View {
                             .fixedSize(horizontal: false, vertical: true)
                             .presentationCompactAdaptation(.popover)
                     }
-                } else if let (inaccuracy, precision) = input.inaccuracy {
+                } else if let (inaccuracy, precision, dimension) = input.inaccuracy {
                     Button(action: { isInaccuracyWarningPresented.toggle() }) {
                         Text("≈")
                             .font(.system(size: 40, weight: .bold))
@@ -120,24 +120,29 @@ struct ContentView: View {
                     }
                     .popover(isPresented: $isInaccuracyWarningPresented, arrowEdge: .top) {
                         VStack {
+                            let floatFormatString = "%.\(Constants.decimalDigitsOfPrecision)f"
                             let formattedSign = inaccuracy.sign == .plus ? "+" : "-"
+                            let formattedUnits = prettyPrintExpression(dimension.formatted(withUnit: "in"))
                             let formattedInaccuracy = prettyPrintExpression(
-                                "\(String(format: "%.\(Constants.decimalDigitsOfPrecision)f", abs(inaccuracy)))\(precision.dimension.formatted(withUnit: "in"))"
+                                "\(String(format: floatFormatString, abs(inaccuracy)))"
                             )
+                            // TODO: This should be pulled out into a function that is used also by ValidPrefixWhatever.
                             let formattedPrecision = prettyPrintExpression(
-                                precision.description
+                                dimension.value == 1
+                                ? precision.rational.formatted
+                                : String(format: floatFormatString, Double(precision.rational))
                             )
                             Text("Rounding error: \(formattedSign)\(formattedInaccuracy)")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Spacer()
                             Text("""
-                                actual \(formattedSign) \(formattedInaccuracy) \
+                                actual \(formattedSign) \(formattedInaccuracy)\(formattedUnits) \
                                 = \
                                 \(prettyPrintExpression(input.draft.value))
                                 """)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Divider()
-                            Text("Rounded to the nearest \(formattedPrecision)")
+                            Text("Rounded to the nearest \(formattedPrecision)\(formattedUnits)")
                                 .font(.system(.callout))
                                 .foregroundStyle(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)

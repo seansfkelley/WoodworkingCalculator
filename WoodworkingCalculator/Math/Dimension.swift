@@ -76,6 +76,21 @@ struct Dimension: Equatable {
         for _ in 1..<rhs.value {
             result *= base
         }
+
+        return result * sign
+    }
+
+    static func ^^ (lhs: UInt, rhs: Dimension) -> UInt {
+        guard rhs.value > 1 else {
+            return lhs
+        }
+
+        let sign = lhs.signum()
+
+        var result = lhs
+        for _ in 1..<rhs.value {
+            result *= lhs
+        }
         
         return result * sign
     }

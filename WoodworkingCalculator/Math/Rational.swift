@@ -41,7 +41,12 @@ struct Rational: Equatable, Hashable, CustomStringConvertible {
     var description: String {
         "\(num)/\(den)"
     }
-    
+
+    var formatted: String {
+        let sign = signum()
+        return "\(sign == -1 ? "-" : "")\(abs(num))\(abs(den) == 1 ? "" : "/\(abs(den))")"
+    }
+
     func signum() -> Int {
         if num.signum() == 0 {
             0

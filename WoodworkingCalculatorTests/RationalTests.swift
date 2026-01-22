@@ -8,6 +8,9 @@ private func rational(_ num: Int, _ den: Int) -> Rational {
 }
 
 struct RationalTests {
+    // TODO: tests for formatted
+    // TODO: tests for unchecked.unsafe
+
     @Test("==", arguments: [
         (rational(1, 2), rational(1, 2)),
         (rational(1, 2), rational(3, 6)),

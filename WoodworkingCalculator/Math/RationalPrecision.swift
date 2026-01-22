@@ -1,17 +1,23 @@
 import Foundation
 
 struct RationalPrecision: Hashable, RawRepresentable {
-    let denominator: Int
+    typealias RawValue = Int
 
-    init(denominator: Int) {
+    let denominator: UInt
+
+    init(denominator: UInt) {
         self.denominator = denominator
     }
 
     init?(rawValue: Int) {
-        self.denominator = rawValue
+        self.denominator = UInt(rawValue)
     }
     
     var rawValue: Int {
-        denominator
+        Int(denominator)
+    }
+
+    var rational: Rational {
+        UncheckedRational(1, Int(denominator)).unsafe
     }
 }

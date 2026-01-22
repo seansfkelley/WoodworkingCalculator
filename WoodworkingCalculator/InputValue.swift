@@ -38,7 +38,6 @@ class InputValue: ObservableObject {
         case .draft(let draft, _):
             return draft
         case .result(let result):
-            let denominator = Int(precision.denominator) ^^ result.dimension
             return displayInchesOnly
                 ? .init(result, as: .inches, precision: precision)
                 : .init(result, as: .feet, precision: precision)
@@ -52,28 +51,17 @@ class InputValue: ObservableObject {
         }
     }
     
-    var inaccuracy: (Double, Inches)? {
+    var inaccuracy: (Double, RationalPrecision, Dimension)? {
         switch value {
         case .draft:
             return nil
         case .result(let inches):
-            switch inches {
-            case .rational(let rational, let dimension):
-                let precision2 = RationalPrecision(denominator: precision.denominator ^^ dimension)
-                let (_, inaccuracy) = rational.roundedTo(precision: precision2)
-                return if abs(inaccuracy) > Constants.epsilon {
-                    (inaccuracy, .rational(UncheckedRational(1, precision2.denominator).unsafe, dimension))
-                } else {
-                    nil
-                }
-            case .real(let real, let dimension):
-                let precision2 = RationalPrecision(denominator: precision.denominator ^^ dimension)
-                let (_, inaccuracy) = real.toNearestRational(of: precision2)
-                return if abs(inaccuracy) > Constants.epsilon {
-                    (inaccuracy, .real(1.0 / Double(precision2.denominator), dimension))
-                } else {
-                    nil
-                }
+            let dimensionallyAdjustedPrecision = RationalPrecision(denominator: precision.denominator ^^ inches.dimension)
+            let (_, inaccuracy) = inches.toReal().toNearestRational(of: dimensionallyAdjustedPrecision)
+            return if abs(inaccuracy) >= Constants.epsilon {
+                (inaccuracy, dimensionallyAdjustedPrecision, inches.dimension)
+            } else {
+                nil
             }
         }
     }
