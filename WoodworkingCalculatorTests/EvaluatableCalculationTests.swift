@@ -8,7 +8,7 @@ private func rational(_ num: Int, _ den: Int) -> Rational {
 // Serialized: Citron is not thread-safe.
 @Suite(.serialized)
 struct EvaluatableCalculationTests {
-    @Test<[(String, EvaluatableCalculation, Result<Quantity, EvaluationError>)]>("from", arguments: [
+    @Test<[(String, EvaluatableCalculation, Result<UsCustomaryQuantity, EvaluationError>)]>("from", arguments: [
         (
             "1/2",
             .rational(UncheckedRational(1, 2), .unitless),
@@ -135,7 +135,7 @@ struct EvaluatableCalculationTests {
             .real(10.0 / 2.54, .unitless),
             .success(.real(10.0 / 2.54, .unitless)),
         ),
-    ]) func from(input: String, expectedEvaluatable: EvaluatableCalculation, expectedResult: Result<Quantity, EvaluationError>) throws {
+    ]) func from(input: String, expectedEvaluatable: EvaluatableCalculation, expectedResult: Result<UsCustomaryQuantity, EvaluationError>) throws {
         let evaluatable = EvaluatableCalculation.from(input)
         // FIXME: I would like to do straight equality, but I don't want to give UncheckedRational
         // an equality definition since it does not reduce to lowest terms, etc.

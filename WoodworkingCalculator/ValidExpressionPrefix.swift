@@ -36,11 +36,11 @@ struct ValidExpressionPrefix: Equatable {
         value = string
     }
 
-    init(_ quantity: Quantity, as preferredUnit: PreferredUnit, precision: Int) {
-        value = if quantity.dimension.value == 0 {
-            formatDecimal(quantity.toReal(), quantity.dimension, preferredUnit)
+    init(_ quantity: UsCustomaryQuantity, as preferredUnit: PreferredUnit, denominator: Int) {
+        value = if quantity.dimension.value == 1 {
+            formatRational(quantity.toRational(withDenominator: denominator).0, preferredUnit)
         } else {
-            formatRational(quantity.toRational(withPrecision: precision).0, quantity.dimension, preferredUnit)
+            formatDecimal(quantity.toReal(), quantity.dimension, preferredUnit)
         }
     }
 
@@ -90,44 +90,31 @@ struct ValidExpressionPrefix: Equatable {
     }
 }
 
-private func formatRational(_ rational: Rational, _ dimension: Dimension, _ preferredUnit: PreferredUnit) -> String {
+private func formatRational(_ rational: Rational, _ preferredUnit: PreferredUnit) -> String {
     var n = abs(rational.num)
     let d = abs(rational.den)
-
-    if dimension.value == 0 {
-        return rational.den == 1
-            ? "\(rational.signum() == -1 ? "-" : "")\(n)"
-            : "\(rational.signum() == -1 ? "-" : "")\(n)/\(d)"
-    }
-
-    let feetUnit = "ft[\(dimension.value)]"
-    let inchUnit = "in[\(dimension.value)]"
-
-    // This is shit, and should stay in integers the whole time. It also doesn't handle negatives
-    // properly at all -- what do we want to do about that?
-    let conversionFactor = Int(pow(12.0, Double(dimension.value)))
 
     var parts: [String] = []
 
     if d == 1 {
-        if n >= conversionFactor && preferredUnit == .feet {
-            parts.append("\(n / conversionFactor)\(feetUnit)")
-            n = n % conversionFactor
+        if n >= 12 && preferredUnit == .feet {
+            parts.append("\(n / 12)ft")
+            n = n % 12
         }
 
         if parts.isEmpty || n > 0 {
-            parts.append("\(n)\(inchUnit)")
+            parts.append("\(n)in")
         }
     } else {
-        if n >= conversionFactor * d && preferredUnit == .feet {
-            parts.append("\(n / (conversionFactor * d))\(feetUnit)")
-            n = n % (conversionFactor * d)
+        if n >= 12 * d && preferredUnit == .feet {
+            parts.append("\(n / (12 * d))ft")
+            n = n % (12 * d)
         }
 
         if n > d {
-            parts.append("\(n / d) \(UncheckedRational(n % d, d))\(inchUnit)")
+            parts.append("\(n / d) \(UncheckedRational(n % d, d))in")
         } else {
-            parts.append("\(UncheckedRational(n, d))\(inchUnit)")
+            parts.append("\(UncheckedRational(n, d))in")
         }
     }
 
