@@ -634,7 +634,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 33: /* quantity ::= mixed_number(i) Inches dimension(d) */
             func codeBlockForRule33(i: UncheckedRational, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 58)
- .rational((i ^^ d), d) 
+ .rational(i, d) 
 #sourceLocation()
 }
             if case .yy11(let i) = yySymbolOnStack(distanceFromTop: 2),
@@ -662,7 +662,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 36: /* quantity ::= integer(i) Inches dimension(d) */
             func codeBlockForRule36(i: Int, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 61)
- .rational(UncheckedRational((i ^^ d), 1), d) 
+ .rational(UncheckedRational(i, 1), d) 
 #sourceLocation()
 }
             if case .yy4(let i) = yySymbolOnStack(distanceFromTop: 2),
@@ -690,7 +690,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 39: /* quantity ::= real(i) Inches dimension(d) */
             func codeBlockForRule39(i: Double, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 64)
- .real((i ^^ d), d) 
+ .real(i, d) 
 #sourceLocation()
 }
             if case .yy8(let i) = yySymbolOnStack(distanceFromTop: 2),

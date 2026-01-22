@@ -55,13 +55,13 @@ quantity ::= integer(f) Feet.              { .rational(UncheckedRational(f * 12,
 quantity ::= real(f) Feet dimension(d).    { .real(f * (12 ^^ d), d) }
 quantity ::= real(f) Feet.                 { .real(f * 12, .length) }
 
-quantity ::= mixed_number(i) Inches dimension(d). { .rational((i ^^ d), d) }
+quantity ::= mixed_number(i) Inches dimension(d). { .rational(i, d) }
 quantity ::= mixed_number(i) Inches.              { .rational(i, .length) }
 quantity ::= mixed_number(i).                     { .rational(i, .unitless) }
-quantity ::= integer(i) Inches dimension(d).      { .rational(UncheckedRational((i ^^ d), 1), d) }
+quantity ::= integer(i) Inches dimension(d).      { .rational(UncheckedRational(i, 1), d) }
 quantity ::= integer(i) Inches.                   { .rational(UncheckedRational(i, 1), .length) }
 quantity ::= integer(i).                          { .rational(UncheckedRational(i, 1), .unitless) }
-quantity ::= real(i) Inches dimension(d).         { .real((i ^^ d), d) }
+quantity ::= real(i) Inches dimension(d).         { .real(i, d) }
 quantity ::= real(i) Inches.                      { .real(i, .length) }
 quantity ::= real(i).                             { .real(i, .unitless) }
 

@@ -9,12 +9,20 @@ enum EvaluatableCalculation: CustomStringConvertible {
     
     var description: String {
         switch (self) {
-        case .rational(let value, let dim): "\(value.den == 1 ? value.num.description : value.description)\(dim)"
-        case .real(let value, let dim): "\(value.description)\(dim)"
-        case .add(let left, let right): "(\(left) + \(right))"
-        case .subtract(let left, let right): "(\(left) - \(right))"
-        case .multiply(let left, let right): "(\(left) × \(right))"
-        case .divide(let left, let right): "(\(left) ÷ \(right))"
+        case .rational(let value, let dim):
+            return "\(value.den == 1 ? value.num.description : value.description)\(dim)"
+        case .real(let value, let dim):
+            let rounded = (value * 1_000_000).rounded() / 1_000_000
+            let prefix = rounded == value ? "" : "~"
+            return "\(prefix)\(rounded)\(dim)"
+        case .add(let left, let right): 
+            return "(\(left) + \(right))"
+        case .subtract(let left, let right):
+            return "(\(left) - \(right))"
+        case .multiply(let left, let right):
+            return "(\(left) × \(right))"
+        case .divide(let left, let right):
+            return "(\(left) ÷ \(right))"
         }
     }
     
