@@ -37,8 +37,8 @@ class InputValue: ObservableObject {
         switch value {
         case .draft(let draft, _): draft
         case .result(let result): displayInchesOnly
-            ? .init(result, as: .inches, precision: precision)
-            : .init(result, as: .feet, precision: precision)
+            ? .init(result, as: .inches, denominator: precision)
+            : .init(result, as: .feet, denominator: precision)
         }
     }
 
@@ -54,7 +54,7 @@ class InputValue: ObservableObject {
         case .draft:
             return nil
         case .result(let result):
-            let (_, inaccuracy) = result.toRational(withPrecision: precision)
+            let (_, inaccuracy) = result.toRational(withDenominator: precision)
             if let inaccuracy {
                 return (precision, inaccuracy, result.dimension)
             } else {

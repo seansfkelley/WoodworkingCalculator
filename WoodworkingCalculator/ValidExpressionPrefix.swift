@@ -3,6 +3,20 @@ import Foundation
 enum PreferredUnit: Equatable {
     case feet
     case inches
+
+    var symbol: String {
+        switch self {
+        case .feet: "'"
+        case .inches: "\""
+        }
+    }
+
+    var abbreviation: String {
+        switch self {
+        case .feet: "ft"
+        case .inches: "in"
+        }
+    }
 }
 
 // Exists because there are multi-character sequences that must be trimmed as an atomic unit.
@@ -128,6 +142,11 @@ private func formatDecimal(_ real: Double, _ dimension: Dimension, _ preferredUn
     formatter.minimumFractionDigits = 0
     formatter.maximumFractionDigits = 3
     formatter.roundingMode = .halfUp
-    return formatter.string(from: NSNumber(value: real)) ?? real.formatted()
+    let formattedString = formatter.string(from: NSNumber(value: real)) ?? real.formatted()
+    return switch dimension.value {
+    case 0: formattedString
+    case 1: "\(formattedString)\(preferredUnit.symbol)"
+    default: "\(formattedString)\(preferredUnit.abbreviation)[\(dimension.value)]"
+    }
 }
 
