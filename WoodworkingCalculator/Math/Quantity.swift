@@ -3,7 +3,7 @@ enum Quantity: Equatable, CustomStringConvertible {
     case rational(Rational, Dimension)
     case real(Double, Dimension)
 
-    struct RoundingError {
+    struct RoundingError: Equatable {
         let error: Double
         let oneDimensionalPrecision: RationalPrecision
         let dimension: Dimension
@@ -60,8 +60,12 @@ enum Quantity: Equatable, CustomStringConvertible {
             return (toReal().formatted(), nil) // TODO: better formatting
         }
 
-        let (rounded, error) = toRational(precision: RationalPrecision(denominator: precision.denominator ^^ dimension))
-        let roundingError = RoundingError(error: error, oneDimensionalPrecision: precision, dimension: dimension)
+        var (rounded, error) = toRational(precision: RationalPrecision(denominator: precision.denominator ^^ dimension))
+        let roundingError: RoundingError? = if error.isZero {
+            nil
+        } else {
+            RoundingError(error: error, oneDimensionalPrecision: precision, dimension: dimension)
+        }
         return if dimension == .length {
             (formatOneDimensionalRational(inches: rounded, as: unit), roundingError)
         } else {

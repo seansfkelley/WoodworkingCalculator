@@ -55,16 +55,12 @@ struct RationalTests {
         (rational(3, 32), 8, rational(1, 8), 1.0 / 32),
         (rational(7, 64), 8, rational(1, 8), 1.0 / 64),
         (rational(9, 64), 8, rational(1, 8), -1.0 / 64),
-        (rational(1, 2), 4, rational(1, 2), nil),
+        (rational(1, 2), 4, rational(1, 2), 0.001),
         (rational(3, 4), 6, rational(2, 3), -1.0 / 12),
-    ]) func roundedTo(input: Rational, denominator: UInt, expected: Rational, expectedRemainder: Double?) {
-        let actual = input.roundedTo(precision: RationalPrecision(denominator: denominator))
+    ]) func roundedTo(input: Rational, denominator: Int, expected: Rational, expectedRemainder: Double) {
+        let actual = input.roundedTo(precision: RationalPrecision(denominator: UInt(denominator)))
         #expect(actual.0 == expected)
-        if case .some(let actualRemainder) = actual.1, case .some(let expectedRemainder) = expectedRemainder {
-            #expect(actualRemainder.isApproximatelyEqual(to: expectedRemainder))
-        } else {
-            #expect(actual.1 == expectedRemainder)
-        }
+        #expect(actual.1.isApproximatelyEqual(to: expectedRemainder))
     }
     
     @Test("arithmetic", arguments: [
@@ -92,18 +88,14 @@ struct DoubleTests {
         #expect(Double(input).isApproximatelyEqual(to: expected))
     }
     
-    @Test<[(input: Double, precision: Int, expected: Rational, expectedRemainder: Double?)]>("toNearestRational", arguments: [
+    @Test("toNearestRational", arguments: [
         (31.0 / 32, 4, rational(1, 1), 1.0 / 32),
         (33.0 / 32, 4, rational(1, 1), -1.0 / 32),
         // Hmm, might want to turn the precision up here? This seems a bit weird that there's 0 error, though it _is_ less than a thou.
-        (1.0 / 65, 64, rational(1, 64), nil),
-    ]) func toNearestRational(input: Double, den: Int, expected: Rational, expectedRemainder: Double?) {
-        let actual = input.toNearestRational(withDenominator: den)
+        (1.0 / 65, 64, rational(1, 64), 0.001),
+    ]) func toNearestRational(input: Double, denominator: Int, expected: Rational, expectedRemainder: Double) {
+        let actual = input.toNearestRational(of: RationalPrecision(denominator: UInt(denominator)))
         #expect(actual.0 == expected)
-        if case .some(let actualRemainder) = actual.1, case .some(let expectedRemainder) = expectedRemainder {
-            #expect(actualRemainder.isApproximatelyEqual(to: expectedRemainder))
-        } else {
-            #expect(actual.1 == expectedRemainder)
-        }
+        #expect(actual.1.isApproximatelyEqual(to: expectedRemainder))
     }
 }

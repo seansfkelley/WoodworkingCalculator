@@ -32,12 +32,18 @@ class InputValue: ObservableObject {
         case unavailable
     }
 
+    struct FormattingOptions {
+        let unit: UsCustomaryUnit
+        let precision: RationalPrecision
+
+        init(_ unit: UsCustomaryUnit, _ precision: RationalPrecision) {
+            self.unit = unit
+            self.precision = precision
+        }
+    }
+
     @Published
     private var value: RawValue = .draft(.init(), nil)
-    @AppStorage(Constants.AppStorage.displayInchesOnlyKey)
-    private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
-    @AppStorage(Constants.AppStorage.precisionKey)
-    private var precision: RationalPrecision = Constants.AppStorage.precisionDefault
 
     var backspaced: BackspaceResult {
         switch value {
@@ -53,14 +59,14 @@ class InputValue: ObservableObject {
         }
     }
 
-    var formatted: (String, Quantity.RoundingError?) {
+    func formatted(with options: FormattingOptions) -> (String, Quantity.RoundingError?) {
         switch value {
         case .draft(let draft, _):
             (draft.value, nil)
         case .result(let quantity):
             quantity.formatted(
-                as: displayInchesOnly ? .inches : .feet,
-                to: precision,
+                as: options.unit,
+                to: options.precision,
                 toDecimalPrecision: Constants.decimalDigitsOfPrecision,
             )
         }
@@ -88,14 +94,13 @@ class InputValue: ObservableObject {
     @discardableResult
     func append(
         _ suffix: String,
+        with options: FormattingOptions,
         canReplaceResult: Bool = false,
         trimmingSuffix: TrimmableCharacterSet? = nil,
     ) -> Bool {
         let currentDraft = switch value {
         case .result(let quantity):
-            displayInchesOnly
-                ? ValidExpressionPrefix(quantity, as: .inches, precision: precision)
-                : ValidExpressionPrefix(quantity, as: .feet, precision: precision)
+            ValidExpressionPrefix(quantity, as: options.unit, precision: options.precision)
         case .draft(let prefix, _):
             prefix
         }
@@ -124,27 +129,14 @@ class InputValue: ObservableObject {
         }
     }
 
-    func evaluate() -> Result<ValidExpressionPrefix?, EvaluationError> {
-        let string = formatted.0
+    @discardableResult
+    func setError(to error: EvaluationError?) -> Bool {
         switch value {
+        case .draft(let  prefix, _):
+            value = .draft(prefix, error)
+            return true
         case .result:
-            return .success(.init(string))
-        case .draft(let expression, _):
-            let missingParens = EvaluatableCalculation.countMissingTrailingParens(string)
-            let formattedInputString = string.trimmingCharacters(in: CharacterSet.whitespaces) + String(repeating: ")", count: missingParens)
-            let result = EvaluatableCalculation.from(formattedInputString)?.evaluate()
-            guard let result else {
-                return .failure(.syntaxError)
-            }
-
-            switch result {
-            case .success(let answer):
-                value = .result(answer)
-                return .success(.init(formattedInputString))
-            case .failure(let error):
-                value = .draft(expression, error)
-                return .failure(error)
-            }
+            return false
         }
     }
 }

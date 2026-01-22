@@ -28,9 +28,18 @@ struct ContentView: View {
     // Why does this have to be a @State? I can't just reassign it as a normal variable?
     @State private var lastBackgroundTime: Date?
     @Environment(\.scenePhase) private var scenePhase
-    
+
+    @AppStorage(Constants.AppStorage.displayInchesOnlyKey)
+    private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
+    @AppStorage(Constants.AppStorage.precisionKey)
+    private var precision: RationalPrecision = Constants.AppStorage.precisionDefault
+
+    private var formattingOptions: InputValue.FormattingOptions {
+        .init(displayInchesOnly ? .inches : .feet, precision)
+    }
+
     private func append(_ string: String, canReplaceResult: Bool = false, trimmingSuffix: TrimmableCharacterSet? = nil) {
-        if input.append(string, canReplaceResult: canReplaceResult, trimmingSuffix: trimmingSuffix) {
+        if input.append(string, with: formattingOptions, canReplaceResult: canReplaceResult, trimmingSuffix: trimmingSuffix) {
             previous = nil
             isInaccuracyWarningPresented = false
             isErrorPresented = false
@@ -100,7 +109,7 @@ struct ContentView: View {
                     isErrorPresented = false
                 }
             HStack {
-                let (formattedInput, roundingError) = input.formatted
+                let (formattedInput, roundingError) = input.formatted(with: formattingOptions)
 
                 if let error = input.error {
                     Button(action: { isErrorPresented.toggle() }) {
@@ -271,17 +280,30 @@ struct ContentView: View {
             }
         }
     }
-    
-    private func evaluate() {
-        switch input.evaluate() {
-        case .success(let previous):
-            self.previous = previous
-        case .failure:
-            shakeError = true
-        }
 
+    private func evaluate() {
         isInaccuracyWarningPresented = false
         isErrorPresented = false
+
+        let string = input.formatted(with: formattingOptions).0
+
+        let missingParens = EvaluatableCalculation.countMissingTrailingParens(string)
+        let formattedInputString = string.trimmingCharacters(in: CharacterSet.whitespaces) + String(repeating: ")", count: missingParens)
+        let result = EvaluatableCalculation.from(formattedInputString)?.evaluate()
+        guard let result else {
+            input.setError(to: .syntaxError)
+            shakeError = true
+            return
+        }
+
+        switch result {
+        case .success(let quantity):
+            input.setValue(to: .result(quantity))
+            previous = .init(formattedInputString)
+        case .failure(let error):
+            input.setError(to: error)
+            shakeError = true
+        }
     }
 }
 

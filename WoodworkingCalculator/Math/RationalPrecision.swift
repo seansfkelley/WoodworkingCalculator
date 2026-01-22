@@ -1,6 +1,6 @@
 import Foundation
 
-struct RationalPrecision: Hashable, RawRepresentable {
+struct RationalPrecision: Equatable, Hashable, RawRepresentable {
     typealias RawValue = Int
 
     let denominator: UInt
