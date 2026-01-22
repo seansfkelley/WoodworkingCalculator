@@ -68,8 +68,14 @@ class InputValue: ObservableObject {
 
     var meters: MetricStatus {
         switch value {
-        case .draft:
-            .insertable
+        case .draft(let prefix, _):
+            // Don't use "m" because if there's a trailing "m" already, appending it would weirdly
+            // create the valid "mm".
+            if prefix.append("mm") != nil {
+                .insertable
+            } else {
+                .unavailable
+            }
         case .result(let quantity):
             if let meters = quantity.meters {
                 .convertible(meters)
