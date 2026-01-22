@@ -36,7 +36,7 @@ struct ValidExpressionPrefix: Equatable {
         value = if inches.dimension.value == 1 {
             formatOneDimensionalRational(inches: rounded, as: preferredUnit)
         } else {
-            formatDecimal(inches: Double(rounded), as: preferredUnit, inDimension: inches.dimension)
+            formatDecimal(inches: Double(rounded), of: inches.dimension, as: preferredUnit)
         }
     }
 

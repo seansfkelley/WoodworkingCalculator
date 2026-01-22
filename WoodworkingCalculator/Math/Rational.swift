@@ -16,6 +16,8 @@ struct UncheckedRational: CustomStringConvertible {
             .success(Rational(num, den))
         }
     }
+
+    var unsafe: Rational { Rational(num, den) }
 }
 
 struct Rational: Equatable, Hashable, CustomStringConvertible {

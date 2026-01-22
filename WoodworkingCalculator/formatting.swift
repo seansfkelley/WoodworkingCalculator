@@ -43,7 +43,7 @@ func formatOneDimensionalRational(inches: Rational, as unit: UsCustomaryUnit) ->
     return "\(inches.signum() == -1 ? "-" : "")\(parts.joined(separator: " "))"
 }
 
-func formatDecimal(inches: Double, of dimension: Dimension, as unit: UsCustomaryUnit) -> String {
+func formatDecimal(inches: Double, of dimension: Dimension, as unit: UsCustomaryUnit, to digits: Int) -> String {
     let convertedValue = if unit == .feet && dimension.value > 0 {
         inches / pow(12.0, Double(dimension.value))
     } else {
@@ -54,7 +54,7 @@ func formatDecimal(inches: Double, of dimension: Dimension, as unit: UsCustomary
     formatter.numberStyle = .decimal
     formatter.usesGroupingSeparator = false
     formatter.minimumFractionDigits = 0
-    formatter.maximumFractionDigits = Constants.decimalDigitsOfPrecision
+    formatter.maximumFractionDigits = digits
     formatter.roundingMode = .halfUp
 
     let formattedString = formatter.string(from: NSNumber(value: convertedValue)) ?? convertedValue.formatted()

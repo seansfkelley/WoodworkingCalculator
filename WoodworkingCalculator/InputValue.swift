@@ -52,17 +52,24 @@ class InputValue: ObservableObject {
         }
     }
     
-    var inaccuracy: (Double, Int, Dimension)? {
+    var inaccuracy: (Double, Inches)? {
         switch value {
         case .draft:
             return nil
-        case .result(let result):
-            let denominator = precision ^^ result.dimension
-            let (_, inaccuracy) = result.toRational(withDenominator: denominator, epsilon: Constants.epsilon)
-            if let inaccuracy {
-                return (inaccuracy, denominator, result.dimension)
-            } else {
-                return nil
+        case .result(let inches):
+            switch inches {
+            case .rational(let rational, let dimension):
+                let precision2 = precision ^^ dimension
+                let (_, inaccuracy) = rational.roundedToDenominator(precision2, epsilon: Constants.epsilon)
+                return inaccuracy.map {
+                    ($0, .rational(UncheckedRational(1, precision2).unsafe, dimension))
+                }
+            case .real(let real, let dimension):
+                let precision2 = precision ^^ dimension
+                let (_, inaccuracy) = real.toNearestRational(withDenominator: precision2, epsilon: Constants.epsilon)
+                return inaccuracy.map {
+                    ($0, .real(1.0 / Double(precision2), dimension))
+                }
             }
         }
     }

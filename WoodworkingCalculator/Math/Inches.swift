@@ -33,4 +33,13 @@ enum Inches: Equatable, CustomStringConvertible {
         case .real(let value, _): value.toNearestRational(withDenominator: denominator, epsilon: epsilon)
         }
     }
+
+    func formatted(as unit: UsCustomaryUnit, withDenominator denominator: Int, toDecimalPrecision digits: Int, epsilon: Double) -> String {
+        let rounded = toRational(withDenominator: denominator, epsilon: epsilon).0
+        return if dimension.value == 1 {
+            formatOneDimensionalRational(inches: rounded, as: unit)
+        } else {
+            formatDecimal(inches: Double(rounded), of: dimension, as: unit, to: digits)
+        }
+    }
 }
