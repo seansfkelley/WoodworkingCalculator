@@ -110,7 +110,7 @@ struct ContentView: View {
                             .fixedSize(horizontal: false, vertical: true)
                             .presentationCompactAdaptation(.popover)
                     }
-                } else if let (denominator, inaccuracy, dimension) = input.inaccuracy {
+                } else if let (inaccuracy, denominator, dimension) = input.inaccuracy {
                     Button(action: { isInaccuracyWarningPresented.toggle() }) {
                         Text("≈")
                             .font(.system(size: 40, weight: .bold))
@@ -120,19 +120,28 @@ struct ContentView: View {
                     }
                     .popover(isPresented: $isInaccuracyWarningPresented, arrowEdge: .top) {
                         VStack {
-                            let formatted = prettyPrintExpression("\(String(format: "%+.3f", inaccuracy))\(dimension.formatted(withUnit: "in"))")
-                            Text("Rounding error: \(formatted))")
+                            let formattedSign = inaccuracy.sign == .plus ? "+" : "-"
+                            let formattedInaccuracy = prettyPrintExpression(formatD
+                                "\(String(format: "%.\(Constants.decimalDigitsOfPrecision)f", abs(inaccuracy)))\(dimension.formatted(withUnit: "in"))"
+                            )
+                            let formattedEpsilon = prettyPrintExpression(
+                                if dimension.value == 1 {
+                                    (denominator == 1 ? "1" : "1/\(denominator)") + dimension.formatted(withUnit: "in")
+                                } else {
+                                    ""
+                                }
+                            )
+                            Text("Rounding error: \(formattedSign)\(formattedInaccuracy)")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Spacer()
                             Text("""
-                                actual \
-                                \(formatted) \
+                                actual \(formattedSign) \(formattedInaccuracy) \
                                 = \
                                 \(prettyPrintExpression(input.draft.value))
                                 """)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Divider()
-                            Text("Rounded to the nearest 1/\(denominator)\"")
+                            Text("Rounded to the nearest \(formattedEpsilon)")
                                 .font(.system(.callout))
                                 .foregroundStyle(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)

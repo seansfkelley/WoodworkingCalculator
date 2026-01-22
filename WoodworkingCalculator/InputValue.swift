@@ -35,10 +35,13 @@ class InputValue: ObservableObject {
 
     var draft: ValidExpressionPrefix {
         switch value {
-        case .draft(let draft, _): draft
-        case .result(let result): displayInchesOnly
-            ? .init(result, as: .inches, denominator: precision)
-            : .init(result, as: .feet, denominator: precision)
+        case .draft(let draft, _):
+            return draft
+        case .result(let result):
+            let denominator = precision ^^ result.dimension
+            return displayInchesOnly
+                ? .init(result, as: .inches, denominator: denominator, epsilon: Constants.epsilon)
+                : .init(result, as: .feet, denominator: denominator, epsilon: Constants.epsilon)
         }
     }
 
@@ -49,14 +52,15 @@ class InputValue: ObservableObject {
         }
     }
     
-    var inaccuracy: (Int, Double, Dimension)? {
+    var inaccuracy: (Double, Int, Dimension)? {
         switch value {
         case .draft:
             return nil
         case .result(let result):
-            let (_, inaccuracy) = result.toRational(withDenominator: precision)
+            let denominator = precision ^^ result.dimension
+            let (_, inaccuracy) = result.toRational(withDenominator: denominator, epsilon: Constants.epsilon)
             if let inaccuracy {
-                return (precision, inaccuracy, result.dimension)
+                return (inaccuracy, denominator, result.dimension)
             } else {
                 return nil
             }

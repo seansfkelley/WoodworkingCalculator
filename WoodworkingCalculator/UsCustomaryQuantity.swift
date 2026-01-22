@@ -28,10 +28,10 @@ enum UsCustomaryQuantity: Equatable, CustomStringConvertible {
         }
     }
 
-    func toRational(withDenominator denominator: Int) -> (Rational, Double?) {
+    func toRational(withDenominator denominator: Int, epsilon: Double) -> (Rational, Double?) {
         switch self {
-        case .rational(let value, _): value.roundedToDenominator(denominator)
-        case .real(let value, _): value.toNearestRational(withDenominator: denominator)
+        case .rational(let value, _): value.roundedToDenominator(denominator, epsilon: epsilon)
+        case .real(let value, _): value.toNearestRational(withDenominator: denominator, epsilon: epsilon)
         }
     }
 }

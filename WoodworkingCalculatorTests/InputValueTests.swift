@@ -106,4 +106,33 @@ struct InputValueTests {
         input.setValue(to: value)
         #expect(input.backspaced == expected)
     }
+
+    @Test<[(InputValue.RawValue, (Int, Double, Dimension)?)]>(arguments: [
+        (.draft(.init("1+1")!, nil), nil),
+        (.draft(.init("1/0")!, .divisionByZero), nil),
+
+        // exact
+        (.result(.rational(rational(1, 2), .length)), nil),
+        (.result(.real(0.5, .length)), nil),
+        
+        // length
+        (.result(.real(0.501, .length)), (Constants.AppStorage.precisionDefault, -0.001, .length)),
+        (.result(.real(1.0 / 3.0, .length)), (Constants.AppStorage.precisionDefault, 1.0 / 3.0 - Double(rational(1, 3)), .length)),
+        
+        // area
+        (.result(.real(0.501, .area)), (Constants.AppStorage.precisionDefault, -0.001, .area)),
+        
+        // volume
+        (.result(.real(0.501, .volume)), (Constants.AppStorage.precisionDefault, -0.001, .volume)),
+    ]) func inaccuracy(value: InputValue.RawValue, expected: (Int, Double, Dimension)?) {
+        input.setValue(to: value)
+        if let expected {
+            let (precision, accuracy, dimension) = input.inaccuracy!
+            #expect(precision == expected.0)
+            #expect(accuracy.isApproximatelyEqual(to: expected.1))
+            #expect(dimension == expected.2)
+        } else {
+            #expect(input.inaccuracy == nil)
+        }
+    }
 }
