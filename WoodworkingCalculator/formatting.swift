@@ -74,7 +74,10 @@ func prettyPrintExpression(_ string: String) -> String {
             } else {
                 1
             }
-            let unit = if match.1 == "in" && exponent == 1 {
+            let unit = if exponent == 0 {
+                // TODO: test this case
+                ""
+            } else if match.1 == "in" && exponent == 1 {
                 "\""
             } else if match.1 == "ft" && exponent == 1 {
                 "'"
