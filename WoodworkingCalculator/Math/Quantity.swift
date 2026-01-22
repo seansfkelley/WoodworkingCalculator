@@ -3,13 +3,6 @@ enum Quantity: Equatable, CustomStringConvertible {
     case rational(Rational, Dimension)
     case real(Double, Dimension)
 
-    var dimension: Dimension {
-        switch self {
-        case .rational(_, let dimension): dimension
-        case .real(_, let dimension): dimension
-        }
-    }
-
     var description: String {
         switch self {
         case .rational(let rational, let dimension):
@@ -18,6 +11,23 @@ enum Quantity: Equatable, CustomStringConvertible {
             let rounded = (real * 1_000_000).rounded() / 1_000_000
             let prefix = rounded == real ? "" : "~"
             return "\(prefix)\(rounded)\(dimension.formatted(withUnit: "in"))"
+        }
+    }
+
+    var dimension: Dimension {
+        switch self {
+        case .rational(_, let dimension): dimension
+        case .real(_, let dimension): dimension
+        }
+    }
+
+    var meters: Double? {
+        if dimension != .unitless {
+            // Decimal ratio is exact, by definition of the US customary system: 1" = 25.4mm.
+            // https://en.wikipedia.org/wiki/United_States_customary_units#International_units
+            toReal() * (0.0254 ^^ dimension)
+        } else {
+            nil
         }
     }
 
@@ -35,14 +45,15 @@ enum Quantity: Equatable, CustomStringConvertible {
         }
     }
 
-    func formatted(as unit: UsCustomaryUnit, to precision: RationalPrecision, toDecimalPrecision digits: Int) -> String {
-        let rounded = toRational(precision: precision).0
+    func formatted(as unit: UsCustomaryUnit, to precision: RationalPrecision, toDecimalPrecision digits: Int) -> (String, (Double, RationalPrecision, Dimension)?) {
+        let dimensionallyAdjustedPrecision = RationalPrecision(denominator: precision.denominator ^^ dimension)
+        let (rounded, inaccuracy) = toRational(precision: dimensionallyAdjustedPrecision)
         return if dimension == .unitless {
-            toReal().formatted() // TODO: better formatting
-        } else  if dimension.value == 1 {
-            formatOneDimensionalRational(inches: rounded, as: unit)
+            (toReal().formatted(), nil) // TODO: better formatting
+        } else if dimension == .length {
+            (formatOneDimensionalRational(inches: rounded, as: unit), (inaccuracy, dimensionallyAdjustedPrecision, dimension))
         } else {
-            formatDecimal(inches: Double(rounded), of: dimension, as: unit, to: digits)
+            (formatDecimal(inches: Double(rounded), of: dimension, as: unit, to: digits), (inaccuracy, dimensionallyAdjustedPrecision, dimension))
         }
     }
 }

@@ -32,7 +32,7 @@ struct ValidExpressionPrefix: Equatable {
     }
 
     init(_ quantity: Quantity, as unit: UsCustomaryUnit, precision: RationalPrecision) {
-        value = quantity.formatted(as: unit, to: precision, toDecimalPrecision: Constants.decimalDigitsOfPrecision)
+        value = quantity.formatted(as: unit, to: precision, toDecimalPrecision: Constants.decimalDigitsOfPrecision).0
     }
 
     var backspaced: ValidExpressionPrefix {

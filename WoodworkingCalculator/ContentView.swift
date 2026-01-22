@@ -54,17 +54,22 @@ struct ContentView: View {
                 Menu {
                     // Unfortunately it does not seem possible to right-align text in a Menu, so
                     // we live with this rather awkward jagged-edge arrangement.
-                    if let meters = input.meters {
-                        Section("Metric Conversions") {
-                            Text("= \(meters.formatAsDecimal(toPlaces: 3)) m")
-                            Text("= \((meters * 100).formatAsDecimal(toPlaces: 2)) cm")
-                            Text("= \((meters * 1000).formatAsDecimal(toPlaces: 1)) mm")
-                        }
-                    } else {
+                    switch input.value {
+                    case .draft:
                         Section("Metric Operations") {
                             Button(action: { append("m") }) { Text("insert \"m\"") }
                             Button(action: { append("cm") }) { Text("insert \"cm\"") }
                             Button(action: { append("mm") }) { Text("insert \"mm\"") }
+                        }
+                    case .result(let quantity):
+                        if let meters = quantity.meters {
+                            Section("Metric Conversions") {
+                                Text("= \(meters.formatAsDecimal(toPlaces: 3)) m")
+                                Text("= \((meters * 100).formatAsDecimal(toPlaces: 2)) cm")
+                                Text("= \((meters * 1000).formatAsDecimal(toPlaces: 1)) mm")
+                            }
+                        } else {
+                            EmptyView()
                         }
                     }
                 } label: {
@@ -73,6 +78,7 @@ struct ContentView: View {
                         .font(.system(size: 32))
                         .foregroundStyle(.orange)
                 }
+                // TODO: Disable if it's an EmptyView.
             }
             Text(prettyPrintExpression(previous?.value ?? ""))
                 .frame(
@@ -94,6 +100,8 @@ struct ContentView: View {
                     isErrorPresented = false
                 }
             HStack {
+                let (formattedInput, inaccuracy) = input.formatted
+
                 if let error = input.error {
                     Button(action: { isErrorPresented.toggle() }) {
                         Image(systemName: "exclamationmark.triangle")
@@ -110,7 +118,7 @@ struct ContentView: View {
                             .fixedSize(horizontal: false, vertical: true)
                             .presentationCompactAdaptation(.popover)
                     }
-                } else if let (inaccuracy, precision, dimension) = input.inaccuracy {
+                } else if let (inaccuracy, precision, dimension) = inaccuracy, abs(inaccuracy) >= Constants.epsilon {
                     Button(action: { isInaccuracyWarningPresented.toggle() }) {
                         Text("≈")
                             .font(.system(size: 40, weight: .bold))
@@ -138,7 +146,7 @@ struct ContentView: View {
                             Text("""
                                 actual \(formattedSign) \(formattedInaccuracy)\(formattedUnits) \
                                 = \
-                                \(prettyPrintExpression(input.draft.value))
+                                \(prettyPrintExpression(formattedInput))
                                 """)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Divider()
@@ -151,7 +159,7 @@ struct ContentView: View {
                         .presentationCompactAdaptation(.popover)
                     }
                 }
-                Text(appendTrailingParentheses(to: prettyPrintExpression(input.draft.value)))
+                Text(appendTrailingParentheses(to: prettyPrintExpression(formattedInput)))
                     .frame(
                         minWidth: 0,
                         maxWidth:  .infinity,
@@ -264,23 +272,13 @@ struct ContentView: View {
     }
     
     private func evaluate() {
-        let inputString = input.draft.value
-        let missingParens = EvaluatableCalculation.countMissingTrailingParens(inputString)
-        let formattedInputString = inputString.trimmingCharacters(in: CharacterSet.whitespaces) + String(repeating: ")", count: missingParens)
-        let result = EvaluatableCalculation.from(formattedInputString)?.evaluate()
-        guard let result else {
-            return
-        }
-        
-        switch result {
-        case .success(let answer):
-            previous = .init(formattedInputString)
-            input.setValue(to: .result(answer))
-        case .failure(let error):
-            input.setValue(to: .draft(input.draft, error))
+        switch input.evaluate() {
+        case .success(let previous):
+            self.previous = previous
+        case .failure:
             shakeError = true
         }
-        
+
         isInaccuracyWarningPresented = false
         isErrorPresented = false
     }

@@ -27,60 +27,36 @@ class InputValue: ObservableObject {
     }
 
     @Published
-    private var value: RawValue = .draft(.init(), nil)
+    var value: RawValue = .draft(.init(), nil)
     @AppStorage(Constants.AppStorage.displayInchesOnlyKey)
     private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
     @AppStorage(Constants.AppStorage.precisionKey)
     private var precision: RationalPrecision = Constants.AppStorage.precisionDefault
 
-    var draft: ValidExpressionPrefix {
-        switch value {
-        case .draft(let draft, _):
-            return draft
-        case .result(let result):
-            return displayInchesOnly
-                ? .init(result, as: .inches, precision: precision)
-                : .init(result, as: .feet, precision: precision)
-        }
-    }
-
-    var error: Error? {
-        switch value {
-        case .result: nil
-        case .draft(_, let error): error
-        }
-    }
-    
-    var inaccuracy: (Double, RationalPrecision, Dimension)? {
-        switch value {
-        case .draft:
-            return nil
-        case .result(let inches):
-            let dimensionallyAdjustedPrecision = RationalPrecision(denominator: precision.denominator ^^ inches.dimension)
-            let (_, inaccuracy) = inches.toReal().toNearestRational(of: dimensionallyAdjustedPrecision)
-            return if abs(inaccuracy) >= Constants.epsilon {
-                (inaccuracy, dimensionallyAdjustedPrecision, inches.dimension)
-            } else {
-                nil
-            }
-        }
-    }
-    
-    var meters: Double? {
-        return switch value {
-        case .draft:
-            nil
-        case .result(let inches):
-            // Decimal ratio is exact, by definition of the US customary system: 1" = 25.4mm.
-            // https://en.wikipedia.org/wiki/United_States_customary_units#International_units
-            inches.toReal() * 0.0254
-        }
-    }
-
     var backspaced: BackspaceResult {
         switch value {
         case .draft(let draft, _): .draft(draft.backspaced)
         case .result: .clear
+        }
+    }
+
+    var error: EvaluationError? {
+        switch value {
+        case .draft(_, let error): error
+        case .result: nil
+        }
+    }
+
+    var formatted: (String, (Double, RationalPrecision, Dimension)?) {
+        switch value {
+        case .draft(let draft, _):
+            (draft.value, nil)
+        case .result(let quantity):
+            quantity.formatted(
+                as: displayInchesOnly ? .inches : .feet,
+                to: precision,
+                toDecimalPrecision: Constants.decimalDigitsOfPrecision,
+            )
         }
     }
 
@@ -90,14 +66,22 @@ class InputValue: ObservableObject {
         canReplaceResult: Bool = false,
         trimmingSuffix: TrimmableCharacterSet? = nil,
     ) -> Bool {
+        let currentDraft = switch value {
+        case .result(let quantity):
+            displayInchesOnly
+                ? ValidExpressionPrefix(quantity, as: .inches, precision: precision)
+                : ValidExpressionPrefix(quantity, as: .feet, precision: precision)
+        case .draft(let prefix, _):
+            prefix
+        }
+
         let candidate = if canReplaceResult, case .result = value {
             ValidExpressionPrefix(suffix)
         } else {
-            draft.append(suffix, trimmingSuffix: trimmingSuffix)
+            currentDraft.append(suffix, trimmingSuffix: trimmingSuffix)
         }
-        
-        if let candidate, candidate.value.wholeMatch(of: /^\s*$/) == nil && candidate != draft
-        {
+
+        if let candidate, candidate.value.wholeMatch(of: /^\s*$/) == nil && candidate != currentDraft {
             value = .draft(candidate, nil)
             return true
         } else {
@@ -112,6 +96,30 @@ class InputValue: ObservableObject {
             return true
         } else {
             return false
+        }
+    }
+
+    func evaluate() -> Result<ValidExpressionPrefix?, EvaluationError> {
+        let string = formatted.0
+        switch value {
+        case .result:
+            return .success(.init(string))
+        case .draft(let expression, _):
+            let missingParens = EvaluatableCalculation.countMissingTrailingParens(string)
+            let formattedInputString = string.trimmingCharacters(in: CharacterSet.whitespaces) + String(repeating: ")", count: missingParens)
+            let result = EvaluatableCalculation.from(formattedInputString)?.evaluate()
+            guard let result else {
+                return .failure(.syntaxError)
+            }
+
+            switch result {
+            case .success(let answer):
+                value = .result(answer)
+                return .success(.init(formattedInputString))
+            case .failure(let error):
+                value = .draft(expression, error)
+                return .failure(error)
+            }
         }
     }
 }
