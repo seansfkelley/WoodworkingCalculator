@@ -26,7 +26,7 @@ enum EvaluatableCalculation: CustomStringConvertible {
         }
     }
     
-    func evaluate() -> Result<Inches, EvaluationError> {
+    func evaluate() -> Result<Quantity, EvaluationError> {
         switch self {
         case .rational(let value, let dim): value.checked.map { .rational($0, dim) }
         case .real(let value, let dim): .success(.real(value, dim))
@@ -47,9 +47,9 @@ enum EvaluatableCalculation: CustomStringConvertible {
         _ doubleOp: (Double, Double) -> Double,
         _ right: EvaluatableCalculation,
         _ combineDimensions: (Dimension, Dimension) -> Result<Dimension, EvaluationError>,
-    ) -> Result<Inches, EvaluationError> {
-        let l: Inches
-        let r: Inches
+    ) -> Result<Quantity, EvaluationError> {
+        let l: Quantity
+        let r: Quantity
 
         switch left.evaluate() {
         case .success(let quantity): l = quantity

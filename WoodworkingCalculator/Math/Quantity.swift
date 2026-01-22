@@ -1,4 +1,5 @@
-enum Inches: Equatable, CustomStringConvertible {
+// In inches.
+enum Quantity: Equatable, CustomStringConvertible {
     case rational(Rational, Dimension)
     case real(Double, Dimension)
 
@@ -36,7 +37,9 @@ enum Inches: Equatable, CustomStringConvertible {
 
     func formatted(as unit: UsCustomaryUnit, to precision: RationalPrecision, toDecimalPrecision digits: Int) -> String {
         let rounded = toRational(precision: precision).0
-        return if dimension.value == 1 {
+        return if dimension == .unitless {
+            toReal().formatted() // TODO: better formatting
+        } else  if dimension.value == 1 {
             formatOneDimensionalRational(inches: rounded, as: unit)
         } else {
             formatDecimal(inches: Double(rounded), of: dimension, as: unit, to: digits)

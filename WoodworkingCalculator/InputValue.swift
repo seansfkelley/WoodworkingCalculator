@@ -4,7 +4,7 @@ import SwiftUI
 class InputValue: ObservableObject {
     enum RawValue {
         case draft(ValidExpressionPrefix, EvaluationError?)
-        case result(Inches)
+        case result(Quantity)
     }
 
     enum BackspaceResult: Equatable {

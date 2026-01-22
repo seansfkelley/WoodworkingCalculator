@@ -31,15 +31,8 @@ struct ValidExpressionPrefix: Equatable {
         value = string
     }
 
-    init(_ inches: Inches, as preferredUnit: UsCustomaryUnit, precision: RationalPrecision) {
-        let rounded = inches.toRational(precision: precision).0
-        value = if inches.dimension == .unitless {
-            inches.toReal().formatted() // TODO: better formatting
-        } else if inches.dimension.value == 1 {
-            formatOneDimensionalRational(inches: rounded, as: preferredUnit)
-        } else {
-            formatDecimal(inches: Double(rounded), of: inches.dimension, as: preferredUnit, to: Constants.decimalDigitsOfPrecision)
-        }
+    init(_ quantity: Quantity, as unit: UsCustomaryUnit, precision: RationalPrecision) {
+        value = quantity.formatted(as: unit, to: precision, toDecimalPrecision: Constants.decimalDigitsOfPrecision)
     }
 
     var backspaced: ValidExpressionPrefix {
