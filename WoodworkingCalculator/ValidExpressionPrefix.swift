@@ -1,7 +1,5 @@
 import Foundation
 
-
-
 // Exists because there are multi-character sequences that must be trimmed as an atomic unit.
 // We want to make sure that callers don't try to chop single characters off the end because they
 // might create something very invalid.
@@ -33,12 +31,12 @@ struct ValidExpressionPrefix: Equatable {
         value = string
     }
 
-    init(_ quantity: UsCustomaryQuantity, as preferredUnit: UsCustomaryUnit, denominator: Int, epsilon: Double) {
-        let rounded = quantity.toRational(withDenominator: denominator, epsilon: epsilon).0
-        value = if quantity.dimension.value == 1 {
+    init(_ inches: Inches, as preferredUnit: UsCustomaryUnit, denominator: Int, epsilon: Double) {
+        let rounded = inches.toRational(withDenominator: denominator, epsilon: epsilon).0
+        value = if inches.dimension.value == 1 {
             formatOneDimensionalRational(inches: rounded, as: preferredUnit)
         } else {
-            formatDecimal(inches: Double(rounded), as: preferredUnit, inDimension: quantity.dimension)
+            formatDecimal(inches: Double(rounded), as: preferredUnit, inDimension: inches.dimension)
         }
     }
 

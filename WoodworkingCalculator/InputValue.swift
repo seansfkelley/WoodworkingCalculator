@@ -4,7 +4,7 @@ import SwiftUI
 class InputValue: ObservableObject {
     enum RawValue {
         case draft(ValidExpressionPrefix, EvaluationError?)
-        case result(UsCustomaryQuantity)
+        case result(Inches)
     }
 
     enum BackspaceResult: Equatable {
@@ -71,10 +71,10 @@ class InputValue: ObservableObject {
         return switch value {
         case .draft:
             nil
-        case .result(let quantity):
+        case .result(let inches):
             // Decimal ratio is exact, by definition of the US customary system: 1" = 25.4mm.
             // https://en.wikipedia.org/wiki/United_States_customary_units#International_units
-            quantity.toReal() * 0.0254
+            inches.toReal() * 0.0254
         }
     }
 

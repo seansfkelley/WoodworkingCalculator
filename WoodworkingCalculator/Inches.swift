@@ -1,5 +1,4 @@
-// In inches.
-enum UsCustomaryQuantity: Equatable, CustomStringConvertible {
+enum Inches: Equatable, CustomStringConvertible {
     case rational(Rational, Dimension)
     case real(Double, Dimension)
 
