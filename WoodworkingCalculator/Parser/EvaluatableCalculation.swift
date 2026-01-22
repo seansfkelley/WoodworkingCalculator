@@ -10,11 +10,11 @@ enum EvaluatableCalculation: CustomStringConvertible {
     var description: String {
         switch (self) {
         case .rational(let value, let dim):
-            return "\(value.den == 1 ? value.num.description : value.description)\(dim)"
+            return "\(value.den == 1 ? value.num.description : value.description)in\(dim)"
         case .real(let value, let dim):
             let rounded = (value * 1_000_000).rounded() / 1_000_000
             let prefix = rounded == value ? "" : "~"
-            return "\(prefix)\(rounded)\(dim)"
+            return "\(prefix)\(rounded)in\(dim)"
         case .add(let left, let right): 
             return "(\(left) + \(right))"
         case .subtract(let left, let right):
@@ -99,7 +99,8 @@ enum EvaluatableCalculation: CustomStringConvertible {
     // keystrokes in a row.
     //
     // In the case of unit indicators, they are treated as atomic units. There is no concept of SI
-    // prefixes, and you can't enter or backspace to a partial unit.
+    // prefixes or units independent from their dimensions, and you can't enter (or backspace to) a
+    // partial unit.
     static func isValidPrefix(_ input: String) -> Bool {
         func check(_ s: String) -> Bool {
             do {
@@ -129,7 +130,8 @@ enum EvaluatableCalculation: CustomStringConvertible {
         // derivatives of it that would make the above cases legal and checks those too.
         return check(input)
             // rationals
-            || (input.contains(/[0-9]$/) && check(input + "/1")) || (input.contains(#/\/$/#) && check(input + "1"))
+            || (input.contains(/[0-9]$/) && check(input + "/1"))
+            || (input.contains(#/\/$/#) && check(input + "1"))
             // reals
             || (input.contains(/\.$/) && check(input + "0"))
     }
