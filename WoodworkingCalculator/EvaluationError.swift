@@ -5,10 +5,10 @@ enum EvaluationError: LocalizedError, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .syntaxError: "This expression cannot be evaluated as written."
-        case .divisionByZero: "This expression divides by zero."
-        case .incompatibleDimensions: "This expression has incompatible units (e.g. mixing length and area)."
-        case .negativeDimension: "This expression would result in unsupported units."
+        case .syntaxError: "This input is incomplete and cannot be evaluated."
+        case .divisionByZero: "This input divides by zero."
+        case .incompatibleDimensions: "This input is adding or subtracting values with different unit types, such as length and area."
+        case .negativeDimension: "This input would result in an unsupported unit type, such as inverse area."
         }
     }
 }
