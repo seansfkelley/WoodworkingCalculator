@@ -7,6 +7,7 @@ struct WoodworkingCalculatorLexerTests {
         ("3 3/4", UncheckedRational(15, 4)),
         ("1  1/2", UncheckedRational(3, 2)),
         ("1/0", UncheckedRational(1, 0)),
+        ("", nil),
         ("1 /2", nil),
         ("1/ 2", nil),
         ("1 / 2", nil),
@@ -80,6 +81,40 @@ struct WoodworkingCalculatorLexerTests {
                 #expect(actual == expected)
             } else {
                 Issue.record("Expected parsed value to be an .integer but it was not")
+            }
+        }
+    }
+
+    @Test("parseDimension", arguments: [
+        ("[0]", 0),
+        ("[1]", 1),
+        ("[123]", 123),
+        ("[1111111111111111111111111]", nil),
+        ("[]", nil),
+        ("[", nil),
+        ("]", nil),
+        ("1", nil),
+        ("[1", nil),
+        ("1]", nil),
+        ("[ 1]", nil),
+        ("[1 ]", nil),
+        ("[a]", nil),
+        ("[-1]", nil),
+        ("[1.0]", nil),
+        ("[1/2]", nil),
+        ("", nil),
+    ]) func testParseDimension(input: String, expected: UInt?) throws {
+        let actual = parseDimension(input)
+        if expected == nil {
+            #expect(actual == nil)
+        } else if actual == nil {
+            Issue.record("Unexpected nil result")
+        } else {
+            #expect(actual!.1 == .Dimension)
+            if case .dimension(let actual) = actual!.0 {
+                #expect(actual.value == expected)
+            } else {
+                Issue.record("Expected parsed value to be a .dimension but it was not")
             }
         }
     }

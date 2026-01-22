@@ -39,11 +39,11 @@ struct InputValueTests {
 
         input.setValue(to: .result(.real(1.0, .length)))
         try #require(input.append("+") == true)
-        #expect(input.draft.value == "1\"+")
+        #expect(input.draft.value == "1in+")
 
         input.setValue(to: .result(.real(1.0, .length)))
         try #require(input.append(" ", canReplaceResult: true) == false) // no whitespace-only strings if trying to overwrite a result
-        #expect(input.draft.value == "1\"")
+        #expect(input.draft.value == "1in")
     }
 
     @Test func appendDeletingSuffix() throws {
@@ -67,13 +67,13 @@ struct InputValueTests {
 
     @Test func resetToRationalResultAndFormat() {
         input.setValue(to: .result(.rational(rational(1, 2), .length)))
-        #expect(input.draft.value == "1/2in1")
+        #expect(input.draft.value == "1/2in")
         #expect(input.error == nil)
     }
 
     @Test func resetToRealResultAndFormatWithAccuracy() {
         input.setValue(to: .result(.real(0.501, .length)))
-        #expect(input.draft.value == "1/2in1")
+        #expect(input.draft.value == "1/2in")
         let (precision, accuracy, dimension) = input.inaccuracy!
         #expect(precision == Constants.AppStorage.precisionDefault)
         #expect(accuracy.isApproximatelyEqual(to: -0.001))

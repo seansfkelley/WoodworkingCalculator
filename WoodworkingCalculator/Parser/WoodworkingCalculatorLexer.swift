@@ -24,25 +24,23 @@ internal func parseMixedNumber(_ input: String) -> LexedTokenData? {
 
 internal func parseReal(_ input: String) -> LexedTokenData? {
     if let _ = try? #/([0-9]{1,10})?\.[0-9]{1,10}/#.wholeMatch(in: input) {
-        let real = Double(input)!
-        return (.real(real), .Real)
+        (.real(Double(input)!), .Real)
     } else {
-        return nil
+        nil
     }
 }
 
 internal func parseInteger(_ input: String) -> LexedTokenData? {
     if let result = try? #/(?<int>[0-9]{1,10})\.?/#.wholeMatch(in: input) {
-        let int = Int(result.int)!
-        return (.integer(int), .Integer)
+        (.integer(Int(result.int)!), .Integer)
     } else {
-        return nil
+        nil
     }
 }
 
 internal func parseDimension(_ input: String) -> LexedTokenData? {
-    if let parsed = UInt(input[input.index(after: input.startIndex)..<input.index(before: input.endIndex)]) {
-        (.dimension(Dimension(parsed)), .Dimension)
+    if let result = try? #/\[(?<int>[0-9]{1,10})\]/#.wholeMatch(in: input) {
+        (.dimension(Dimension(UInt(result.int)!)), .Dimension)
     } else {
         nil
     }

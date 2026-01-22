@@ -84,8 +84,9 @@ struct Dimension: Equatable, CustomStringConvertible {
         guard rhs.value > 1 else {
             return lhs
         }
-        
-        return pow(lhs, Double(rhs.value))
+
+        let sign = lhs.sign
+        return pow(abs(lhs), Double(rhs.value)) * (sign == .plus ? 1 : -1)
     }
     
     static func ^^ (lhs: UncheckedRational, rhs: Dimension) -> UncheckedRational {
