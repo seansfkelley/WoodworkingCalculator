@@ -59,7 +59,7 @@ struct ValidExpressionPrefix: Equatable {
     }
 
     var backspaced: ValidExpressionPrefix {
-        if let match = value.firstMatch(of: /(in|ft|mm|cm|m)(\[-?[0-9]+\])?$/) {
+        if let match = value.firstMatch(of: /(in|ft|mm|cm|m)(\[[0-9]+\])?$/) {
             // FIXME: Don't like non-null assertion.
             .init(String(value.prefix(value.count - match.output.0.count)))!
         } else {
@@ -70,7 +70,7 @@ struct ValidExpressionPrefix: Equatable {
 
     var pretty: String {
         value
-            .replacing(/(in|ft|mm|cm|m)(\[(-?[0-9]+)\])?/, with: { match in
+            .replacing(/(in|ft|mm|cm|m)(\[([0-9]+)\])?/, with: { match in
                 let exponent = if let raw = match.3 {
                     Int(raw)!
                 } else {
