@@ -100,7 +100,7 @@ struct ContentView: View {
                     isErrorPresented = false
                 }
             HStack {
-                let (formattedInput, inaccuracy) = input.formatted
+                let (formattedInput, roundingError) = input.formatted
 
                 if let error = input.error {
                     Button(action: { isErrorPresented.toggle() }) {
@@ -118,7 +118,7 @@ struct ContentView: View {
                             .fixedSize(horizontal: false, vertical: true)
                             .presentationCompactAdaptation(.popover)
                     }
-                } else if let (inaccuracy, precision, dimension) = inaccuracy, abs(inaccuracy) >= Constants.epsilon {
+                } else if let roundingError, abs(roundingError.error) >= Constants.epsilon {
                     Button(action: { isInaccuracyWarningPresented.toggle() }) {
                         Text("≈")
                             .font(.system(size: 40, weight: .bold))
@@ -129,16 +129,17 @@ struct ContentView: View {
                     .popover(isPresented: $isInaccuracyWarningPresented, arrowEdge: .top) {
                         VStack {
                             let floatFormatString = "%.\(Constants.decimalDigitsOfPrecision)f"
-                            let formattedSign = inaccuracy.sign == .plus ? "+" : "-"
-                            let formattedUnits = prettyPrintExpression(dimension.formatted(withUnit: "in"))
-                            let formattedInaccuracy = prettyPrintExpression(
-                                "\(String(format: floatFormatString, abs(inaccuracy)))"
+                            let formattedSign = roundingError.error.sign == .plus ? "+" : "-"
+                            let formattedUnits = prettyPrintExpression(
+                                roundingError.dimension.formatted(withUnit: "in")
                             )
-                            // TODO: This should be pulled out into a function that is used also by ValidPrefixWhatever.
+                            let formattedInaccuracy = prettyPrintExpression(
+                                "\(String(format: floatFormatString, abs(roundingError.error)))"
+                            )
                             let formattedPrecision = prettyPrintExpression(
-                                dimension.value == 1
-                                ? precision.rational.formatted
-                                : String(format: floatFormatString, Double(precision.rational))
+                                roundingError.dimension == .length
+                                ? roundingError.dimensionallyAdjustedPrecision.rational.formatted
+                                : String(format: floatFormatString, Double(roundingError.dimensionallyAdjustedPrecision.rational))
                             )
                             Text("Rounding error: \(formattedSign)\(formattedInaccuracy)")
                                 .frame(maxWidth: .infinity, alignment: .leading)

@@ -36,8 +36,8 @@ struct FormattingTests {
         (864.0, .volume, "864in[3]", "0.5ft[3]"),
     ])
     func testFormatDecimal(input: Double, dimension: Dimension, inches: String, feet: String) {
-        #expect(formatDecimal(inches: input, of: dimension, as: .inches) == inches)
-        #expect(formatDecimal(inches: input, of: dimension, as: .feet) == feet)
+        #expect(formatDecimal(inches: input, of: dimension, as: .inches, to: 3) == inches)
+        #expect(formatDecimal(inches: input, of: dimension, as: .feet, to: 3) == feet)
     }
 
     @Test<[(String, String)]>("prettyPrintExpression", arguments: [

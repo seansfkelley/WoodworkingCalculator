@@ -51,14 +51,14 @@ struct RationalTests {
         #expect(input.description == expected)
     }
     
-    @Test("roundedToDenominator", arguments: [
+    @Test("roundedTo", arguments: [
         (rational(3, 32), 8, rational(1, 8), 1.0 / 32),
         (rational(7, 64), 8, rational(1, 8), 1.0 / 64),
         (rational(9, 64), 8, rational(1, 8), -1.0 / 64),
         (rational(1, 2), 4, rational(1, 2), nil),
         (rational(3, 4), 6, rational(2, 3), -1.0 / 12),
-    ]) func roundedToDenominator(input: Rational, denominator: Int, expected: Rational, expectedRemainder: Double?) {
-        let actual = input.roundedToDenominator(denominator)
+    ]) func roundedTo(input: Rational, denominator: UInt, expected: Rational, expectedRemainder: Double?) {
+        let actual = input.roundedTo(precision: RationalPrecision(denominator: denominator))
         #expect(actual.0 == expected)
         if case .some(let actualRemainder) = actual.1, case .some(let expectedRemainder) = expectedRemainder {
             #expect(actualRemainder.isApproximatelyEqual(to: expectedRemainder))

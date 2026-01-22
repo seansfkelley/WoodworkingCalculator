@@ -47,7 +47,7 @@ class InputValue: ObservableObject {
         }
     }
 
-    var formatted: (String, (Double, RationalPrecision, Dimension)?) {
+    var formatted: (String, Quantity.RoundingError?) {
         switch value {
         case .draft(let draft, _):
             (draft.value, nil)

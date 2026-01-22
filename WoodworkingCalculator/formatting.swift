@@ -58,9 +58,9 @@ func formatDecimal(inches: Double, of dimension: Dimension, as unit: UsCustomary
     formatter.roundingMode = .halfUp
 
     let formattedString = formatter.string(from: NSNumber(value: convertedValue)) ?? convertedValue.formatted()
-    return switch dimension.value {
-    case 0: formattedString
-    case 1: "\(formattedString)\(unit.abbreviation)"
+    return switch dimension {
+    case .unitless: formattedString
+    case .length: "\(formattedString)\(unit.abbreviation)"
     default: "\(formattedString)\(dimension.formatted(withUnit: unit.abbreviation))"
     }
 }

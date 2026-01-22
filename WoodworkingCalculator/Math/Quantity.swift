@@ -3,6 +3,16 @@ enum Quantity: Equatable, CustomStringConvertible {
     case rational(Rational, Dimension)
     case real(Double, Dimension)
 
+    struct RoundingError {
+        let error: Double
+        let oneDimensionalPrecision: RationalPrecision
+        let dimension: Dimension
+
+        var dimensionallyAdjustedPrecision: RationalPrecision {
+            .init(denominator: oneDimensionalPrecision.denominator ^^ dimension)
+        }
+    }
+
     var description: String {
         switch self {
         case .rational(let rational, let dimension):
@@ -45,15 +55,17 @@ enum Quantity: Equatable, CustomStringConvertible {
         }
     }
 
-    func formatted(as unit: UsCustomaryUnit, to precision: RationalPrecision, toDecimalPrecision digits: Int) -> (String, (Double, RationalPrecision, Dimension)?) {
-        let dimensionallyAdjustedPrecision = RationalPrecision(denominator: precision.denominator ^^ dimension)
-        let (rounded, inaccuracy) = toRational(precision: dimensionallyAdjustedPrecision)
-        return if dimension == .unitless {
-            (toReal().formatted(), nil) // TODO: better formatting
-        } else if dimension == .length {
-            (formatOneDimensionalRational(inches: rounded, as: unit), (inaccuracy, dimensionallyAdjustedPrecision, dimension))
+    func formatted(as unit: UsCustomaryUnit, to precision: RationalPrecision, toDecimalPrecision digits: Int) -> (String, RoundingError?) {
+        guard dimension != .unitless else {
+            return (toReal().formatted(), nil) // TODO: better formatting
+        }
+
+        let (rounded, error) = toRational(precision: RationalPrecision(denominator: precision.denominator ^^ dimension))
+        let roundingError = RoundingError(error: error, oneDimensionalPrecision: precision, dimension: dimension)
+        return if dimension == .length {
+            (formatOneDimensionalRational(inches: rounded, as: unit), roundingError)
         } else {
-            (formatDecimal(inches: Double(rounded), of: dimension, as: unit, to: digits), (inaccuracy, dimensionallyAdjustedPrecision, dimension))
+            (formatDecimal(inches: Double(rounded), of: dimension, as: unit, to: digits), roundingError)
         }
     }
 }
