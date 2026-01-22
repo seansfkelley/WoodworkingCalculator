@@ -1,15 +1,8 @@
 import Foundation
 
-enum PreferredUnit: Equatable {
+enum UsCustomaryUnit: Equatable {
     case feet
     case inches
-
-    var symbol: String {
-        switch self {
-        case .feet: "'"
-        case .inches: "\""
-        }
-    }
 
     var abbreviation: String {
         switch self {
@@ -50,7 +43,7 @@ struct ValidExpressionPrefix: Equatable {
         value = string
     }
 
-    init(_ quantity: UsCustomaryQuantity, as preferredUnit: PreferredUnit, denominator: Int) {
+    init(_ quantity: UsCustomaryQuantity, as preferredUnit: UsCustomaryUnit, denominator: Int) {
         value = if quantity.dimension.value == 1 {
             formatRational(quantity.toRational(withDenominator: denominator).0, preferredUnit)
         } else {
@@ -68,31 +61,6 @@ struct ValidExpressionPrefix: Equatable {
         }
     }
 
-    var pretty: String {
-        value
-            .replacing(/(in|ft|mm|cm|m)(\[([0-9]+)\])?/, with: { match in
-                let exponent = if let raw = match.3 {
-                    Int(raw)!
-                } else {
-                    1
-                }
-                let unit = if match.1 == "in" && exponent == 1 {
-                    "\""
-                } else if match.1 == "ft" && exponent == 1 {
-                    "'"
-                } else {
-                    String(match.1)
-                }
-                return "\(unit)\(exponent == 1 ? "" : exponent.superscript)"
-            })
-            .replacing(/([0-9]+)\/([0-9]*)/, with: { match in
-                "\(Int(match.1)!.superscript)\u{2044}\(Int(match.2).map(\.subscript) ?? " ")"
-            })
-            .replacing(/([0-9]) ([0-9]|$)/, with: { match in
-                "\(match.1)\u{2002}\(match.2)"
-            })
-    }
-
     func append(_ suffix: String, trimmingSuffix trimmableCharacters: TrimmableCharacterSet? = nil) -> ValidExpressionPrefix? {
         var string = value
         if let trimmableSet = trimmableCharacters?.set {
@@ -104,7 +72,7 @@ struct ValidExpressionPrefix: Equatable {
     }
 }
 
-private func formatRational(_ rational: Rational, _ preferredUnit: PreferredUnit) -> String {
+private func formatRational(_ rational: Rational, _ preferredUnit: UsCustomaryUnit) -> String {
     var n = abs(rational.num)
     let d = abs(rational.den)
 
@@ -112,39 +80,38 @@ private func formatRational(_ rational: Rational, _ preferredUnit: PreferredUnit
 
     if d == 1 {
         if n >= 12 && preferredUnit == .feet {
-            parts.append("\(n / 12)ft")
+            parts.append("\(n / 12)\(UsCustomaryUnit.feet.abbreviation)")
             n = n % 12
         }
 
         if parts.isEmpty || n > 0 {
-            parts.append("\(n)in")
+            parts.append("\(n)\(UsCustomaryUnit.inches.abbreviation)")
         }
     } else {
         if n >= 12 * d && preferredUnit == .feet {
-            parts.append("\(n / (12 * d))ft")
+            parts.append("\(n / (12 * d))\(UsCustomaryUnit.feet.abbreviation)")
             n = n % (12 * d)
         }
 
         if n > d {
-            parts.append("\(n / d) \(UncheckedRational(n % d, d))in")
+            parts.append("\(n / d) \(UncheckedRational(n % d, d))\(UsCustomaryUnit.inches.abbreviation)")
         } else {
-            parts.append("\(UncheckedRational(n, d))in")
+            parts.append("\(UncheckedRational(n, d))\(UsCustomaryUnit.inches.abbreviation)")
         }
     }
 
     return "\(rational.signum() == -1 ? "-" : "")\(parts.joined(separator: " "))"
 }
 
-private func formatDecimal(_ real: Double, _ dimension: Dimension, _ preferredUnit: PreferredUnit) -> String {
+private func formatDecimal(_ real: Double, _ dimension: Dimension, _ preferredUnit: UsCustomaryUnit) -> String {
     let formatter = NumberFormatter()
     formatter.numberStyle = .decimal
     formatter.usesGroupingSeparator = false
     formatter.minimumFractionDigits = 0
     formatter.maximumFractionDigits = 3
     formatter.roundingMode = .halfUp
-    
-    // Convert from inches to feet for higher dimensions when preferred unit is feet
-    let convertedValue = if preferredUnit == .feet && dimension.value > 1 {
+
+    let convertedValue = if preferredUnit == .feet && dimension.value > 0 {
         real / pow(12.0, Double(dimension.value))
     } else {
         real
@@ -153,8 +120,8 @@ private func formatDecimal(_ real: Double, _ dimension: Dimension, _ preferredUn
     let formattedString = formatter.string(from: NSNumber(value: convertedValue)) ?? convertedValue.formatted()
     return switch dimension.value {
     case 0: formattedString
-    case 1: "\(formattedString)\(preferredUnit.symbol)"
-    default: "\(formattedString)\(preferredUnit.abbreviation)[\(dimension.value)]"
+    case 1: "\(formattedString)\(preferredUnit.abbreviation)"
+    default: "\(formattedString)\(dimension.formatted(withUnit: preferredUnit.abbreviation))"
     }
 }
 

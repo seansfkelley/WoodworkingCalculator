@@ -15,7 +15,7 @@ precedencegroup DimensionExponentiationPrecedence {
 // dimension) but will be if unary negation is ever pushed down to bind more tightly than dimension.
 infix operator ^^: DimensionExponentiationPrecedence
 
-struct Dimension: Equatable, CustomStringConvertible {
+struct Dimension: Equatable {
     // 0 = unassigned (will adopt whatever it is combined with)
     // 1 = unitless
     // 2 = length
@@ -23,12 +23,12 @@ struct Dimension: Equatable, CustomStringConvertible {
     // etc.
     var value: UInt
 
-    var description: String { "[\(value)]" }
-
     init(_ value: UInt) {
         self.value = value
     }
-    
+
+    func formatted(withUnit unit: String) -> String { "\(unit)[\(value)]" }
+
     static let unitless = Dimension(0)
     static let length = Dimension(1)
     static let area = Dimension(2)

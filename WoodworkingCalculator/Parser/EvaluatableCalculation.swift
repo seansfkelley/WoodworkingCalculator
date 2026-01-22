@@ -9,13 +9,13 @@ enum EvaluatableCalculation: CustomStringConvertible {
     
     var description: String {
         switch (self) {
-        case .rational(let value, let dim):
-            return "\(value.den == 1 ? value.num.description : value.description)in\(dim)"
-        case .real(let value, let dim):
+        case .rational(let value, let dimension):
+            return "\(value.den == 1 ? value.num.description : value.description)\(dimension.formatted(withUnit: "in"))"
+        case .real(let value, let dimension):
             let rounded = (value * 1_000_000).rounded() / 1_000_000
             let prefix = rounded == value ? "" : "~"
-            return "\(prefix)\(rounded)in\(dim)"
-        case .add(let left, let right): 
+            return "\(prefix)\(rounded)\(dimension.formatted(withUnit: "in"))"
+        case .add(let left, let right):
             return "(\(left) + \(right))"
         case .subtract(let left, let right):
             return "(\(left) - \(right))"

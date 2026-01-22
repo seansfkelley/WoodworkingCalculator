@@ -13,11 +13,11 @@ enum UsCustomaryQuantity: Equatable, CustomStringConvertible {
     var description: String {
         switch self {
         case .rational(let rational, let dimension):
-            return "\(rational)in\(dimension)"
+            return "\(rational)\(dimension.formatted(withUnit: "in"))"
         case .real(let real, let dimension):
             let rounded = (real * 1_000_000).rounded() / 1_000_000
             let prefix = rounded == real ? "" : "~"
-            return "\(prefix)\(rounded)in\(dimension)"
+            return "\(prefix)\(rounded)\(dimension.formatted(withUnit: "in"))"
         }
     }
 

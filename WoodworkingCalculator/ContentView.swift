@@ -74,7 +74,7 @@ struct ContentView: View {
                         .foregroundStyle(.orange)
                 }
             }
-            Text(previous?.pretty ?? "")
+            Text(prettyPrintExpression(previous?.value ?? ""))
                 .frame(
                     minWidth: 0,
                     maxWidth:  .infinity,
@@ -110,7 +110,7 @@ struct ContentView: View {
                             .fixedSize(horizontal: false, vertical: true)
                             .presentationCompactAdaptation(.popover)
                     }
-                } else if let (precision, inaccuracy, dimension) = input.inaccuracy {
+                } else if let (denominator, inaccuracy, dimension) = input.inaccuracy {
                     Button(action: { isInaccuracyWarningPresented.toggle() }) {
                         Text("≈")
                             .font(.system(size: 40, weight: .bold))
@@ -120,19 +120,19 @@ struct ContentView: View {
                     }
                     .popover(isPresented: $isInaccuracyWarningPresented, arrowEdge: .top) {
                         VStack {
-                            Text("Rounding error: \(String(format: "%+.3f", inaccuracy))\"")
+                            let formatted = prettyPrintExpression("\(String(format: "%+.3f", inaccuracy))\(dimension.formatted(withUnit: "in"))")
+                            Text("Rounding error: \(formatted))")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Spacer()
                             Text("""
                                 actual \
-                                \(inaccuracy.sign == .plus ? "+" : "-") \
-                                \(String(format: "%.3f", abs(inaccuracy)))\" \
+                                \(formatted) \
                                 = \
-                                \(input.draft.pretty)
+                                \(prettyPrintExpression(input.draft.value))
                                 """)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Divider()
-                            Text("Rounded to the nearest 1/\(precision)\"")
+                            Text("Rounded to the nearest 1/\(denominator)\"")
                                 .font(.system(.callout))
                                 .foregroundStyle(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -141,7 +141,7 @@ struct ContentView: View {
                         .presentationCompactAdaptation(.popover)
                     }
                 }
-                Text(appendTrailingParentheses(to: input.draft.pretty))
+                Text(appendTrailingParentheses(to: prettyPrintExpression(input.draft.value)))
                     .frame(
                         minWidth: 0,
                         maxWidth:  .infinity,
