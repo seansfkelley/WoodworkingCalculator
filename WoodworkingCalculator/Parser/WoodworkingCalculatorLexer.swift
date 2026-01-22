@@ -9,7 +9,7 @@ internal enum WoodworkingCalculatorToken {
 // n.b. this is a pair because the lexer has to be able to forward the token code (type),
 // along with the payload, to the parser. The token code is controlled by citron, so we can't
 // modify it.
-typealias LexedTokenData = (WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode)
+typealias LexedTokenData = (WoodworkingCalculatorParser.CitronToken, WoodworkingCalculatorParser.CitronTokenCode)
 
 internal func parseMixedNumber(_ input: String) -> LexedTokenData? {
     if let result = try? #/((?<whole>[0-9]{1,10}) +)?(?<num>[0-9]{1,10})/(?<den>[0-9]{1,10})/#.wholeMatch(in: input) {

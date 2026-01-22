@@ -99,7 +99,7 @@ enum EvaluatableCalculation: CustomStringConvertible {
                 return true
             } catch is CitronParserUnexpectedEndOfInputError {
                 return true
-            } catch is _CitronParserUnexpectedTokenError<WoodworkingCalculatorGrammar.CitronToken, WoodworkingCalculatorGrammar.CitronTokenCode> {
+            } catch is _CitronParserUnexpectedTokenError<WoodworkingCalculatorParser.CitronToken, WoodworkingCalculatorParser.CitronTokenCode> {
                 return false
             } catch {
                 return false
@@ -132,7 +132,7 @@ enum EvaluatableCalculation: CustomStringConvertible {
 }
 
 private func parse(_ input: String, autoterminatingParentheticals: Bool) throws -> EvaluatableCalculation {
-    let parser = WoodworkingCalculatorGrammar()
+    let parser = WoodworkingCalculatorParser()
     var missingRightParens = 0
     
     try lexer.tokenize(input) { (t, c) in

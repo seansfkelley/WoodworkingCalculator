@@ -325,11 +325,11 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.swift",
+				"$(SRCROOT)/WoodworkingCalculator/Parser/WoodworkingCalculatorParser.swift",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "Citron/citron WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y -o WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.swift\n";
+			shellScript = "Citron/citron WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y -o WoodworkingCalculator/Parser/WoodworkingCalculatorParser.swift\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

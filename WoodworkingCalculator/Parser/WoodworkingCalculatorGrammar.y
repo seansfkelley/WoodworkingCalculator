@@ -1,14 +1,4 @@
-%preface {
-    func forceUnwrapDimension(_ token: WoodworkingCalculatorToken) -> Dimension {
-        if case .dimension(let dim) = token {
-            return dim
-        } else {
-            preconditionFailure("lexer did not return Dimension when expected")
-        }
-    }
-}
-
-%class_name WoodworkingCalculatorGrammar
+%class_name WoodworkingCalculatorParser
 
 %token_type WoodworkingCalculatorToken
 
