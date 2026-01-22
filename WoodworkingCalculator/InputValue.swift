@@ -26,8 +26,14 @@ class InputValue: ObservableObject {
         }
     }
 
+    enum MetricStatus: Equatable {
+        case insertable
+        case convertible(Double) // meters
+        case unavailable
+    }
+
     @Published
-    var value: RawValue = .draft(.init(), nil)
+    private var value: RawValue = .draft(.init(), nil)
     @AppStorage(Constants.AppStorage.displayInchesOnlyKey)
     private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
     @AppStorage(Constants.AppStorage.precisionKey)
@@ -57,6 +63,19 @@ class InputValue: ObservableObject {
                 to: precision,
                 toDecimalPrecision: Constants.decimalDigitsOfPrecision,
             )
+        }
+    }
+
+    var meters: MetricStatus {
+        switch value {
+        case .draft:
+            .insertable
+        case .result(let quantity):
+            if let meters = quantity.meters {
+                .convertible(meters)
+            } else {
+                .unavailable
+            }
         }
     }
 

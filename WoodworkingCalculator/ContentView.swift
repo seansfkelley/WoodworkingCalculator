@@ -51,34 +51,34 @@ struct ContentView: View {
                         .presentationDetents([.medium])
                 }
                 Spacer()
+                
+                let meters = input.meters
                 Menu {
                     // Unfortunately it does not seem possible to right-align text in a Menu, so
                     // we live with this rather awkward jagged-edge arrangement.
-                    switch input.value {
-                    case .draft:
+                    switch meters {
+                    case .insertable:
                         Section("Metric Operations") {
                             Button(action: { append("m") }) { Text("insert \"m\"") }
                             Button(action: { append("cm") }) { Text("insert \"cm\"") }
                             Button(action: { append("mm") }) { Text("insert \"mm\"") }
                         }
-                    case .result(let quantity):
-                        if let meters = quantity.meters {
-                            Section("Metric Conversions") {
-                                Text("= \(meters.formatAsDecimal(toPlaces: 3)) m")
-                                Text("= \((meters * 100).formatAsDecimal(toPlaces: 2)) cm")
-                                Text("= \((meters * 1000).formatAsDecimal(toPlaces: 1)) mm")
-                            }
-                        } else {
-                            EmptyView()
+                    case .convertible(let meters):
+                        Section("Metric Conversions") {
+                            Text("= \(meters.formatAsDecimal(toPlaces: 3)) m")
+                            Text("= \((meters * 100).formatAsDecimal(toPlaces: 2)) cm")
+                            Text("= \((meters * 1000).formatAsDecimal(toPlaces: 1)) mm")
                         }
+                    case .unavailable:
+                        EmptyView()
                     }
                 } label: {
                     Image(systemName: "ruler")
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .font(.system(size: 32))
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(meters == .unavailable ? .gray : .orange)
                 }
-                // TODO: Disable if it's an EmptyView.
+                .disabled(meters == .unavailable)
             }
             Text(prettyPrintExpression(previous?.value ?? ""))
                 .frame(
