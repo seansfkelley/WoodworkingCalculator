@@ -5,9 +5,13 @@ enum PreferredUnit: Equatable {
     case inches
 }
 
-// Exists because there are multi-character sequences that include trimmable characters, so we want
-// to make sure that when we are requested to trim, _we_ are in charge of performing the trimming so
-// that a valid result comes out the other side.
+// Exists because there are multi-character sequences that must be trimmed as an atomic unit.
+// We want to make sure that callers don't try to chop single characters off the end because they
+// might create something very invalid.
+//
+// As of this writing there are no trim rules that interact with such multi-character sequences, but
+// the backspace logic which is related to this does, so I took the opportunity to move all the
+// logic here instead.
 enum TrimmableCharacterSet {
     case whitespaceAndFractionSlash
 
@@ -53,24 +57,22 @@ struct ValidExpressionPrefix: Equatable {
     var pretty: String {
         value
             .replacing(/(in|ft|mm|cm|m)(\[(-?[0-9]+)\])?/, with: { match in
-                let exponent: Int
-                if let raw = match.3 {
-                    exponent = Int(raw)!
+                let exponent = if let raw = match.3 {
+                    Int(raw)!
                 } else {
-                    exponent = 1
+                    1
                 }
-                let unit: String
-                if match.1 == "in" && exponent == 1 {
-                    unit = "\""
+                let unit = if match.1 == "in" && exponent == 1 {
+                    "\""
                 } else if match.1 == "ft" && exponent == 1 {
-                    unit = "'"
+                    "'"
                 } else {
-                    unit = String(match.1)
+                    String(match.1)
                 }
                 return "\(unit)\(exponent == 1 ? "" : exponent.superscript)"
             })
             .replacing(/([0-9]+)\/([0-9]*)/, with: { match in
-                "\(Int(match.1)!.superscript)⁄\(Int(match.2).map(\.subscript) ?? " ")"
+                "\(Int(match.1)!.superscript)\u{2044}\(Int(match.2).map(\.subscript) ?? " ")"
             })
             .replacing(/([0-9]) ([0-9]|$)/, with: { match in
                 "\(match.1)\u{2002}\(match.2)"
