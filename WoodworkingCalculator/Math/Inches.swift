@@ -27,15 +27,15 @@ enum Inches: Equatable, CustomStringConvertible {
         }
     }
 
-    func toRational(withDenominator denominator: Int, epsilon: Double) -> (Rational, Double?) {
+    func toRational(precision: RationalPrecision) -> (Rational, Double) {
         switch self {
-        case .rational(let value, _): value.roundedToDenominator(denominator, epsilon: epsilon)
-        case .real(let value, _): value.toNearestRational(withDenominator: denominator, epsilon: epsilon)
+        case .rational(let value, _): value.roundedTo(precision: precision)
+        case .real(let value, _): value.toNearestRational(of: precision)
         }
     }
 
-    func formatted(as unit: UsCustomaryUnit, withDenominator denominator: Int, toDecimalPrecision digits: Int, epsilon: Double) -> String {
-        let rounded = toRational(withDenominator: denominator, epsilon: epsilon).0
+    func formatted(as unit: UsCustomaryUnit, to precision: RationalPrecision, toDecimalPrecision digits: Int) -> String {
+        let rounded = toRational(precision: precision).0
         return if dimension.value == 1 {
             formatOneDimensionalRational(inches: rounded, as: unit)
         } else {

@@ -6,7 +6,7 @@ struct Constants {
         static let displayInchesOnlyDefault = false
         
         static let precisionKey = "precision"
-        static let precisionDefault = 32
+        static let precisionDefault = RationalPrecision(denominator: 32)
     }
 
     static let decimalDigitsOfPrecision = 3

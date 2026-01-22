@@ -31,12 +31,12 @@ struct ValidExpressionPrefix: Equatable {
         value = string
     }
 
-    init(_ inches: Inches, as preferredUnit: UsCustomaryUnit, denominator: Int, epsilon: Double) {
-        let rounded = inches.toRational(withDenominator: denominator, epsilon: epsilon).0
+    init(_ inches: Inches, as preferredUnit: UsCustomaryUnit, precision: RationalPrecision) {
+        let rounded = inches.toRational(precision: precision).0
         value = if inches.dimension.value == 1 {
             formatOneDimensionalRational(inches: rounded, as: preferredUnit)
         } else {
-            formatDecimal(inches: Double(rounded), of: inches.dimension, as: preferredUnit)
+            formatDecimal(inches: Double(rounded), of: inches.dimension, as: preferredUnit, to: Constants.decimalDigitsOfPrecision)
         }
     }
 

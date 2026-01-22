@@ -31,17 +31,17 @@ class InputValue: ObservableObject {
     @AppStorage(Constants.AppStorage.displayInchesOnlyKey)
     private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
     @AppStorage(Constants.AppStorage.precisionKey)
-    private var precision: Int = Constants.AppStorage.precisionDefault
+    private var precision: RationalPrecision = Constants.AppStorage.precisionDefault
 
     var draft: ValidExpressionPrefix {
         switch value {
         case .draft(let draft, _):
             return draft
         case .result(let result):
-            let denominator = precision ^^ result.dimension
+            let denominator = Int(precision.denominator) ^^ result.dimension
             return displayInchesOnly
-                ? .init(result, as: .inches, denominator: denominator, epsilon: Constants.epsilon)
-                : .init(result, as: .feet, denominator: denominator, epsilon: Constants.epsilon)
+                ? .init(result, as: .inches, precision: precision)
+                : .init(result, as: .feet, precision: precision)
         }
     }
 
@@ -59,16 +59,20 @@ class InputValue: ObservableObject {
         case .result(let inches):
             switch inches {
             case .rational(let rational, let dimension):
-                let precision2 = precision ^^ dimension
-                let (_, inaccuracy) = rational.roundedToDenominator(precision2, epsilon: Constants.epsilon)
-                return inaccuracy.map {
-                    ($0, .rational(UncheckedRational(1, precision2).unsafe, dimension))
+                let precision2 = RationalPrecision(denominator: precision.denominator ^^ dimension)
+                let (_, inaccuracy) = rational.roundedTo(precision: precision2)
+                return if abs(inaccuracy) > Constants.epsilon {
+                    (inaccuracy, .rational(UncheckedRational(1, precision2.denominator).unsafe, dimension))
+                } else {
+                    nil
                 }
             case .real(let real, let dimension):
-                let precision2 = precision ^^ dimension
-                let (_, inaccuracy) = real.toNearestRational(withDenominator: precision2, epsilon: Constants.epsilon)
-                return inaccuracy.map {
-                    ($0, .real(1.0 / Double(precision2), dimension))
+                let precision2 = RationalPrecision(denominator: precision.denominator ^^ dimension)
+                let (_, inaccuracy) = real.toNearestRational(of: precision2)
+                return if abs(inaccuracy) > Constants.epsilon {
+                    (inaccuracy, .real(1.0 / Double(precision2.denominator), dimension))
+                } else {
+                    nil
                 }
             }
         }
