@@ -422,7 +422,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 11: /* quantity ::= integer(q) Meters dimension(d) */
             func codeBlockForRule11(q: Int, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 31)
- .real(Double(q) / 0.0254, d) 
+ .real(Double(q) / (0.0254 ^^ d), d) 
 #sourceLocation()
 }
             if case .yy4(let q) = yySymbolOnStack(distanceFromTop: 2),
@@ -441,7 +441,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 13: /* quantity ::= real(q) Meters dimension(d) */
             func codeBlockForRule13(q: Double, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 33)
- .real(q / 0.0254, d) 
+ .real(q / (0.0254 ^^ d), d) 
 #sourceLocation()
 }
             if case .yy8(let q) = yySymbolOnStack(distanceFromTop: 2),
@@ -460,7 +460,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 15: /* quantity ::= integer(q) Centimeters dimension(d) */
             func codeBlockForRule15(q: Int, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 36)
- .real(Double(q) / 2.54, d) 
+ .real(Double(q) / (2.54 ^^ d), d) 
 #sourceLocation()
 }
             if case .yy4(let q) = yySymbolOnStack(distanceFromTop: 2),
@@ -479,7 +479,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 17: /* quantity ::= real(q) Centimeters dimension(d) */
             func codeBlockForRule17(q: Double, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 38)
- .real(q / 2.54, d) 
+ .real(q / (2.54 ^^ d), d) 
 #sourceLocation()
 }
             if case .yy8(let q) = yySymbolOnStack(distanceFromTop: 2),
@@ -498,7 +498,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 19: /* quantity ::= integer(q) Millimeters dimension(d) */
             func codeBlockForRule19(q: Int, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 41)
- .real(Double(q) / 25.4, d) 
+ .real(Double(q) / (25.4 ^^ d), d) 
 #sourceLocation()
 }
             if case .yy4(let q) = yySymbolOnStack(distanceFromTop: 2),
@@ -517,7 +517,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 21: /* quantity ::= real(q) Millimeters dimension(d) */
             func codeBlockForRule21(q: Double, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 43)
- .real(q / 25.4, d) 
+ .real(q / (25.4 ^^ d), d) 
 #sourceLocation()
 }
             if case .yy8(let q) = yySymbolOnStack(distanceFromTop: 2),
@@ -596,7 +596,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 29: /* quantity ::= integer(f) Feet dimension(d) */
             func codeBlockForRule29(f: Int, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 53)
- .rational(UncheckedRational(f * 12, 1), d) 
+ .rational(UncheckedRational(f * 12 ^^ d, 1), d) 
 #sourceLocation()
 }
             if case .yy4(let f) = yySymbolOnStack(distanceFromTop: 2),
@@ -615,7 +615,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 31: /* quantity ::= real(f) Feet dimension(d) */
             func codeBlockForRule31(f: Double, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 55)
- .real(f * 12, d) 
+ .real(f * (12 ^^ d), d) 
 #sourceLocation()
 }
             if case .yy8(let f) = yySymbolOnStack(distanceFromTop: 2),
@@ -634,7 +634,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 33: /* quantity ::= mixed_number(i) Inches dimension(d) */
             func codeBlockForRule33(i: UncheckedRational, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 58)
- .rational(i, d) 
+ .rational((i ^^ d), d) 
 #sourceLocation()
 }
             if case .yy11(let i) = yySymbolOnStack(distanceFromTop: 2),
@@ -662,7 +662,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 36: /* quantity ::= integer(i) Inches dimension(d) */
             func codeBlockForRule36(i: Int, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 61)
- .rational(UncheckedRational(i, 1), d) 
+ .rational(UncheckedRational((i ^^ d), 1), d) 
 #sourceLocation()
 }
             if case .yy4(let i) = yySymbolOnStack(distanceFromTop: 2),
@@ -690,7 +690,7 @@ class WoodworkingCalculatorParser: CitronParser {
         case 39: /* quantity ::= real(i) Inches dimension(d) */
             func codeBlockForRule39(i: Double, d: Dimension) throws -> EvaluatableCalculation {
 #sourceLocation(file: "WoodworkingCalculator/Parser/WoodworkingCalculatorGrammar.y", line: 64)
- .real(i, d) 
+ .real((i ^^ d), d) 
 #sourceLocation()
 }
             if case .yy8(let i) = yySymbolOnStack(distanceFromTop: 2),

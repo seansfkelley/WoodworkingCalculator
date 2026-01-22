@@ -41,7 +41,7 @@ internal func parseInteger(_ input: String) -> LexedTokenData? {
 }
 
 internal func parseDimension(_ input: String) -> LexedTokenData? {
-    if let parsed = Int(input[input.index(after: input.startIndex)..<input.index(before: input.endIndex)]) {
+    if let parsed = UInt(input[input.index(after: input.startIndex)..<input.index(before: input.endIndex)]) {
         (.dimension(Dimension(parsed)), .Dimension)
     } else {
         nil
@@ -49,7 +49,7 @@ internal func parseDimension(_ input: String) -> LexedTokenData? {
 }
 
 let lexer = CitronLexer<LexedTokenData>(rules: [
-    .regexPattern("\\[-?[0-9]+\\]", parseDimension),
+    .regexPattern("\\[[0-9]+\\]", parseDimension),
     .string("in", (.void, .Inches)),
     .string("ft", (.void, .Feet)),
     .string("mm", (.void, .Millimeters)),

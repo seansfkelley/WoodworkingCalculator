@@ -22,7 +22,7 @@ struct DimensionTests {
     
     @Test
     func addIncompatibleFails() {
-        #expect(Dimension(1) + Dimension(2) == .failure(.incompatibleUnits))
+        #expect(Dimension(1) + Dimension(2) == .failure(.incompatibleDimensions))
     }
     
     @Test
@@ -32,7 +32,7 @@ struct DimensionTests {
     
     @Test
     func subtractIncompatibleFails() {
-        #expect(Dimension(2) - Dimension(1) == .failure(.incompatibleUnits))
+        #expect(Dimension(2) - Dimension(1) == .failure(.incompatibleDimensions))
     }
     
     @Test

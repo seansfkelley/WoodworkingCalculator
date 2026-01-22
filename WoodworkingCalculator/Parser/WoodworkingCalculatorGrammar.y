@@ -28,19 +28,19 @@ atom ::= Subtract LeftParen expression(x) RightParen. { .subtract(.rational(Unch
 %nonterminal_type quantity EvaluatableCalculation
 // Decimal ratio is exact, by definition of the US customary system: 1" = 25.4mm.
 // https://en.wikipedia.org/wiki/United_States_customary_units#International_units
-quantity ::= integer(q) Meters dimension(d). { .real(Double(q) / 0.0254, d) }
+quantity ::= integer(q) Meters dimension(d). { .real(Double(q) / (0.0254 ^^ d), d) }
 quantity ::= integer(q) Meters.              { .real(Double(q) / 0.0254, .length) }
-quantity ::= real(q) Meters dimension(d).    { .real(q / 0.0254, d) }
+quantity ::= real(q) Meters dimension(d).    { .real(q / (0.0254 ^^ d), d) }
 quantity ::= real(q) Meters.                 { .real(q / 0.0254, .length) }
 
-quantity ::= integer(q) Centimeters dimension(d). { .real(Double(q) / 2.54, d) }
+quantity ::= integer(q) Centimeters dimension(d). { .real(Double(q) / (2.54 ^^ d), d) }
 quantity ::= integer(q) Centimeters.              { .real(Double(q) / 2.54, .length) }
-quantity ::= real(q) Centimeters dimension(d).    { .real(q / 2.54, d) }
+quantity ::= real(q) Centimeters dimension(d).    { .real(q / (2.54 ^^ d), d) }
 quantity ::= real(q) Centimeters.                 { .real(q / 2.54, .length) }
 
-quantity ::= integer(q) Millimeters dimension(d). { .real(Double(q) / 25.4, d) }
+quantity ::= integer(q) Millimeters dimension(d). { .real(Double(q) / (25.4 ^^ d), d) }
 quantity ::= integer(q) Millimeters.              { .real(Double(q) / 25.4, .length) }
-quantity ::= real(q) Millimeters dimension(d).    { .real(q / 25.4, d) }
+quantity ::= real(q) Millimeters dimension(d).    { .real(q / (25.4 ^^ d), d) }
 quantity ::= real(q) Millimeters.                 { .real(q / 25.4, .length) }
 
 quantity ::= integer(f) Feet mixed_number(i) Inches. { .rational(UncheckedRational((f * 12) * i.den + i.num, i.den), .length) }
@@ -50,18 +50,18 @@ quantity ::= integer(f) Feet mixed_number(i).        { .rational(UncheckedRation
 quantity ::= integer(f) Feet integer(i).             { .rational(UncheckedRational(f * 12 + i, 1), .length) }
 quantity ::= integer(f) Feet real(i).                { .real(Double(f * 12) + i, .length) }
 
-quantity ::= integer(f) Feet dimension(d). { .rational(UncheckedRational(f * 12, 1), d) }
+quantity ::= integer(f) Feet dimension(d). { .rational(UncheckedRational(f * 12 ^^ d, 1), d) }
 quantity ::= integer(f) Feet.              { .rational(UncheckedRational(f * 12, 1), .length) }
-quantity ::= real(f) Feet dimension(d).    { .real(f * 12, d) }
+quantity ::= real(f) Feet dimension(d).    { .real(f * (12 ^^ d), d) }
 quantity ::= real(f) Feet.                 { .real(f * 12, .length) }
 
-quantity ::= mixed_number(i) Inches dimension(d). { .rational(i, d) }
+quantity ::= mixed_number(i) Inches dimension(d). { .rational((i ^^ d), d) }
 quantity ::= mixed_number(i) Inches.              { .rational(i, .length) }
 quantity ::= mixed_number(i).                     { .rational(i, .unitless) }
-quantity ::= integer(i) Inches dimension(d).      { .rational(UncheckedRational(i, 1), d) }
+quantity ::= integer(i) Inches dimension(d).      { .rational(UncheckedRational((i ^^ d), 1), d) }
 quantity ::= integer(i) Inches.                   { .rational(UncheckedRational(i, 1), .length) }
 quantity ::= integer(i).                          { .rational(UncheckedRational(i, 1), .unitless) }
-quantity ::= real(i) Inches dimension(d).         { .real(i, d) }
+quantity ::= real(i) Inches dimension(d).         { .real((i ^^ d), d) }
 quantity ::= real(i) Inches.                      { .real(i, .length) }
 quantity ::= real(i).                             { .real(i, .unitless) }
 
