@@ -13,6 +13,18 @@ enum Quantity: Equatable, CustomStringConvertible {
         }
     }
 
+    struct FormattingOptions {
+        let unit: UsCustomaryUnit
+        let roundedTo: RationalPrecision
+        let maximumDecimalDigits: Int
+
+        init(_ unit: UsCustomaryUnit, _ roundedTo: RationalPrecision, _ maximumDecimalDigits: Int) {
+            self.unit = unit
+            self.roundedTo = roundedTo
+            self.maximumDecimalDigits = maximumDecimalDigits
+        }
+    }
+
     var description: String {
         switch self {
         case .rational(let rational, let dimension):
@@ -55,21 +67,25 @@ enum Quantity: Equatable, CustomStringConvertible {
         }
     }
 
-    func formatted(as unit: UsCustomaryUnit, to precision: RationalPrecision, toDecimalPrecision digits: Int) -> (String, RoundingError?) {
+    func formatted(with options: FormattingOptions) -> (String, RoundingError?) {
         guard dimension != .unitless else {
             return (toReal().formatted(), nil) // TODO: better formatting
         }
 
-        var (rounded, error) = toRational(precision: RationalPrecision(denominator: precision.denominator ^^ dimension))
-        let roundingError: RoundingError? = if error.isZero {
-            nil
-        } else {
-            RoundingError(error: error, oneDimensionalPrecision: precision, dimension: dimension)
-        }
+        var (rounded, error) = toRational(precision: RationalPrecision(denominator: options.roundedTo.denominator ^^ dimension))
+        let roundingError: RoundingError? = error.isZero
+            ? nil
+            : RoundingError(error: error, oneDimensionalPrecision: options.roundedTo, dimension: dimension)
         return if dimension == .length {
-            (formatOneDimensionalRational(inches: rounded, as: unit), roundingError)
+            (
+                formatOneDimensionalRational(inches: rounded, as: options.unit),
+                roundingError,
+            )
         } else {
-            (formatDecimal(inches: Double(rounded), of: dimension, as: unit, to: digits), roundingError)
+            (
+                formatDecimal(inches: Double(rounded), of: dimension, as: options.unit, to: options.maximumDecimalDigits),
+                roundingError,
+            )
         }
     }
 }

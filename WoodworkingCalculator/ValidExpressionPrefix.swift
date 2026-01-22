@@ -31,8 +31,8 @@ struct ValidExpressionPrefix: Equatable {
         value = string
     }
 
-    init(_ quantity: Quantity, as unit: UsCustomaryUnit, precision: RationalPrecision) {
-        value = quantity.formatted(as: unit, to: precision, toDecimalPrecision: Constants.decimalDigitsOfPrecision).0
+    init(_ quantity: Quantity, with options: Quantity.FormattingOptions) {
+        value = quantity.formatted(with: options).0
     }
 
     var backspaced: ValidExpressionPrefix {

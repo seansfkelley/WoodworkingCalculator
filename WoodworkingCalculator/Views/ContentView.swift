@@ -1,29 +1,16 @@
 import SwiftUI
 import ExyteGrid
 
-private func appendTrailingParentheses(to string: String) -> AttributedString {
-    var attributedString = AttributedString(string)
-
-    let missingParentheses = EvaluatableCalculation.countMissingTrailingParens(string)
-    if missingParentheses > 0 {
-        var trailingParens = AttributedString(String(repeating: ")", count: missingParentheses))
-        trailingParens.foregroundColor = .secondary
-        attributedString.append(trailingParens)
-    }
-
-    return attributedString
-}
-
 private let darkGray = Color.gray.mix(with: .black, by: 0.25)
 private let ignorableDenominatorShortcutPrefixes: Set<Character> = [" ", "/"]
 
 struct ContentView: View {
     @State private var previous: ValidExpressionPrefix?
     @State private var isSettingsPresented = false
-    @State private var isInaccuracyWarningPresented = false
     @State private var isErrorPresented = false
+    @State private var isRoundingErrorWarningPresented = false
     @State private var shakeError = false
-    @StateObject private var input = InputValue()
+    @State private var input = InputValue.draft(.init(), nil)
 
     // Why does this have to be a @State? I can't just reassign it as a normal variable?
     @State private var lastBackgroundTime: Date?
@@ -34,14 +21,20 @@ struct ContentView: View {
     @AppStorage(Constants.AppStorage.precisionKey)
     private var precision: RationalPrecision = Constants.AppStorage.precisionDefault
 
-    private var formattingOptions: InputValue.FormattingOptions {
-        .init(displayInchesOnly ? .inches : .feet, precision)
+    private var formattingOptions: Quantity.FormattingOptions {
+        .init(displayInchesOnly ? .inches : .feet, precision, Constants.decimalDigitsOfPrecision)
     }
 
     private func append(_ string: String, canReplaceResult: Bool = false, trimmingSuffix: TrimmableCharacterSet? = nil) {
-        if input.append(string, with: formattingOptions, canReplaceResult: canReplaceResult, trimmingSuffix: trimmingSuffix) {
+        if let newInput = input.appending(
+            suffix: string,
+            formattingResultWith: formattingOptions,
+            allowingResultReplacement: canReplaceResult,
+            trimmingSuffix: trimmingSuffix,
+        ) {
+            input = newInput
             previous = nil
-            isInaccuracyWarningPresented = false
+            isRoundingErrorWarningPresented = false
             isErrorPresented = false
         }
     }
@@ -60,34 +53,28 @@ struct ContentView: View {
                         .presentationDetents([.medium])
                 }
                 Spacer()
-                
-                let meters = input.meters
+
                 Menu {
                     // Unfortunately it does not seem possible to right-align text in a Menu, so
                     // we live with this rather awkward jagged-edge arrangement.
-                    switch meters {
-                    case .insertable:
-                        Section("Metric Operations") {
-                            Button(action: { append("m") }) { Text("insert \"m\"") }
-                            Button(action: { append("cm") }) { Text("insert \"cm\"") }
-                            Button(action: { append("mm") }) { Text("insert \"mm\"") }
-                        }
-                    case .convertible(let meters):
+                    if case .result(let quantity) = input, let meters = quantity.meters {
                         Section("Metric Conversions") {
                             Text("= \(meters.formatAsDecimal(toPlaces: 3)) m")
                             Text("= \((meters * 100).formatAsDecimal(toPlaces: 2)) cm")
                             Text("= \((meters * 1000).formatAsDecimal(toPlaces: 1)) mm")
                         }
-                    case .unavailable:
-                        EmptyView()
+                    } else {
+                        Section("Insert Metric Unit") {
+                            Button(action: { append("m") }) { Text("insert \"m\"") }
+                            Button(action: { append("cm") }) { Text("insert \"cm\"") }
+                            Button(action: { append("mm") }) { Text("insert \"mm\"") }
+                        }
                     }
                 } label: {
                     Image(systemName: "ruler")
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .font(.system(size: 32))
-                        .foregroundStyle(meters == .unavailable ? .gray : .orange)
                 }
-                .disabled(meters == .unavailable)
             }
             Text(prettyPrintExpression(previous?.value ?? ""))
                 .frame(
@@ -103,103 +90,35 @@ struct ContentView: View {
                 .lineLimit(1)
                 .truncationMode(.head)
                 .onTapGesture {
-                    input.setValue(to: previous.map { .draft($0, nil) })
-                    previous = nil
-                    isInaccuracyWarningPresented = false
-                    isErrorPresented = false
-                }
-            HStack {
-                let (formattedInput, roundingError) = input.formatted(with: formattingOptions)
-
-                if let error = input.error {
-                    Button(action: { isErrorPresented.toggle() }) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 32))
-                            .foregroundStyle(.red)
-                            .padding(.vertical)
-                            .padding(.leading, 8)
-                            .offset(x: shakeError ? 20 : 0)
-                    }
-                    .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
-                        Text(error.localizedDescription)
-                            .font(.system(.body))
-                            .padding()
-                            .fixedSize(horizontal: false, vertical: true)
-                            .presentationCompactAdaptation(.popover)
-                    }
-                } else if let roundingError, abs(roundingError.error) >= Constants.epsilon {
-                    Button(action: { isInaccuracyWarningPresented.toggle() }) {
-                        Text("≈")
-                            .font(.system(size: 40, weight: .bold))
-                            .foregroundStyle(.orange)
-                            .padding(.vertical)
-                            .padding(.leading, 8)
-                    }
-                    .popover(isPresented: $isInaccuracyWarningPresented, arrowEdge: .top) {
-                        VStack {
-                            let floatFormatString = "%.\(Constants.decimalDigitsOfPrecision)f"
-                            let formattedSign = roundingError.error.sign == .plus ? "+" : "-"
-                            let formattedUnits = prettyPrintExpression(
-                                roundingError.dimension.formatted(withUnit: "in")
-                            )
-                            let formattedInaccuracy = prettyPrintExpression(
-                                "\(String(format: floatFormatString, abs(roundingError.error)))"
-                            )
-                            let formattedPrecision = prettyPrintExpression(
-                                roundingError.dimension == .length
-                                ? roundingError.dimensionallyAdjustedPrecision.rational.formatted
-                                : String(format: floatFormatString, Double(roundingError.dimensionallyAdjustedPrecision.rational))
-                            )
-                            Text("Rounding error: \(formattedSign)\(formattedInaccuracy)")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Spacer()
-                            Text("""
-                                actual \(formattedSign) \(formattedInaccuracy)\(formattedUnits) \
-                                = \
-                                \(prettyPrintExpression(formattedInput))
-                                """)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Divider()
-                            Text("Rounded to the nearest \(formattedPrecision)\(formattedUnits)")
-                                .font(.system(.callout))
-                                .foregroundStyle(.secondary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .padding()
-                        .presentationCompactAdaptation(.popover)
+                    if let previous {
+                        input = .draft(previous, nil)
+                        self.previous = nil
+                        isErrorPresented = false
+                        isRoundingErrorWarningPresented = false
                     }
                 }
-                Text(appendTrailingParentheses(to: prettyPrintExpression(formattedInput)))
-                    .frame(
-                        minWidth: 0,
-                        maxWidth:  .infinity,
-                        minHeight: 100,
-                        maxHeight: 100,
-                        alignment: .trailing
-                    )
-                    .font(.system(size: 100, weight: .light))
-                    .truncateWithFade(width: 0.1, startingAt: 0.05)
-                    .minimumScaleFactor(0.3)
-                    .lineLimit(1)
-                    .truncationMode(.head)
-                    .textSelection(.enabled)
-                    .accessibilityIdentifier("readout")
-            }
+            ResultReadout(
+                input: input,
+                formattingOptions: formattingOptions,
+                isErrorPresented: $isErrorPresented,
+                isRoundingErrorWarningPresented: $isRoundingErrorWarningPresented,
+                shakeError: $shakeError,
+            )
             Grid(tracks: 4, spacing: 8) {
                 // n.b. GridGroup is only to work around limitations in SwiftUI's ViewBuilder
                 // closure typings, but I figured it doubled as a nice way to emphasize the rows.
                 GridGroup {
                     CalculatorButton(.text(input.backspaced.buttonText), .gray) {
                         previous = nil
-                        isInaccuracyWarningPresented = false
                         isErrorPresented = false
-                        input.setValue(to: input.backspaced.rawValue)
+                        isRoundingErrorWarningPresented = false
+                        input = input.backspaced.inputValue
                     }
                     .simultaneousGesture(LongPressGesture(minimumDuration: 1).onEnded { _ in
                         previous = nil
-                        isInaccuracyWarningPresented = false
                         isErrorPresented = false
-                        input.setValue(to: nil)
+                        isRoundingErrorWarningPresented = false
+                        input = .draft(.init(), nil)
                     })
                     CalculatorButton(.text("("), .gray, contentOffset: CGPoint(x: -2, y: -2)) {
                         append("(", canReplaceResult: true)
@@ -260,10 +179,10 @@ struct ContentView: View {
                 newPhase == .inactive &&
                 lastBackgroundTime != nil &&
                 Date().timeIntervalSince(lastBackgroundTime!) > 30 * 60 {
-                input.setValue(to: nil)
+                input = .draft(.init(), nil)
                 previous = nil
-                isInaccuracyWarningPresented = false
                 isErrorPresented = false
+                isRoundingErrorWarningPresented = false
                 isSettingsPresented = false
             } else if newPhase == .background {
                 lastBackgroundTime = Date()
@@ -282,26 +201,29 @@ struct ContentView: View {
     }
 
     private func evaluate() {
-        isInaccuracyWarningPresented = false
         isErrorPresented = false
+        isRoundingErrorWarningPresented = false
 
-        let string = input.formatted(with: formattingOptions).0
+        let rawString = switch input {
+        case .draft(let prefix, _): prefix.value
+        case .result(let quantity): quantity.formatted(with: formattingOptions).0
+        }
 
-        let missingParens = EvaluatableCalculation.countMissingTrailingParens(string)
-        let formattedInputString = string.trimmingCharacters(in: CharacterSet.whitespaces) + String(repeating: ")", count: missingParens)
-        let result = EvaluatableCalculation.from(formattedInputString)?.evaluate()
+        let missingParens = EvaluatableCalculation.countMissingTrailingParens(rawString)
+        let cleanedInputString = rawString.trimmingCharacters(in: CharacterSet.whitespaces) + String(repeating: ")", count: missingParens)
+        let result = EvaluatableCalculation.from(cleanedInputString)?.evaluate()
         guard let result else {
-            input.setError(to: .syntaxError)
+            input = .draft(.init(rawString)!, .syntaxError)
             shakeError = true
             return
         }
 
         switch result {
         case .success(let quantity):
-            input.setValue(to: .result(quantity))
-            previous = .init(formattedInputString)
+            input = .result(quantity)
+            previous = .init(cleanedInputString)
         case .failure(let error):
-            input.setError(to: error)
+            input = .draft(.init(rawString)!, error)
             shakeError = true
         }
     }
@@ -347,6 +269,8 @@ struct CalculatorButton: View {
         .tint(fill)
     }
 }
+
+
 
 #Preview {
     ContentView()
