@@ -51,10 +51,12 @@ struct ContentView: View {
             HStack {
                 Button(action: { isSettingsPresented.toggle() }) {
                     Image(systemName: "gear")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.system(size: 32))
+                        .font(.system(size: 24))
                         .foregroundStyle(.orange)
+                        .frame(width: 32, height: 32)
                 }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
                 .sheet(isPresented: $isSettingsPresented) {
                     Settings()
                         .presentationDetents([.medium])
@@ -87,10 +89,12 @@ struct ContentView: View {
                     }
                 } label: {
                     Image(systemName: "ruler")
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .font(.system(size: 32))
+                        .font(.system(size: 24))
                         .foregroundStyle(.orange)
+                        .frame(width: 32, height: 32)
                 }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
             }
             Text(prettyPrintExpression(previous?.value ?? ""))
                 .frame(
