@@ -36,7 +36,19 @@ enum EvaluatableCalculation: CustomStringConvertible {
         case .divide(let left, let right):  Self.evaluateBinaryOperator(left, (/), (/), right, (/))
         }
     }
-    
+
+    var allDimensionsAreUnitless: Bool {
+        return switch self {
+        case .rational(_, let dimension), .real(_, let dimension):
+            dimension == .unitless
+        case .add(let left, let right),
+             .subtract(let left, let right),
+             .multiply(let left, let right),
+             .divide(let left, let right):
+            left.allDimensionsAreUnitless && right.allDimensionsAreUnitless
+        }
+    }
+
     // This signature is pretty dumb and the implementation isn't much better, but it's the best
     // way I could determine to DRY up the binary operator stuff. Generics don't seem to work,
     // even with a dedicated "arithmetical" protocol that includes the four basic operators that

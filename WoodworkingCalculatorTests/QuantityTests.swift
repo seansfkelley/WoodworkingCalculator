@@ -89,5 +89,12 @@ struct QuantityTests {
         #expect(result == rational(1, 2))
         #expect(error.isApproximatelyEqual(to: -0.001))
     }
+
+    @Test("withDimension", arguments: [
+        (Quantity.rational(rational(3, 4), .length), Dimension.area, Quantity.rational(rational(3, 4), .area)),
+        (Quantity.real(42.5, .volume), Dimension.unitless, Quantity.real(42.5, .unitless)),
+    ]) func withDimension(original: Quantity, newDimension: Dimension, expected: Quantity) {
+        #expect(original.withDimension(newDimension) == expected)
+    }
 }
 

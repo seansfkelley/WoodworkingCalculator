@@ -303,4 +303,26 @@ struct EvaluatableCalculationTests {
     ]) func countMissingTrailingParens(input: String, expected: Int) throws {
         #expect(EvaluatableCalculation.countMissingTrailingParens(input) == expected)
     }
+
+    @Test("allDimensionsAreUnitless (true)", arguments: [
+        "1",
+        "3.5 + 1/2",
+        "1 + 2 × 3 ÷ 4",
+        "((1 + 1) × (2 - 1))",
+    ]) func allDimensionsAreUnitlessTrue(input: String) throws {
+        let evaluatable = try #require(EvaluatableCalculation.from(input))
+        #expect(evaluatable.allDimensionsAreUnitless == true)
+    }
+
+    @Test("allDimensionsAreUnitless (false)", arguments: [
+        "1ft",
+        "1ft + 1in",
+        "1ft 3in × 3.2",
+        "3ft[2]",
+        "1/2in[3]",
+        "1in ÷ 1in", // the result is unitless, but the input is not!
+    ]) func allDimensionsAreUnitlessFalse(input: String) throws {
+        let evaluatable = try #require(EvaluatableCalculation.from(input))
+        #expect(evaluatable.allDimensionsAreUnitless == false)
+    }
 }

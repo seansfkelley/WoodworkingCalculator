@@ -69,6 +69,13 @@ enum Quantity: Equatable, CustomStringConvertible {
         }
     }
 
+    func withDimension(_ dimension: Dimension) -> Quantity {
+        switch self {
+        case .rational(let value, _): .rational(value, dimension)
+        case .real(let value, _): .real(value, dimension)
+        }
+    }
+
     func formatted(with options: FormattingOptions) -> (String, RoundingError?) {
         guard dimension != .unitless else {
             return (formatUnitlessDecimal(toReal(), to: options.maxUnitlessDecimalDigits), nil)

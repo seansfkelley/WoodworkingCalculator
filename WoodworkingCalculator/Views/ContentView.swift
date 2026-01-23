@@ -242,15 +242,19 @@ struct ContentView: View {
 
         let missingParens = EvaluatableCalculation.countMissingTrailingParens(rawString)
         let cleanedInputString = rawString.trimmingCharacters(in: CharacterSet.whitespaces) + String(repeating: ")", count: missingParens)
-        let result = EvaluatableCalculation.from(cleanedInputString)?.evaluate()
-        guard let result else {
+        let calculation = EvaluatableCalculation.from(cleanedInputString)
+        guard let calculation else {
             // silently nop until they finish what they were doing
             return
         }
 
-        switch result {
+        switch calculation.evaluate() {
         case .success(let quantity):
-            input = .result(quantity)
+            if assumeInches && quantity.dimension == .unitless && calculation.allDimensionsAreUnitless {
+                input = .result(quantity.withDimension(.length))
+            } else {
+                input = .result(quantity)
+            }
             previous = .init(cleanedInputString)
         case .failure(let error):
             input = .draft(.init(rawString)!, error)

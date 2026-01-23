@@ -21,8 +21,10 @@ struct Settings: View {
                     Text("1/64\"").tag(RationalPrecision(denominator: 64))
                 }
             } footer: {
-                Text("Results will be rounded to the nearest 1/\(precision.denominator)\". Areas and volumes are rounded to the corresponding square or cube.")
-                    .font(.caption)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Results with units will be rounded to the nearest 1/\(precision.denominator)\". Areas and volumes are rounded to the corresponding square or cube.")
+                    Text("Unitless results are not rounded.")
+                }
             }
 
             Section {
@@ -41,16 +43,13 @@ struct Settings: View {
                 Toggle("Assume Inches", isOn: $assumeInches)
             } footer: {
                 VStack(alignment: .leading, spacing: 6) {
-                    Group {
-                        if assumeInches {
-                            Text("If no units are entered, the result is assumed to be inches. If units are entered but cancel out, the result is a unitless decimal number.")
-                        } else {
-                            Text("If no units are entered, the result is a unitless decimal number.")
-                        }
-                        Text("Entering units is optional. Unitless numbers adopt the unit of other numbers they are combined with.")
-                        Text("Long-press the unit buttons to enter areas or volumes.")
+                    if assumeInches {
+                        Text("If no units are entered, the result is assumed to be inches. If units are entered but cancel out, the result is a unitless decimal number.")
+                    } else {
+                        Text("If no units are entered, the result is a unitless decimal number.")
                     }
-                    .font(.caption)
+                    Text("Entering units is optional. Unitless numbers adopt the unit of other numbers they are combined with.")
+                    Text("Long-press the unit buttons to enter areas or volumes.")
                 }
             }
         }
