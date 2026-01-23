@@ -6,6 +6,7 @@ struct ResultReadout: View {
     @Binding var isErrorPresented: Bool
     @Binding var isRoundingErrorWarningPresented: Bool
     @Binding var shakeError: Bool
+    let openSettings: () -> Void
 
     private var epsilon: Double {
         pow(0.1, Double(Constants.decimalDigitsOfPrecision))
@@ -32,7 +33,7 @@ struct ResultReadout: View {
                             .presentationCompactAdaptation(.popover)
                     }
                 }
-                mainThing(text: prefix.value)
+                textContent(text: prefix.value)
             }
         case .result(let quantity):
             let (formatted, roundingError) = quantity.formatted(with: formattingOptions)
@@ -104,24 +105,28 @@ struct ResultReadout: View {
                                 .padding(.vertical, 4)
                                 .background(.red.opacity(0.2), in: RoundedRectangle(cornerRadius: 8))
                             }
-                            Divider()
-                            Text("Rounding to the nearest \(precision). Configure precision in settings.")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                            
+                            HStack(spacing: 4) {
+                                Text("Rounding to \(precision).")
+                                    .foregroundStyle(.secondary)
+                                Button(action: openSettings) {
+                                    Text("Change precision.")
+                                }
+                                .buttonStyle(.plain)
+                                .foregroundStyle(.blue)
+                            }
+                            .fixedSize(horizontal: false, vertical: true)
                         }
                         .padding()
                         .presentationCompactAdaptation(.popover)
                     }
                 }
-                mainThing(text: formatted)
+                textContent(text: formatted)
             }
         }
     }
 
     @ViewBuilder
-    private func mainThing(text: String) -> some View {
+    private func textContent(text: String) -> some View {
         Text(appendTrailingParentheses(to: prettyPrintExpression(text)))
             .frame(
                 minWidth: 0,

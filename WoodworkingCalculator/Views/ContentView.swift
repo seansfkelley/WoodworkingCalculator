@@ -131,6 +131,10 @@ struct ContentView: View {
                 isErrorPresented: $isErrorPresented,
                 isRoundingErrorWarningPresented: $isRoundingErrorWarningPresented,
                 shakeError: $shakeError,
+                openSettings: {
+                    isRoundingErrorWarningPresented = false
+                    isSettingsPresented = true
+                }
             )
             .padding(.horizontal, CGFloat(horizontalSpacing))
             Grid(tracks: 4, spacing: GridSpacing(integerLiteral: gridSpacing)) {
