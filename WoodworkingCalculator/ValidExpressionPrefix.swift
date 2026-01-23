@@ -17,7 +17,7 @@ enum TrimmableCharacterSet {
     }
 }
 
-struct ValidExpressionPrefix: Equatable {
+struct ValidExpressionPrefix: Equatable, CustomStringConvertible {
     let value: String
 
     init() {
@@ -34,6 +34,8 @@ struct ValidExpressionPrefix: Equatable {
     init(_ quantity: Quantity, with options: Quantity.FormattingOptions) {
         value = quantity.formatted(with: options).0
     }
+
+    var description: String { value }
 
     var backspaced: ValidExpressionPrefix {
         if let match = value.firstMatch(of: /(in|ft|mm|cm|m)(\[[0-9]+\])?$/) {
