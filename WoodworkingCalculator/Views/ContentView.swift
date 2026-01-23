@@ -17,9 +17,11 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     @AppStorage(Constants.AppStorage.displayInchesOnlyKey)
-    private var displayInchesOnly: Bool = Constants.AppStorage.displayInchesOnlyDefault
+    private var displayInchesOnly = Constants.AppStorage.displayInchesOnlyDefault
     @AppStorage(Constants.AppStorage.precisionKey)
-    private var precision: RationalPrecision = Constants.AppStorage.precisionDefault
+    private var precision = Constants.AppStorage.precisionDefault
+    @AppStorage(Constants.AppStorage.assumeInchesKey)
+    private var assumeInches = Constants.AppStorage.assumeInchesDefault
 
     private var formattingOptions: Quantity.FormattingOptions {
         .init(

@@ -7,6 +7,9 @@ struct Constants {
         
         static let precisionKey = "precision"
         static let precisionDefault = RationalPrecision(denominator: 32)
+
+        static let assumeInchesKey = "assumeInches"
+        static let assumeInchesDefault = true
     }
 
     static let decimalDigitsOfPrecision = 3
