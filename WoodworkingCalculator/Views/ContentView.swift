@@ -122,11 +122,15 @@ struct ContentView: View {
                 // n.b. GridGroup is only to work around limitations in SwiftUI's ViewBuilder
                 // closure typings, but I figured it doubled as a nice way to emphasize the rows.
                 GridGroup {
-                    CalculatorButton(.text(input.backspaced.buttonText), .gray) {
+                    let backspaced: ValidExpressionPrefix? = switch input {
+                    case .draft(let prefix, _): prefix.backspaced
+                    case .result: nil
+                    }
+                    CalculatorButton(.text(backspaced == nil ? "C" : "⌫"), .gray) {
                         previous = nil
                         isErrorPresented = false
                         isRoundingErrorWarningPresented = false
-                        input = input.backspaced.inputValue
+                        input = .draft(backspaced ?? .init(), nil)
                     }
                     .simultaneousGesture(LongPressGesture(minimumDuration: 1).onEnded { _ in
                         previous = nil

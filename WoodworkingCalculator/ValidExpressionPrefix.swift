@@ -17,6 +17,9 @@ enum TrimmableCharacterSet {
     }
 }
 
+// The only reason this is separated from InputValue is because we don't want to be forced to carry
+// a potential error around for storing an input string in history. Minorly, we also don't want to
+// conflate results with inputs, which InputValue is intended to gloss over.
 struct ValidExpressionPrefix: Equatable, CustomStringConvertible {
     let value: String
 
