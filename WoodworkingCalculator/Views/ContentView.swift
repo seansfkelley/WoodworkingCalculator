@@ -3,6 +3,8 @@ import ExyteGrid
 
 private let darkGray = Color.gray.mix(with: .black, by: 0.25)
 private let ignorableDenominatorShortcutPrefixes: Set<Character> = [" ", "/"]
+private let horizontalSpacing = 12
+private let gridSpacing = 8
 
 struct ContentView: View {
     @State private var previous: ValidExpressionPrefix?
@@ -48,83 +50,86 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            HStack {
-                Button(action: { isSettingsPresented.toggle() }) {
-                    Image(systemName: "gear")
-                        .font(.system(size: 24))
-                        .foregroundStyle(.orange)
-                        .frame(width: 32, height: 32)
-                }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
-                .sheet(isPresented: $isSettingsPresented) {
-                    Settings()
-                        .presentationDetents([.medium])
-                }
-                Spacer()
+            Group {
+                HStack {
+                    Button(action: { isSettingsPresented.toggle() }) {
+                        Image(systemName: "gear")
+                            .font(.system(size: 24))
+                            .foregroundStyle(.orange)
+                            .frame(width: 32, height: 32)
+                    }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
+                    .sheet(isPresented: $isSettingsPresented) {
+                        Settings()
+                            .presentationDetents([.medium])
+                    }
+                    Spacer()
 
-                Menu {
-                    // Unfortunately it does not seem possible to right-align text in a Menu, so
-                    // we live with this rather awkward jagged-edge arrangement.
-                    switch input {
-                    case .result(let quantity):
-                        Section("Metric Conversions") {
-                            if let meters = quantity.meters {
-                                Text("= \(meters.formatAsDecimal(toPlaces: 3)) m")
-                                Text("= \((meters * 100).formatAsDecimal(toPlaces: 2)) cm")
-                                Text("= \((meters * 1000).formatAsDecimal(toPlaces: 1)) mm")
-                            } else {
-                                Text("Unitless values cannot be converted.")
+                    Menu {
+                        // Unfortunately it does not seem possible to right-align text in a Menu, so
+                        // we live with this rather awkward jagged-edge arrangement.
+                        switch input {
+                        case .result(let quantity):
+                            Section("Metric Conversions") {
+                                if let meters = quantity.meters {
+                                    Text("= \(meters.formatAsDecimal(toPlaces: 3)) m")
+                                    Text("= \((meters * 100).formatAsDecimal(toPlaces: 2)) cm")
+                                    Text("= \((meters * 1000).formatAsDecimal(toPlaces: 1)) mm")
+                                } else {
+                                    Text("Unitless values cannot be converted.")
+                                }
+                            }
+                        case .draft(let prefix, _):
+                            // Use "mm" and not just "m" because if there is already a trailing "m",
+                            // appending a single "m" would actually create a valid unit. o_O
+                            let valid = EvaluatableCalculation.isValidPrefix(prefix.value + "mm")
+                            Section("Insert Metric Unit") {
+                                Button(action: { append("m") }) { Text("insert \"m\"") }.disabled(!valid)
+                                Button(action: { append("cm") }) { Text("insert \"cm\"") }.disabled(!valid)
+                                Button(action: { append("mm") }) { Text("insert \"mm\"") }.disabled(!valid)
                             }
                         }
-                    case .draft(let prefix, _):
-                        // Use "mm" and not just "m" because if there is already a trailing "m",
-                        // appending a single "m" would actually create a valid unit. o_O
-                        let valid = EvaluatableCalculation.isValidPrefix(prefix.value + "mm")
-                        Section("Insert Metric Unit") {
-                            Button(action: { append("m") }) { Text("insert \"m\"") }.disabled(!valid)
-                            Button(action: { append("cm") }) { Text("insert \"cm\"") }.disabled(!valid)
-                            Button(action: { append("mm") }) { Text("insert \"mm\"") }.disabled(!valid)
+                    } label: {
+                        Image(systemName: "ruler")
+                            .font(.system(size: 24))
+                            .foregroundStyle(.orange)
+                            .frame(width: 32, height: 32)
+                    }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
+                }
+                Text(prettyPrintExpression(previous?.value ?? ""))
+                    .frame(
+                        minWidth: 0,
+                        maxWidth:  .infinity,
+                        minHeight: 40,
+                        maxHeight: 40,
+                        alignment: .trailing
+                    )
+                    .font(.system(size: 40))
+                    .foregroundStyle(.secondary)
+                    .truncateWithFade(width: 0.1, startingAt: 0.1)
+                    .lineLimit(1)
+                    .truncationMode(.head)
+                    .onTapGesture {
+                        if let previous {
+                            input = .draft(previous, nil)
+                            self.previous = nil
+                            isErrorPresented = false
+                            isRoundingErrorWarningPresented = false
                         }
                     }
-                } label: {
-                    Image(systemName: "ruler")
-                        .font(.system(size: 24))
-                        .foregroundStyle(.orange)
-                        .frame(width: 32, height: 32)
-                }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
-            }
-            Text(prettyPrintExpression(previous?.value ?? ""))
-                .frame(
-                    minWidth: 0,
-                    maxWidth:  .infinity,
-                    minHeight: 40,
-                    maxHeight: 40,
-                    alignment: .trailing
+                ResultReadout(
+                    input: input,
+                    formattingOptions: formattingOptions,
+                    isErrorPresented: $isErrorPresented,
+                    isRoundingErrorWarningPresented: $isRoundingErrorWarningPresented,
+                    shakeError: $shakeError,
                 )
-                .font(.system(size: 40))
-                .foregroundStyle(.secondary)
-                .truncateWithFade(width: 0.1, startingAt: 0.1)
-                .lineLimit(1)
-                .truncationMode(.head)
-                .onTapGesture {
-                    if let previous {
-                        input = .draft(previous, nil)
-                        self.previous = nil
-                        isErrorPresented = false
-                        isRoundingErrorWarningPresented = false
-                    }
-                }
-            ResultReadout(
-                input: input,
-                formattingOptions: formattingOptions,
-                isErrorPresented: $isErrorPresented,
-                isRoundingErrorWarningPresented: $isRoundingErrorWarningPresented,
-                shakeError: $shakeError,
-            )
-            Grid(tracks: 4, spacing: 8) {
+            }
+            .padding(.horizontal, CGFloat(horizontalSpacing))
+            Grid(tracks: 4, spacing: GridSpacing(integerLiteral: gridSpacing)) {
                 // n.b. GridGroup is only to work around limitations in SwiftUI's ViewBuilder
                 // closure typings, but I figured it doubled as a nice way to emphasize the rows.
                 GridGroup {
@@ -198,8 +203,11 @@ struct ContentView: View {
                     CalculatorButton(.text("⁄₁₆"), .gray) { append("/16", trimmingSuffix: .whitespaceAndFractionSlash) }
                 }
             }
+            // Grid applies padding to the edges too, not just between items, so compensate here.
+            // This is also why we don't just put a padding on the entire VStack but instead have to
+            // use a Group, above.
+            .padding(.horizontal, CGFloat(horizontalSpacing - gridSpacing))
         }
-        .padding()
         .onChange(of: scenePhase) { oldPhase, newPhase in
             // It seems like when foregrounding/backgrounding the app, it always bounces through
             // the inactive state. By clearing the state before we're fully active, we avoid a
