@@ -20,16 +20,30 @@ struct Settings: View {
                     Text("1/32\"").tag(RationalPrecision(denominator: 32))
                     Text("1/64\"").tag(RationalPrecision(denominator: 64))
                 }
-
-                Toggle("Assume Inches", isOn: $assumeInches)
-            } header: {
-                Text("Calculation")
+            } footer: {
+                Text("Results will be rounded to the nearest 1/\(precision.denominator)\". Areas and volumes are rounded to the corresponding square or cube.")
+                    .font(.caption)
             }
-            footer: {
+
+            Section {
+                Picker(selection: $displayInchesOnly, label: Text("Result Format")) {
+                    Text("Inches").tag(true)
+                    Text("Feet and Inches").tag(false)
+                }
+            } footer: {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Results for lengths will display as \(displayInchesOnly ? "inches only" : "feet and inches"). Area and volume results will be decimal \(displayInchesOnly ? "inches" : "feet").")
+                    Text("Unitless results are always decimals.")
+                }
+            }
+
+            Section {
+                Toggle("Assume Inches", isOn: $assumeInches)
+            } footer: {
                 VStack(alignment: .leading, spacing: 6) {
                     Group {
                         if assumeInches {
-                            Text("If no units are entered, the result is assumed to be fractional inches. If units are entered but cancel out, the result is a unitless decimal number.")
+                            Text("If no units are entered, the result is assumed to be inches. If units are entered but cancel out, the result is a unitless decimal number.")
                         } else {
                             Text("If no units are entered, the result is a unitless decimal number.")
                         }
@@ -39,15 +53,8 @@ struct Settings: View {
                     .font(.caption)
                 }
             }
-            Section {
-                Picker(selection: $displayInchesOnly, label: Text("Result Format")) {
-                    Text("Inches").tag(true)
-                    Text("Feet and Inches").tag(false)
-                }
-            } header: {
-                Text("Display")
-            }
         }
+        .padding(.bottom)
     }
 }
 
