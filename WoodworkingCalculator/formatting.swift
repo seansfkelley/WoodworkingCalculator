@@ -77,8 +77,8 @@ func formatUnitlessDecimal(_ value: Double, to digits: Int) -> String {
 }
 
 
-func prettyPrintExpression(_ string: String) -> String {
-    string
+func prettyPrintExpression(_ string: String, includingFractions: Bool = true) -> String {
+    let formatted = string
         .replacing(/(in|ft|mm|cm|m)(\[([0-9]+)\])?/, with: { match in
             let exponent = if let raw = match.3 {
                 Int(raw)!
@@ -100,7 +100,12 @@ func prettyPrintExpression(_ string: String) -> String {
         .replacing(/([0-9]) ([0-9]|$)/, with: { match in
             "\(match.1)\u{2002}\(match.2)"
         })
-        .replacing(/([0-9]+)\/([0-9]*)/, with: { match in
+
+    return if includingFractions {
+        formatted.replacing(/([0-9]+)\/([0-9]*)/, with: { match in
             "\(Int(match.1)!.superscript)\u{2044}\(Int(match.2).map(\.subscript) ?? " ")"
         })
+    } else {
+        formatted
+    }
 }

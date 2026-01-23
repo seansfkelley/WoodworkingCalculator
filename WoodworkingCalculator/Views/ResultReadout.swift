@@ -7,6 +7,10 @@ struct ResultReadout: View {
     @Binding var isRoundingErrorWarningPresented: Bool
     @Binding var shakeError: Bool
 
+    private var epsilon: Double {
+        pow(0.1, Double(Constants.decimalDigitsOfPrecision))
+    }
+
     var body: some View {
         switch input {
         case .draft(let prefix, let error):
@@ -33,44 +37,73 @@ struct ResultReadout: View {
         case .result(let quantity):
             let (formatted, roundingError) = quantity.formatted(with: formattingOptions)
             HStack {
-                if let roundingError, abs(roundingError.error) >= Constants.epsilon {
+                if let roundingError, abs(roundingError.error) >= epsilon {
                     Button(action: { isRoundingErrorWarningPresented.toggle() }) {
                         Text("≈")
-                            .font(.system(size: 40, weight: .bold))
+                            .font(.system(size: 40))
                             .foregroundStyle(.orange)
                             .padding(.bottom, 4)
                     }
                     .buttonStyle(.glass)
                     .buttonBorderShape(.circle)
                     .popover(isPresented: $isRoundingErrorWarningPresented, arrowEdge: .top) {
-                        VStack {
-                            let floatFormatString = "%.\(Constants.decimalDigitsOfPrecision)f"
-                            let formattedSign = roundingError.error.sign == .plus ? "+" : "-"
-                            let formattedUnits = prettyPrintExpression(
-                                roundingError.dimension.formatted(withUnit: "in")
+                        let actual = prettyPrintExpression(
+                            formatDecimal(
+                                inches: quantity.toReal(),
+                                of: roundingError.dimension,
+                                as: formattingOptions.unit,
+                                to: Constants.decimalDigitsOfPrecisionExtended,
                             )
-                            let formattedInaccuracy = prettyPrintExpression(
-                                "\(String(format: floatFormatString, abs(roundingError.error)))"
+                        )
+                        let absError = prettyPrintExpression(
+                            formatDecimal(
+                                inches: abs(roundingError.error),
+                                of: roundingError.dimension,
+                                as: formattingOptions.unit,
+                                to: Constants.decimalDigitsOfPrecisionExtended,
                             )
-                            let formattedPrecision = prettyPrintExpression(
-                                roundingError.dimension == .length
-                                ? roundingError.dimensionallyAdjustedPrecision.rational.formatted
-                                : String(format: floatFormatString, Double(roundingError.dimensionallyAdjustedPrecision.rational))
-                            )
-                            Text("Rounding error: \(formattedSign)\(formattedInaccuracy)")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Spacer()
-                            Text("""
-                                actual \(formattedSign) \(formattedInaccuracy)\(formattedUnits) \
-                                = \
-                                \(prettyPrintExpression(formatted))
-                                """)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        )
+                        let precision = prettyPrintExpression(
+                            roundingError.dimension == .length
+                                ? formatOneDimensionalRational(
+                                    inches: roundingError.oneDimensionalPrecision.rational,
+                                    as: .inches,
+                                )
+                                : formatDecimal(
+                                    inches: Double(roundingError.dimensionallyAdjustedPrecision.rational),
+                                    of: roundingError.dimension,
+                                    as: .inches,
+                                    to: Constants.decimalDigitsOfPrecision,
+                                ),
+                            includingFractions: false,
+                        )
+                        let sign = roundingError.error.sign == .plus ? "+" : "−"
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack(spacing: 6) {
+                                Text("=")
+                                Text(actual)
+                                Text(sign)
+                                Text(absError)
+                            }
+                            .font(.title)
+                            HStack(spacing: 6) {
+                                Text("=").font(.title).hidden()
+                                ZStack {
+                                    Text("exact").foregroundStyle(.secondary)
+                                    Text(actual).font(.title).hidden()
+                                }
+                                Text(sign).font(.title).hidden()
+                                ZStack {
+                                    Text("error").foregroundStyle(.secondary)
+                                    Text(absError).font(.title).hidden()
+                                }
+                            }
                             Divider()
-                            Text("Rounded to the nearest \(formattedPrecision)\(formattedUnits)")
-                                .font(.system(.callout))
+                            Text("Rounding to the nearest \(precision). Configure precision in settings.")
+                                .font(.caption)
                                 .foregroundStyle(.secondary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         .padding()
                         .presentationCompactAdaptation(.popover)

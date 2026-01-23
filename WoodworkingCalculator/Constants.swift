@@ -13,7 +13,6 @@ struct Constants {
     }
 
     static let decimalDigitsOfPrecision = 3
-    static var epsilon: Double { pow(0.1, Double(decimalDigitsOfPrecision)) }
-
+    static let decimalDigitsOfPrecisionExtended = 6
     static let decimalDigitsOfPrecisionUnitless = 9
 }
