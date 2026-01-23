@@ -141,7 +141,7 @@ struct ContentView: View {
                     case .draft(let prefix, _): prefix.backspaced
                     case .result: nil
                     }
-                    CalculatorButton(.text(backspaced == nil ? "C" : "⌫"), .gray) {
+                    CalculatorButton(.text(backspaced == nil ? "C" : "⌫"), .gray, contentOffset: backspaced == nil ? .zero : CGPoint(x: -2, y: 0)) {
                         previous = nil
                         isErrorPresented = false
                         isRoundingErrorWarningPresented = false
@@ -153,10 +153,10 @@ struct ContentView: View {
                         isRoundingErrorWarningPresented = false
                         input = .draft(.init(), nil)
                     })
-                    CalculatorButton(.text("("), .gray, contentOffset: CGPoint(x: -2, y: -2)) {
+                    CalculatorButton(.text("("), .gray, contentOffset: CGPoint(x: -3, y: -3)) {
                         append("(", canReplaceResult: true)
                     }
-                    CalculatorButton(.text(")"), .gray, contentOffset: CGPoint(x: 2, y: -2)) {
+                    CalculatorButton(.text(")"), .gray, contentOffset: CGPoint(x: 3, y: -3)) {
                         append(")")
                     }
                     CalculatorButton(.image("divide"), .orange) { append("÷") }
@@ -201,10 +201,18 @@ struct ContentView: View {
                     CalculatorButton(.text("⁄"), .gray) { append("/", trimmingSuffix: .whitespaceAndFractionSlash) }
                 }
                 GridGroup {
-                    CalculatorButton(.text("⁄₂"), .gray) { append("/2", trimmingSuffix: .whitespaceAndFractionSlash) }
-                    CalculatorButton(.text("⁄₄"), .gray) { append("/4", trimmingSuffix: .whitespaceAndFractionSlash) }
-                    CalculatorButton(.text("⁄₈"), .gray) { append("/8", trimmingSuffix: .whitespaceAndFractionSlash) }
-                    CalculatorButton(.text("⁄₁₆"), .gray) { append("/16", trimmingSuffix: .whitespaceAndFractionSlash) }
+                    CalculatorButton(.text("⁄₂"), .gray, contentOffset: CGPoint(x: 4, y: 0)) {
+                        append("/2", trimmingSuffix: .whitespaceAndFractionSlash)
+                    }
+                    CalculatorButton(.text("⁄₄"), .gray, contentOffset: CGPoint(x: 4, y: 0)) {
+                        append("/4", trimmingSuffix: .whitespaceAndFractionSlash)
+                    }
+                    CalculatorButton(.text("⁄₈"), .gray, contentOffset: CGPoint(x: 4, y: 0)) {
+                        append("/8", trimmingSuffix: .whitespaceAndFractionSlash)
+                    }
+                    CalculatorButton(.text("⁄₁₆"), .gray, contentOffset: CGPoint(x: 4, y: 0)) {
+                        append("/16", trimmingSuffix: .whitespaceAndFractionSlash)
+                    }
                 }
             }
             // Grid applies padding to the edges too, not just between items, so compensate here.
@@ -301,7 +309,7 @@ struct CalculatorButton: View {
             switch content {
             case .text(let text):
                 Text(text)
-                    .font(.system(size: 32))
+                    .font(.system(size: 40))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .offset(x: contentOffset.x, y: contentOffset.y)
