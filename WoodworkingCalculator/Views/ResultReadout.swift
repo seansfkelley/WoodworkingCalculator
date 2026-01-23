@@ -74,8 +74,8 @@ struct ResultReadout: View {
                         .padding()
                         .presentationCompactAdaptation(.popover)
                     }
-                    mainThing(text: formatted)
                 }
+                mainThing(text: formatted)
             }
         }
     }

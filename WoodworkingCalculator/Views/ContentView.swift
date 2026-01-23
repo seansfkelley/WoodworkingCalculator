@@ -57,23 +57,32 @@ struct ContentView: View {
                 Menu {
                     // Unfortunately it does not seem possible to right-align text in a Menu, so
                     // we live with this rather awkward jagged-edge arrangement.
-                    if case .result(let quantity) = input, let meters = quantity.meters {
+                    switch input {
+                    case .result(let quantity):
                         Section("Metric Conversions") {
-                            Text("= \(meters.formatAsDecimal(toPlaces: 3)) m")
-                            Text("= \((meters * 100).formatAsDecimal(toPlaces: 2)) cm")
-                            Text("= \((meters * 1000).formatAsDecimal(toPlaces: 1)) mm")
+                            if let meters = quantity.meters {
+                                Text("= \(meters.formatAsDecimal(toPlaces: 3)) m")
+                                Text("= \((meters * 100).formatAsDecimal(toPlaces: 2)) cm")
+                                Text("= \((meters * 1000).formatAsDecimal(toPlaces: 1)) mm")
+                            } else {
+                                Text("Unitless values cannot be converted.")
+                            }
                         }
-                    } else {
+                    case .draft(let prefix, _):
+                        // Use "mm" and not just "m" because if there is already a trailing "m",
+                        // appending a single "m" would actually create a valid unit. o_O
+                        let valid = EvaluatableCalculation.isValidPrefix(prefix.value + "mm")
                         Section("Insert Metric Unit") {
-                            Button(action: { append("m") }) { Text("insert \"m\"") }
-                            Button(action: { append("cm") }) { Text("insert \"cm\"") }
-                            Button(action: { append("mm") }) { Text("insert \"mm\"") }
+                            Button(action: { append("m") }) { Text("insert \"m\"") }.disabled(!valid)
+                            Button(action: { append("cm") }) { Text("insert \"cm\"") }.disabled(!valid)
+                            Button(action: { append("mm") }) { Text("insert \"mm\"") }.disabled(!valid)
                         }
                     }
                 } label: {
                     Image(systemName: "ruler")
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .font(.system(size: 32))
+                        .foregroundStyle(.orange)
                 }
             }
             Text(prettyPrintExpression(previous?.value ?? ""))
