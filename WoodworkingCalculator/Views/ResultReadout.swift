@@ -38,9 +38,10 @@ struct ResultReadout: View {
                         Text("≈")
                             .font(.system(size: 40, weight: .bold))
                             .foregroundStyle(.orange)
-                            .padding(.vertical)
-                            .padding(.leading, 8)
+                            .padding(.bottom, 4)
                     }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
                     .popover(isPresented: $isRoundingErrorWarningPresented, arrowEdge: .top) {
                         VStack {
                             let floatFormatString = "%.\(Constants.decimalDigitsOfPrecision)f"

@@ -50,84 +50,88 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            Group {
-                HStack {
-                    Button(action: { isSettingsPresented.toggle() }) {
-                        Image(systemName: "gear")
-                            .font(.system(size: 24))
-                            .foregroundStyle(.orange)
-                            .frame(width: 32, height: 32)
-                    }
-                    .buttonStyle(.glass)
-                    .buttonBorderShape(.circle)
-                    .sheet(isPresented: $isSettingsPresented) {
-                        Settings()
-                            .presentationDetents([.medium])
-                    }
-                    Spacer()
-
-                    Menu {
-                        // Unfortunately it does not seem possible to right-align text in a Menu, so
-                        // we live with this rather awkward jagged-edge arrangement.
-                        switch input {
-                        case .result(let quantity):
-                            Section("Metric Conversions") {
-                                if let meters = quantity.meters {
-                                    Text("= \(meters.formatAsDecimal(toPlaces: 3)) m")
-                                    Text("= \((meters * 100).formatAsDecimal(toPlaces: 2)) cm")
-                                    Text("= \((meters * 1000).formatAsDecimal(toPlaces: 1)) mm")
-                                } else {
-                                    Text("Unitless values cannot be converted.")
-                                }
-                            }
-                        case .draft(let prefix, _):
-                            // Use "mm" and not just "m" because if there is already a trailing "m",
-                            // appending a single "m" would actually create a valid unit. o_O
-                            let valid = EvaluatableCalculation.isValidPrefix(prefix.value + "mm")
-                            Section("Insert Metric Unit") {
-                                Button(action: { append("m") }) { Text("insert \"m\"") }.disabled(!valid)
-                                Button(action: { append("cm") }) { Text("insert \"cm\"") }.disabled(!valid)
-                                Button(action: { append("mm") }) { Text("insert \"mm\"") }.disabled(!valid)
-                            }
-                        }
-                    } label: {
-                        Image(systemName: "ruler")
-                            .font(.system(size: 24))
-                            .foregroundStyle(.orange)
-                            .frame(width: 32, height: 32)
-                    }
-                    .buttonStyle(.glass)
-                    .buttonBorderShape(.circle)
+            HStack {
+                Button(action: { isSettingsPresented.toggle() }) {
+                    Image(systemName: "gear")
+                        .font(.system(size: 24))
+                        .foregroundStyle(.orange)
+                        .frame(width: 32, height: 32)
                 }
-                Text(prettyPrintExpression(previous?.value ?? ""))
-                    .frame(
-                        minWidth: 0,
-                        maxWidth:  .infinity,
-                        minHeight: 40,
-                        maxHeight: 40,
-                        alignment: .trailing
-                    )
-                    .font(.system(size: 40))
-                    .foregroundStyle(.secondary)
-                    .truncateWithFade(width: 0.1, startingAt: 0.1)
-                    .lineLimit(1)
-                    .truncationMode(.head)
-                    .onTapGesture {
-                        if let previous {
-                            input = .draft(previous, nil)
-                            self.previous = nil
-                            isErrorPresented = false
-                            isRoundingErrorWarningPresented = false
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
+                .sheet(isPresented: $isSettingsPresented) {
+                    Settings()
+                        .presentationDetents([.medium])
+                }
+                Spacer()
+
+                Menu {
+                    // Unfortunately it does not seem possible to right-align text in a Menu, so
+                    // we live with this rather awkward jagged-edge arrangement.
+                    switch input {
+                    case .result(let quantity):
+                        Section("Metric Conversions") {
+                            if let meters = quantity.meters {
+                                Text("= \(meters.formatAsDecimal(toPlaces: 3)) m")
+                                Text("= \((meters * 100).formatAsDecimal(toPlaces: 2)) cm")
+                                Text("= \((meters * 1000).formatAsDecimal(toPlaces: 1)) mm")
+                            } else {
+                                Text("Unitless values cannot be converted.")
+                            }
+                        }
+                    case .draft(let prefix, _):
+                        // Use "mm" and not just "m" because if there is already a trailing "m",
+                        // appending a single "m" would actually create a valid unit. o_O
+                        let valid = EvaluatableCalculation.isValidPrefix(prefix.value + "mm")
+                        Section("Insert Metric Unit") {
+                            Button(action: { append("m") }) { Text("insert \"m\"") }.disabled(!valid)
+                            Button(action: { append("cm") }) { Text("insert \"cm\"") }.disabled(!valid)
+                            Button(action: { append("mm") }) { Text("insert \"mm\"") }.disabled(!valid)
                         }
                     }
-                ResultReadout(
-                    input: input,
-                    formattingOptions: formattingOptions,
-                    isErrorPresented: $isErrorPresented,
-                    isRoundingErrorWarningPresented: $isRoundingErrorWarningPresented,
-                    shakeError: $shakeError,
-                )
+                } label: {
+                    Image(systemName: "ruler")
+                        .font(.system(size: 24))
+                        .foregroundStyle(.orange)
+                        .frame(width: 32, height: 32)
+                }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
             }
+            // I have no idea why this HStack or the buttons in it seem to have a few more pixels of
+            // horizontal padding, which we compensate for here by not padding it out as much as the
+            // content below. The choice of `gridSpacing` is actually NOT significant except that it
+            // seems to be the right number empirically and maybe there's something to that.
+            .padding(.horizontal, CGFloat(gridSpacing))
+            Text(prettyPrintExpression(previous?.value ?? ""))
+                .frame(
+                    minWidth: 0,
+                    maxWidth:  .infinity,
+                    minHeight: 40,
+                    maxHeight: 40,
+                    alignment: .trailing
+                )
+                .font(.system(size: 40))
+                .foregroundStyle(.secondary)
+                .truncateWithFade(width: 0.1, startingAt: 0.1)
+                .lineLimit(1)
+                .truncationMode(.head)
+                .onTapGesture {
+                    if let previous {
+                        input = .draft(previous, nil)
+                        self.previous = nil
+                        isErrorPresented = false
+                        isRoundingErrorWarningPresented = false
+                    }
+                }
+                .padding(.horizontal, CGFloat(horizontalSpacing))
+            ResultReadout(
+                input: input,
+                formattingOptions: formattingOptions,
+                isErrorPresented: $isErrorPresented,
+                isRoundingErrorWarningPresented: $isRoundingErrorWarningPresented,
+                shakeError: $shakeError,
+            )
             .padding(.horizontal, CGFloat(horizontalSpacing))
             Grid(tracks: 4, spacing: GridSpacing(integerLiteral: gridSpacing)) {
                 // n.b. GridGroup is only to work around limitations in SwiftUI's ViewBuilder
@@ -204,8 +208,6 @@ struct ContentView: View {
                 }
             }
             // Grid applies padding to the edges too, not just between items, so compensate here.
-            // This is also why we don't just put a padding on the entire VStack but instead have to
-            // use a Group, above.
             .padding(.horizontal, CGFloat(horizontalSpacing - gridSpacing))
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
