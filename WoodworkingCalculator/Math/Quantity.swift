@@ -15,13 +15,15 @@ enum Quantity: Equatable, CustomStringConvertible {
 
     struct FormattingOptions {
         let unit: UsCustomaryUnit
-        let roundedTo: RationalPrecision
-        let maximumDecimalDigits: Int
+        let roundingUnitsTo: RationalPrecision
+        let maxUnitDecimalDigits: Int
+        let maxUnitlessDecimalDigits: Int
 
-        init(_ unit: UsCustomaryUnit, _ roundedTo: RationalPrecision, _ maximumDecimalDigits: Int) {
+        init(_ unit: UsCustomaryUnit, _ roundingUnitsTo: RationalPrecision, _ maxUnitDecimalDigits: Int, _ maxUnitlessDecimalDigits: Int) {
             self.unit = unit
-            self.roundedTo = roundedTo
-            self.maximumDecimalDigits = maximumDecimalDigits
+            self.roundingUnitsTo = roundingUnitsTo
+            self.maxUnitDecimalDigits = maxUnitDecimalDigits
+            self.maxUnitlessDecimalDigits = maxUnitlessDecimalDigits
         }
     }
 
@@ -69,13 +71,13 @@ enum Quantity: Equatable, CustomStringConvertible {
 
     func formatted(with options: FormattingOptions) -> (String, RoundingError?) {
         guard dimension != .unitless else {
-            return (toReal().formatted(), nil) // TODO: better formatting
+            return (formatUnitlessDecimal(toReal(), to: options.maxUnitlessDecimalDigits), nil)
         }
 
-        var (rounded, error) = toRational(precision: RationalPrecision(denominator: options.roundedTo.denominator ^^ dimension))
+        let (rounded, error) = toRational(precision: RationalPrecision(denominator: options.roundingUnitsTo.denominator ^^ dimension))
         let roundingError: RoundingError? = error.isZero
             ? nil
-            : RoundingError(error: error, oneDimensionalPrecision: options.roundedTo, dimension: dimension)
+            : RoundingError(error: error, oneDimensionalPrecision: options.roundingUnitsTo, dimension: dimension)
         return if dimension == .length {
             (
                 formatOneDimensionalRational(inches: rounded, as: options.unit),
@@ -83,7 +85,7 @@ enum Quantity: Equatable, CustomStringConvertible {
             )
         } else {
             (
-                formatDecimal(inches: Double(rounded), of: dimension, as: options.unit, to: options.maximumDecimalDigits),
+                formatDecimal(inches: Double(rounded), of: dimension, as: options.unit, to: options.maxUnitDecimalDigits),
                 roundingError,
             )
         }

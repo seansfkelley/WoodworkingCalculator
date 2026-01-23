@@ -22,7 +22,12 @@ struct ContentView: View {
     private var precision: RationalPrecision = Constants.AppStorage.precisionDefault
 
     private var formattingOptions: Quantity.FormattingOptions {
-        .init(displayInchesOnly ? .inches : .feet, precision, Constants.decimalDigitsOfPrecision)
+        .init(
+            displayInchesOnly ? .inches : .feet,
+            precision,
+            Constants.decimalDigitsOfPrecision,
+            Constants.decimalDigitsOfPrecisionUnitless,
+        )
     }
 
     private func append(_ string: String, canReplaceResult: Bool = false, trimmingSuffix: TrimmableCharacterSet? = nil) {

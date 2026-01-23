@@ -65,6 +65,17 @@ func formatDecimal(inches: Double, of dimension: Dimension, as unit: UsCustomary
     }
 }
 
+func formatUnitlessDecimal(_ value: Double, to digits: Int) -> String {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .decimal
+    formatter.usesGroupingSeparator = false
+    formatter.minimumFractionDigits = 0
+    formatter.maximumFractionDigits = digits
+    formatter.roundingMode = .halfUp
+
+    return formatter.string(from: NSNumber(value: value)) ?? value.formatted()
+}
+
 
 func prettyPrintExpression(_ string: String) -> String {
     string
