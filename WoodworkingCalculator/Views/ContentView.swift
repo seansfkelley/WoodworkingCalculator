@@ -11,8 +11,6 @@ struct ContentView: View {
     @State private var isRoundingErrorWarningPresented = false
     @State private var shakeError = false
     @State private var input = InputValue.draft(.init(), nil)
-    @State private var showFeetUnitMenu = false
-    @State private var showInchesUnitMenu = false
 
     // Why does this have to be a @State? I can't just reassign it as a normal variable?
     @State private var lastBackgroundTime: Date?
@@ -149,17 +147,17 @@ struct ContentView: View {
                     CalculatorButton(.image("divide"), .orange) { append("÷") }
                 }
                 GridGroup {
-                    CalculatorButton(.text("'"), .gray, action: { append(UsCustomaryUnit.feet.abbreviation) }, longPressAction: { showFeetUnitMenu = true })
-                        .popover(isPresented: $showFeetUnitMenu) {
-                            UnitMenuView(unitType: .feet) { dimension in
-                                append(dimension.formatted(withUnit: UsCustomaryUnit.feet.abbreviation))
-                            }
+                    CalculatorButton(.text("'"), .gray, action: { append(UsCustomaryUnit.feet.abbreviation) })
+                        .contextMenu {
+                            DimensionButton(.feet, .length) { append($0) }
+                            DimensionButton(.feet, .area) { append($0) }
+                            DimensionButton(.feet, .volume) { append($0) }
                         }
-                    CalculatorButton(.text("\""), .gray, action: { append(UsCustomaryUnit.inches.abbreviation) }, longPressAction: { showInchesUnitMenu = true })
-                        .popover(isPresented: $showInchesUnitMenu) {
-                            UnitMenuView(unitType: .inches) { dimension in
-                                append(dimension.formatted(withUnit: UsCustomaryUnit.inches.abbreviation))
-                            }
+                    CalculatorButton(.text("\""), .gray, action: { append(UsCustomaryUnit.inches.abbreviation) })
+                        .contextMenu {
+                            DimensionButton(.inches, .length) { append($0) }
+                            DimensionButton(.inches, .area) { append($0) }
+                            DimensionButton(.inches, .volume) { append($0) }
                         }
                     CalculatorButton(.text("."), .gray) { append(".", canReplaceResult: true) }
                     CalculatorButton(.image("multiply"), .orange) { append("×") }
@@ -208,7 +206,8 @@ struct ContentView: View {
             if oldPhase == .background &&
                 newPhase == .inactive &&
                 lastBackgroundTime != nil &&
-                Date().timeIntervalSince(lastBackgroundTime!) > 30 * 60 {
+                Date().timeIntervalSince(lastBackgroundTime!) > 30 * 60
+            {
                 input = .draft(.init(), nil)
                 previous = nil
                 isErrorPresented = false
@@ -243,8 +242,7 @@ struct ContentView: View {
         let cleanedInputString = rawString.trimmingCharacters(in: CharacterSet.whitespaces) + String(repeating: ")", count: missingParens)
         let result = EvaluatableCalculation.from(cleanedInputString)?.evaluate()
         guard let result else {
-            input = .draft(.init(rawString)!, .syntaxError)
-            shakeError = true
+            // silently nop until they finish what they were doing
             return
         }
 
@@ -269,25 +267,17 @@ struct CalculatorButton: View {
     let fill: Color
     let contentOffset: CGPoint
     let action: () -> Void
-    let longPressAction: (() -> Void)?
 
-    @State private var longPressTriggered = false
-    
-    init(_ content: Content, _ fill: Color, contentOffset: CGPoint = CGPoint(), action: @escaping () -> Void, longPressAction: (() -> Void)? = nil) {
+
+    init(_ content: Content, _ fill: Color, contentOffset: CGPoint = CGPoint(), action: @escaping () -> Void) {
         self.content = content
         self.fill = fill
         self.contentOffset = contentOffset
         self.action = action
-        self.longPressAction = longPressAction
     }
-    
+
     var body: some View {
-        Button(action: {
-            if !longPressTriggered {
-                action()
-            }
-            longPressTriggered = false
-        }) {
+        Button(action: action) {
             switch content {
             case .text(let text):
                 Text(text)
@@ -306,64 +296,42 @@ struct CalculatorButton: View {
         .buttonStyle(.borderedProminent)
         .buttonBorderShape(.roundedRectangle(radius: .infinity))
         .tint(fill)
-        .simultaneousGesture(
-            longPressAction != nil ?
-                LongPressGesture(minimumDuration: 0.5)
-                    .onEnded { _ in
-                        longPressTriggered = true
-                        longPressAction?()
-                    }
-                : nil
-        )
     }
 }
 
-struct UnitMenuView: View {
-    let unitType: UsCustomaryUnit
-    let onSelectDimension: (Dimension) -> Void
+struct DimensionButton: View {
+    let dimension: Dimension
+    let unit: UsCustomaryUnit
+    let onSelect: (String) -> Void
     
-    @Environment(\.dismiss) private var dismiss
-    
-    init(unitType: UsCustomaryUnit, onSelectDimension: @escaping (Dimension) -> Void) {
-        self.unitType = unitType
-        self.onSelectDimension = onSelectDimension
+    init(_ unit: UsCustomaryUnit, _ dimension: Dimension, onSelect: @escaping (String) -> Void) {
+        self.unit = unit
+        self.dimension = dimension
+        self.onSelect = onSelect
     }
     
+    private var systemImage: String? {
+        switch dimension {
+        case .length: "line.diagonal"
+        case .area: "square"
+        case .volume: "cube"
+        default: nil
+        }
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text(unitType == .feet ? "Feet Units" : "Inch Units")
-                .font(.headline)
-                .padding(.bottom, 4)
-            
-            VStack(alignment: .leading, spacing: 12) {
-                Button(action: {
-                    onSelectDimension(.length)
-                    dismiss()
-                }) {
-                    Text("Length (\(prettyPrintExpression(Dimension.length.formatted(withUnit: unitType.abbreviation))))")
-                }
-                
-                Button(action: {
-                    onSelectDimension(.area)
-                    dismiss()
-                }) {
-                    Text("Area (\(prettyPrintExpression(Dimension.area.formatted(withUnit: unitType.abbreviation))))")
-                }
-                
-                Button(action: {
-                    onSelectDimension(.volume)
-                    dismiss()
-                }) {
-                    Text("Volume (\(prettyPrintExpression(Dimension.volume.formatted(withUnit: unitType.abbreviation))))")
-                }
+        let formatted = dimension.formatted(withUnit: unit.abbreviation)
+        Button {
+            onSelect(formatted)
+        } label: {
+            if let systemImage {
+                Label(prettyPrintExpression(formatted), systemImage: systemImage)
+            } else {
+                Text(prettyPrintExpression(formatted))
             }
         }
-        .padding()
-        .presentationCompactAdaptation(.popover)
     }
 }
-
-
 
 #Preview {
     ContentView()
