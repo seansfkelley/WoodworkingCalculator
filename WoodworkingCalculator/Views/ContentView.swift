@@ -61,6 +61,7 @@ struct ContentView: View {
                 .buttonBorderShape(.circle)
                 .sheet(isPresented: $isSettingsPresented) {
                     Settings()
+                        .background(.windowBackground)
                         .presentationDetents([.medium])
                 }
                 Spacer()
