@@ -81,29 +81,35 @@ struct ResultReadout: View {
 
                         VStack(alignment: .leading, spacing: 6) {
                             HStack(spacing: 6) {
-                                Text("=")
-                                Text(actual)
-                                Text(sign)
-                                Text(absError)
-                            }
-                            .font(.title)
-                            HStack(spacing: 6) {
-                                Text("=").font(.title).hidden()
-                                ZStack {
-                                    Text("exact").foregroundStyle(.secondary)
-                                    Text(actual).font(.title).hidden()
+                                Text("=").font(.title)
+                                VStack(spacing: 2) {
+                                    Text(actual)
+                                        .font(.title)
+                                    Text("actual")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
                                 }
-                                Text(sign).font(.title).hidden()
-                                ZStack {
-                                    Text("error").foregroundStyle(.secondary)
-                                    Text(absError).font(.title).hidden()
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(.secondary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
+                                Text(sign).font(.title)
+                                VStack(spacing: 2) {
+                                    Text(absError)
+                                        .font(.title)
+                                    Text("error")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
                                 }
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(.red.opacity(0.2), in: RoundedRectangle(cornerRadius: 8))
                             }
                             Divider()
                             Text("Rounding to the nearest \(precision). Configure precision in settings.")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
+                            
                         }
                         .padding()
                         .presentationCompactAdaptation(.popover)
