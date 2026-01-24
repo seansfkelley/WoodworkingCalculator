@@ -46,6 +46,8 @@ private enum TimeInterval: CaseIterable {
 
 struct HistoryList: View {
     let historyManager: ChronologicalHistoryManager<StoredCalculation>
+    let formattingOptions: Quantity.FormattingOptions
+    let onSelectEntry: (String, Quantity) -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var editMode: EditMode = .inactive
     @State private var selectedIDs: Set<UUID> = []
@@ -99,15 +101,34 @@ struct HistoryList: View {
                         ForEach(groupedSearchHistory, id: \.0) { interval, entries in
                             Section(interval.displayName) {
                                 ForEach(entries) { entry in
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(entry.data.input)
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
+                                    Button {
+                                        if editMode == .inactive {
+                                            onSelectEntry(entry.data.input, entry.data.result.quantity)
+                                            dismiss()
+                                        }
+                                    } label: {
+                                        HStack(spacing: 8) {
+                                            VStack(alignment: .leading, spacing: 4) {
+                                                Text(prettyPrintExpression(entry.data.input))
+                                                    .font(.caption)
+                                                    .foregroundStyle(.secondary)
 
-                                        Text(entry.data.formattedResult)
-                                            .font(.body)
+                                                Text(prettyPrintExpression(entry.data.formattedResult))
+                                                    .font(.body)
+                                                    .foregroundStyle(.primary)
+                                            }
+                                            .padding(.vertical, 4)
+                                            
+                                            if entry.data.formattedResult != entry.data.result.quantity.formatted(with: formattingOptions).0 {
+                                                Spacer()
+                                                Image(systemName: "notequal")
+                                                    .foregroundStyle(.secondary)
+                                            }
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .contentShape(Rectangle())
                                     }
-                                    .padding(.vertical, 4)
+                                    .buttonStyle(.plain)
                                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                         Button(role: .destructive) {
                                             historyManager.delete(ids: [entry.id])

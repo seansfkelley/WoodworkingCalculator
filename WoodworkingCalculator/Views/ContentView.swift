@@ -76,7 +76,14 @@ struct ContentView: View {
                 .buttonStyle(.glass)
                 .buttonBorderShape(.circle)
                 .sheet(isPresented: $isHistoryPresented) {
-                    HistoryList(historyManager: history)
+                    HistoryList(
+                        historyManager: history,
+                        formattingOptions: formattingOptions,
+                        onSelectEntry: {
+                            previous = .init($0)
+                            input = .result($1)
+                        }
+                    )
                         .background(.windowBackground)
                         .presentationDetents([.medium, .large])
                 }
@@ -293,17 +300,18 @@ struct ContentView: View {
 
         switch calculation.evaluate() {
         case .success(let quantity):
-            if assumeInches && quantity.dimension == .unitless && calculation.allDimensionsAreUnitless {
-                input = .result(quantity.withDimension(.length))
+            let dimensionedQuantity = if assumeInches && quantity.dimension == .unitless && calculation.allDimensionsAreUnitless {
+                quantity.withDimension(.length)
             } else {
-                input = .result(quantity)
+                quantity
             }
+            input = .result(dimensionedQuantity)
             previous = .init(cleanedInputString)
             history.append(
                 .init(
                     input: cleanedInputString,
-                    result: .from(quantity: quantity),
-                    formattedResult: quantity.formatted(with: formattingOptions).0,
+                    result: .from(quantity: dimensionedQuantity),
+                    formattedResult: dimensionedQuantity.formatted(with: formattingOptions).0,
                 ),
             )
         case .failure(let error):
