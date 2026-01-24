@@ -118,20 +118,17 @@ private actor JsonlSynchronizer {
     
     func append<T: Codable>(_ entry: HistoryEntry<T>) throws {
         let encoder = JSONEncoder()
-        let data = try encoder.encode(entry)
-        
         let directory = fileURL.deletingLastPathComponent()
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         
-        var lineData = data
-        lineData.append(contentsOf: [0x0A])
+        let lineData = try encoder.encode(entry) + Data("\n".utf8)
         
-        if FileManager.default.fileExists(atPath: fileURL.path) {
+        do {
             let fileHandle = try FileHandle(forWritingTo: fileURL)
+            defer { try? fileHandle.close() }
             try fileHandle.seekToEnd()
             try fileHandle.write(contentsOf: lineData)
-            try fileHandle.close()
-        } else {
+        } catch CocoaError.fileNoSuchFile {
             try lineData.write(to: fileURL)
         }
         
@@ -145,7 +142,7 @@ private actor JsonlSynchronizer {
         for entry in entries {
             let entryData = try encoder.encode(entry)
             fileData.append(entryData)
-            fileData.append(contentsOf: [0x0A]) // Newline character
+            fileData.append(contentsOf: "\n".utf8)
         }
         
         let directory = fileURL.deletingLastPathComponent()
