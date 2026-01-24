@@ -33,6 +33,8 @@ struct StoredCalculation: Codable {
 }
 
 struct ContentView: View {
+    private var history = ChronologicalHistoryManager<StoredCalculation>(fileURL: .applicationSupportDirectory.appendingPathComponent("history.json"))
+
     @State private var previous: ValidExpressionPrefix?
     @State private var isSettingsPresented = false
     @State private var isErrorPresented = false
@@ -309,6 +311,13 @@ struct ContentView: View {
                 input = .result(quantity)
             }
             previous = .init(cleanedInputString)
+            history.append(
+                .init(
+                    input: cleanedInputString,
+                    result: .from(quantity: quantity),
+                    formattedResult: quantity.formatted(with: formattingOptions).0,
+                ),
+            )
         case .failure(let error):
             input = .draft(.init(rawString)!, error)
             shakeError = true

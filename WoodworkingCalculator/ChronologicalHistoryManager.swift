@@ -121,8 +121,8 @@ final class ChronologicalHistoryManager<Entry: Codable> {
     private func loadAndMerge() async {
         do {
             // Read from disk (entries already in chronological order)
-            let loadedEntries = try await diskIO.read()
-            
+            let loadedEntries: [HistoryEntry<Entry>] = try await diskIO.read()
+
             // Check if entries were added during load
             if _entries.isEmpty {
                 // No merge needed - just set entries directly
