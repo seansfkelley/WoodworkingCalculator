@@ -120,7 +120,7 @@ struct HistoryList: View {
                                             }
                                             .padding(.vertical, 4)
 
-                                            let (upToDateFormattedResult, upToDateRoundingError) = entry.data.result.quantity.formatted(with: formattingOptions)
+                                            let upToDateFormattedResult = entry.data.result.quantity.formatted(with: formattingOptions).0
                                             if entry.data.formattedResult != upToDateFormattedResult {
                                                 Spacer()
                                                 Button {
@@ -137,14 +137,35 @@ struct HistoryList: View {
                                                         get: { popoverEntryID == entry.id },
                                                         set: { if !$0 { popoverEntryID = nil } }
                                                     ),
-                                                    attachmentAnchor: .point(.leading),
-                                                    arrowEdge: .trailing
+                                                    attachmentAnchor: .point(.bottom),
+                                                    arrowEdge: .top
                                                 ) {
                                                     VStack(alignment: .leading, spacing: 6) {
-                                                        Text("Settings changed since this was calculated. With current settings:")
+                                                        Text("Settings changed since this was calculated.")
                                                             .font(.body)
-                                                        Text("\(upToDateRoundingError == nil ? "=" : "≈") \(prettyPrintExpression(upToDateFormattedResult))")
-                                                            .font(.title2)
+                                                        HStack(spacing: 4) {
+                                                            VStack(spacing: 2) {
+                                                                Text(prettyPrintExpression(entry.data.formattedResult))
+                                                                    .font(.title2)
+                                                                Text("previous")
+                                                                    .font(.caption)
+                                                                    .foregroundStyle(.secondary)
+                                                            }
+                                                            .padding(.horizontal, 8)
+                                                            .padding(.vertical, 4)
+                                                            .background(.secondary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
+                                                            Image(systemName: "arrow.right")
+                                                            VStack(spacing: 2) {
+                                                                Text(prettyPrintExpression(upToDateFormattedResult))
+                                                                    .font(.title2)
+                                                                Text("current")
+                                                                    .font(.caption)
+                                                                    .foregroundStyle(.secondary)
+                                                            }
+                                                            .padding(.horizontal, 8)
+                                                            .padding(.vertical, 4)
+                                                            .background(.secondary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
+                                                        }
                                                     }
                                                     .fixedSize(horizontal: false, vertical: true)
                                                     .padding()
