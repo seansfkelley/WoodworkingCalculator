@@ -1,6 +1,8 @@
 import SwiftUI
 import ExyteGrid
+import OSLog
 
+private let logger = Logger(subsystem: "WoodworkingCalculator", category: "ContentView")
 private let darkGray = Color.gray.mix(with: .black, by: 0.25)
 private let ignorableDenominatorShortcutPrefixes: Set<Character> = [" ", "/"]
 private let horizontalSpacing = 12
@@ -82,6 +84,7 @@ struct ContentView: View {
                         onSelectEntry: {
                             previous = .init($0)
                             input = .result($1)
+                            appendHistoryEntry($0, $1)
                         }
                     )
                         .background(.windowBackground)
@@ -307,17 +310,26 @@ struct ContentView: View {
             }
             input = .result(dimensionedQuantity)
             previous = .init(cleanedInputString)
-            history.append(
-                .init(
-                    input: cleanedInputString,
-                    result: .from(quantity: dimensionedQuantity),
-                    formattedResult: dimensionedQuantity.formatted(with: formattingOptions).0,
-                ),
-            )
+            appendHistoryEntry(cleanedInputString, dimensionedQuantity)
         case .failure(let error):
             input = .draft(.init(rawString)!, error)
             shakeError = true
         }
+    }
+
+    private func appendHistoryEntry(_ input: String, _ result: Quantity) {
+        let formattedResult = result.formatted(with: formattingOptions).0
+        if let last = history.entries.last, last.data.input == input && last.data.formattedResult == formattedResult {
+            logger.info("not adding redundant history entry")
+            return
+        }
+        history.append(
+            .init(
+                input: input,
+                result: .from(quantity: result),
+                formattedResult: result.formatted(with: formattingOptions).0,
+            ),
+        )
     }
 }
 

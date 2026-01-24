@@ -51,6 +51,7 @@ struct HistoryList: View {
     @Environment(\.dismiss) private var dismiss
     @State private var editMode: EditMode = .inactive
     @State private var selectedIDs: Set<UUID> = []
+    @State private var showingFormattingPopover = false
 
     private var groupedSearchHistory: [(TimeInterval, [HistoryEntry<StoredCalculation>])] {
         let calendar = Calendar.current
@@ -67,7 +68,7 @@ struct HistoryList: View {
         var result: [(TimeInterval, [HistoryEntry<StoredCalculation>])] = []
         var currentEntries: [HistoryEntry<StoredCalculation>] = []
 
-        for entry in historyManager.entries {
+        for entry in historyManager.entries.reversed() {
             while !boundaries.isEmpty && entry.timestamp < boundaries.first!.0 {
                 if !currentEntries.isEmpty {
                     result.append((boundaries.first!.1, currentEntries))
@@ -118,11 +119,31 @@ struct HistoryList: View {
                                                     .foregroundStyle(.primary)
                                             }
                                             .padding(.vertical, 4)
-                                            
-                                            if entry.data.formattedResult != entry.data.result.quantity.formatted(with: formattingOptions).0 {
+
+                                            let upToDateFormattedResult = entry.data.result.quantity.formatted(with: formattingOptions).0
+                                            if entry.data.formattedResult != upToDateFormattedResult {
                                                 Spacer()
-                                                Image(systemName: "notequal")
-                                                    .foregroundStyle(.secondary)
+                                                Button {
+                                                    showingFormattingPopover = true
+                                                } label: {
+                                                    Image(systemName: "notequal")
+                                                        .font(.title2)
+                                                        .foregroundStyle(.secondary)
+                                                        .padding()
+                                                }
+                                                .padding(.trailing)
+                                                .buttonStyle(.plain)
+                                                .popover(isPresented: $showingFormattingPopover, attachmentAnchor: .point(.leading)) {
+                                                    VStack(alignment: .leading, spacing: 6) {
+                                                        Text("With current settings, this result is now:")
+                                                            .font(.body)
+                                                        Text("≈ \(prettyPrintExpression(upToDateFormattedResult))")
+                                                            .font(.title2)
+                                                    }
+                                                    .fixedSize(horizontal: false, vertical: true)
+                                                    .padding()
+                                                    .presentationCompactAdaptation(.popover)
+                                                }
                                             }
                                         }
                                         .frame(maxWidth: .infinity, alignment: .leading)

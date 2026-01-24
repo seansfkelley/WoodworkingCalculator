@@ -45,20 +45,14 @@ final class ChronologicalHistoryManager<Entry: Codable> {
     // MARK: - Properties
     
     /// Internal storage in chronological order (oldest first)
-    private var _entries: [HistoryEntry<Entry>] = []
-    
-    /// All entries in reverse-chronological order (latest first)
-    /// Observable - SwiftUI views automatically update when this changes
-    var entries: [HistoryEntry<Entry>] {
-        _entries.reversed()
-    }
-    
+    private(set) var entries: [HistoryEntry<Entry>] = []
+
     /// Stateless actor for disk I/O operations
     private let diskIO: DiskIOActor
     
     /// Logger for error reporting
-    private let logger = Logger(subsystem: "ChronologicalHistoryManager", category: "History")
-    
+    private let logger = Logger(subsystem: "WoodworkingCalculator", category: "ChronologicalHistoryManager")
+
     // MARK: - Initialization
     
     /// Initialize with a file URL
@@ -83,7 +77,7 @@ final class ChronologicalHistoryManager<Entry: Codable> {
         let historyEntry = HistoryEntry(data: entry)
         
         // Update memory immediately (O(1) amortized)
-        _entries.append(historyEntry)
+        entries.append(historyEntry)
         
         // Persist to disk in background (fire-and-forget)
         Task { [diskIO, logger] in
@@ -100,10 +94,10 @@ final class ChronologicalHistoryManager<Entry: Codable> {
     /// - Parameter ids: Set of IDs to delete
     func delete(ids: Set<UUID>) {
         // Update memory immediately (O(n) for filtering)
-        _entries.removeAll { ids.contains($0.id) }
+        entries.removeAll { ids.contains($0.id) }
         
         // Create snapshot for background persistence
-        let snapshot = _entries
+        let snapshot = entries
         
         // Persist to disk in background (fire-and-forget)
         Task { [diskIO, logger] in
@@ -124,13 +118,13 @@ final class ChronologicalHistoryManager<Entry: Codable> {
             let loadedEntries: [HistoryEntry<Entry>] = try await diskIO.read()
 
             // Check if entries were added during load
-            if _entries.isEmpty {
+            if entries.isEmpty {
                 // No merge needed - just set entries directly
-                _entries = loadedEntries
+                entries = loadedEntries
             } else {
                 // Merge needed: loaded entries (older) + current entries (newer)
-                let mergedEntries = loadedEntries + _entries
-                _entries = mergedEntries
+                let mergedEntries = loadedEntries + entries
+                entries = mergedEntries
                 
                 // Persist merged state back to disk
                 try await diskIO.rewrite(mergedEntries)
@@ -151,8 +145,8 @@ private actor DiskIOActor {
     // MARK: - Properties
     
     private let fileURL: URL
-    private let logger = Logger(subsystem: "ChronologicalHistoryManager", category: "DiskIO")
-    
+    private let logger = Logger(subsystem: "WoodworkingCalculator", category: "DiskIOActor")
+
     // MARK: - Initialization
     
     init(fileURL: URL) {
