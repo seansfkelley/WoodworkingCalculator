@@ -51,7 +51,6 @@ struct HistoryList: View {
     @Environment(\.dismiss) private var dismiss
     @State private var editMode: EditMode = .inactive
     @State private var selectedIDs: Set<UUID> = []
-    @State private var popoverEntryID: UUID?
 
     private var groupedSearchHistory: [(TimeInterval, [HistoryEntry<StoredCalculation>])] {
         let calendar = Calendar.current
@@ -108,71 +107,10 @@ struct HistoryList: View {
                                             dismiss()
                                         }
                                     } label: {
-                                        HStack(spacing: 8) {
-                                            VStack(alignment: .leading, spacing: 4) {
-                                                Text(prettyPrintExpression(entry.data.input))
-                                                    .font(.caption)
-                                                    .foregroundStyle(.secondary)
-
-                                                Text(prettyPrintExpression(entry.data.formattedResult))
-                                                    .font(.body)
-                                                    .foregroundStyle(.primary)
-                                            }
-                                            .padding(.vertical, 4)
-
-                                            let upToDateFormattedResult = entry.data.result.quantity.formatted(with: formattingOptions).0
-                                            if entry.data.formattedResult != upToDateFormattedResult {
-                                                Spacer()
-                                                Button {
-                                                    popoverEntryID = entry.id
-                                                } label: {
-                                                    Image(systemName: "notequal")
-                                                        .font(.title2)
-                                                        .foregroundStyle(.secondary)
-                                                        .padding()
-                                                }
-                                                .buttonStyle(.plain)
-                                                .popover(
-                                                    isPresented: Binding(
-                                                        get: { popoverEntryID == entry.id },
-                                                        set: { if !$0 { popoverEntryID = nil } }
-                                                    ),
-                                                    attachmentAnchor: .point(.bottom),
-                                                    arrowEdge: .top
-                                                ) {
-                                                    VStack(alignment: .leading, spacing: 6) {
-                                                        Text("Settings changed since this was calculated.")
-                                                            .font(.body)
-                                                        HStack(spacing: 4) {
-                                                            VStack(spacing: 2) {
-                                                                Text(prettyPrintExpression(entry.data.formattedResult))
-                                                                    .font(.title2)
-                                                                Text("previous")
-                                                                    .font(.caption)
-                                                                    .foregroundStyle(.secondary)
-                                                            }
-                                                            .padding(.horizontal, 8)
-                                                            .padding(.vertical, 4)
-                                                            .background(.secondary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
-                                                            Image(systemName: "arrow.right")
-                                                            VStack(spacing: 2) {
-                                                                Text(prettyPrintExpression(upToDateFormattedResult))
-                                                                    .font(.title2)
-                                                                Text("current")
-                                                                    .font(.caption)
-                                                                    .foregroundStyle(.secondary)
-                                                            }
-                                                            .padding(.horizontal, 8)
-                                                            .padding(.vertical, 4)
-                                                            .background(.secondary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
-                                                        }
-                                                    }
-                                                    .fixedSize(horizontal: false, vertical: true)
-                                                    .padding()
-                                                    .presentationCompactAdaptation(.popover)
-                                                }
-                                            }
-                                        }
+                                        HistoryListItem(
+                                            entry: entry.data,
+                                            formattingOptions: formattingOptions
+                                        )
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .contentShape(Rectangle())
                                     }
@@ -185,7 +123,7 @@ struct HistoryList: View {
                                         }
 
                                         Button {
-                                            UIPasteboard.general.string = entry.data.formattedResult
+                                            UIPasteboard.general.string = prettyPrintExpression(entry.data.formattedResult)
                                         } label: {
                                             Label("Copy", systemImage: "doc.on.doc")
                                         }
@@ -242,6 +180,77 @@ struct HistoryList: View {
                             Image(systemName: "xmark")
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+private struct HistoryListItem: View {
+    let entry: StoredCalculation
+    let formattingOptions: Quantity.FormattingOptions
+    @State private var showingPopover = false
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(prettyPrintExpression(entry.input))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Text(prettyPrintExpression(entry.formattedResult))
+                    .font(.body)
+                    .foregroundStyle(.primary)
+            }
+            .padding(.vertical, 4)
+
+            let upToDateFormattedResult = entry.result.quantity.formatted(with: formattingOptions).0
+            if entry.formattedResult != upToDateFormattedResult {
+                Spacer()
+                Button {
+                    showingPopover = true
+                } label: {
+                    Image(systemName: "notequal")
+                        .font(.title2)
+                        .foregroundStyle(.secondary)
+                        .padding()
+                }
+                .buttonStyle(.plain)
+                .popover(
+                    isPresented: $showingPopover,
+                    attachmentAnchor: .point(.bottom),
+                    arrowEdge: .top
+                ) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Settings changed since this was calculated.")
+                            .font(.body)
+                        HStack(spacing: 4) {
+                            VStack(spacing: 2) {
+                                Text(prettyPrintExpression(entry.formattedResult))
+                                    .font(.title2)
+                                Text("previous")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(.secondary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
+                            Image(systemName: "arrow.right")
+                            VStack(spacing: 2) {
+                                Text(prettyPrintExpression(upToDateFormattedResult))
+                                    .font(.title2)
+                                Text("current")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(.secondary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
+                        }
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding()
+                    .presentationCompactAdaptation(.popover)
                 }
             }
         }
