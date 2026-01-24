@@ -81,7 +81,7 @@ struct ContentView: View {
                         onSelectEntry: {
                             previous = .init($0)
                             input = .result($1)
-                            appendHistoryEntry($0, $1)
+                            appendHistoryEntryIfDifferent($0, $1)
                         }
                     )
                         .background(.windowBackground)
@@ -214,6 +214,13 @@ struct ContentView: View {
                 }
             }
         }
+        .onChange(of: formattingOptions) {
+            // This is a little hacky in that there is no type-level guaranteed that this result
+            // came from previous, but I mean, we know how all this stuff works so it's fine.
+            if case .result(let quantity) = input, let previous {
+                appendHistoryEntryIfDifferent(previous.value, quantity)
+            }
+        }
     }
 
     private func evaluate() {
@@ -242,14 +249,14 @@ struct ContentView: View {
             }
             input = .result(dimensionedQuantity)
             previous = .init(cleanedInputString)
-            appendHistoryEntry(cleanedInputString, dimensionedQuantity)
+            appendHistoryEntryIfDifferent(cleanedInputString, dimensionedQuantity)
         case .failure(let error):
             input = .draft(.init(rawString)!, error)
             shakeError = true
         }
     }
 
-    private func appendHistoryEntry(_ input: String, _ result: Quantity) {
+    private func appendHistoryEntryIfDifferent(_ input: String, _ result: Quantity) {
         let formattedResult = result.formatted(with: formattingOptions).0
         if let last = history.entries.last, last.data.input == input && last.data.formattedResult == formattedResult {
             logger.info("not adding redundant history entry")

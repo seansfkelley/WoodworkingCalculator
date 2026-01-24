@@ -13,7 +13,7 @@ enum Quantity: Equatable, CustomStringConvertible {
         }
     }
 
-    struct FormattingOptions {
+    struct FormattingOptions: Equatable {
         let unit: UsCustomaryUnit
         let roundingUnitsTo: RationalPrecision
         let maxUnitDecimalDigits: Int
