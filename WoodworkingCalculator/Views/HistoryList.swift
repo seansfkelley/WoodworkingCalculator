@@ -120,7 +120,7 @@ struct HistoryList: View {
                                             }
                                             .padding(.vertical, 4)
 
-                                            let upToDateFormattedResult = entry.data.result.quantity.formatted(with: formattingOptions).0
+                                            let (upToDateFormattedResult, upToDateRoundingError) = entry.data.result.quantity.formatted(with: formattingOptions)
                                             if entry.data.formattedResult != upToDateFormattedResult {
                                                 Spacer()
                                                 Button {
@@ -131,13 +131,16 @@ struct HistoryList: View {
                                                         .foregroundStyle(.secondary)
                                                         .padding()
                                                 }
-                                                .padding(.trailing)
                                                 .buttonStyle(.plain)
-                                                .popover(isPresented: $showingFormattingPopover, attachmentAnchor: .point(.leading)) {
+                                                .popover(
+                                                    isPresented: $showingFormattingPopover,
+                                                    attachmentAnchor: .point(.leading),
+                                                    arrowEdge: .leading,
+                                                ) {
                                                     VStack(alignment: .leading, spacing: 6) {
-                                                        Text("With current settings, this result is now:")
+                                                        Text("Settings changed since this was calculated. With current settings:")
                                                             .font(.body)
-                                                        Text("≈ \(prettyPrintExpression(upToDateFormattedResult))")
+                                                        Text("\(upToDateRoundingError == nil ? "=" : "≈") \(prettyPrintExpression(upToDateFormattedResult))")
                                                             .font(.title2)
                                                     }
                                                     .fixedSize(horizontal: false, vertical: true)
