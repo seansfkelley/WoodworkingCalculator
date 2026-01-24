@@ -8,8 +8,19 @@ private func rational(_ num: Int, _ den: Int) -> Rational {
 }
 
 struct RationalTests {
-    // TODO: tests for formatted
-    // TODO: tests for unchecked.unsafe
+    @Test("formatted", arguments: [
+        (rational(1, 2), "1/2"),
+        (rational(3, 1), "3"),
+        (rational(-1, -2), "1/2"),
+    ]) func formatted(input: Rational, expected: String) {
+        #expect(input.formatted == expected)
+    }
+
+    @Test
+    func unsafe() {
+        #expect(UncheckedRational(1, 2).unsafe == rational(1, 2))
+        // I don't know how to test for uncatchable runtime errors, so uh, just don't do it?
+    }
 
     @Test("==", arguments: [
         (rational(1, 2), rational(1, 2)),
@@ -52,10 +63,10 @@ struct RationalTests {
     }
     
     @Test("roundedTo", arguments: [
+        (rational(1, 2), 4, rational(1, 2), 0.0),
         (rational(3, 32), 8, rational(1, 8), 1.0 / 32),
         (rational(7, 64), 8, rational(1, 8), 1.0 / 64),
         (rational(9, 64), 8, rational(1, 8), -1.0 / 64),
-        (rational(1, 2), 4, rational(1, 2), 0.001),
         (rational(3, 4), 6, rational(2, 3), -1.0 / 12),
     ]) func roundedTo(input: Rational, denominator: Int, expected: Rational, expectedRemainder: Double) {
         let actual = input.roundedTo(precision: RationalPrecision(denominator: UInt(denominator)))
