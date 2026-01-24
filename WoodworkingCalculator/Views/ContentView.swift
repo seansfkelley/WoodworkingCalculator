@@ -6,37 +6,12 @@ private let ignorableDenominatorShortcutPrefixes: Set<Character> = [" ", "/"]
 private let horizontalSpacing = 12
 private let gridSpacing = 8
 
-// To preserve migration safety, this should not depend on anything beyond the basic types.
-struct StoredCalculation: Codable {
-    enum Result: Codable {
-        case real(Double, UInt)
-        case rational(Int, Int, UInt)
-
-        static func from(quantity: Quantity) -> Result {
-            switch quantity {
-            case .real(let value, let dimension): .real(value, dimension.value)
-            case .rational(let rational, let dimension): .rational(rational.num, rational.den, dimension.value)
-            }
-        }
-
-        var quantity: Quantity {
-            switch self {
-            case .real(let value, let dimension): .real(value, .init(dimension))
-            case .rational(let num, let den, let dimension): .rational(UncheckedRational(num, den).unsafe, .init(dimension))
-            }
-        }
-    }
-
-    let input: String
-    let result: Result
-    let formattedResult: String
-}
-
 struct ContentView: View {
     private var history = ChronologicalHistoryManager<StoredCalculation>(fileURL: .applicationSupportDirectory.appendingPathComponent("history.json"))
 
     @State private var previous: ValidExpressionPrefix?
     @State private var isSettingsPresented = false
+    @State private var isHistoryPresented = false
     @State private var isErrorPresented = false
     @State private var isRoundingErrorWarningPresented = false
     @State private var shakeError = false
@@ -91,6 +66,19 @@ struct ContentView: View {
                     Settings()
                         .background(.windowBackground)
                         .presentationDetents([.medium])
+                }
+                Button(action: { isHistoryPresented.toggle() }) {
+                    Image(systemName: "clock")
+                        .font(.system(size: 24))
+                        .foregroundStyle(.orange)
+                        .frame(width: 32, height: 32)
+                }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
+                .sheet(isPresented: $isHistoryPresented) {
+                    HistoryList(historyManager: history)
+                        .background(.windowBackground)
+                        .presentationDetents([.medium, .large])
                 }
                 Spacer()
 
