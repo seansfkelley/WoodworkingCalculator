@@ -22,7 +22,7 @@ struct Settings: View {
                 }
             } footer: {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Results with units will be rounded to the nearest 1/\(precision.denominator)\". Areas and volumes are rounded to the corresponding square or cube.")
+                    Text("Results with units will be rounded to the nearest \(precision.rational.formatted)\". Areas and volumes are rounded to the corresponding square or cube.")
                     Text("Unitless results are not rounded.")
                 }
             }
