@@ -1,10 +1,7 @@
 import SwiftUI
-import ExyteGrid
 import OSLog
 
 private let logger = Logger(subsystem: "WoodworkingCalculator", category: "ContentView")
-private let darkGray = Color.gray.mix(with: .black, by: 0.25)
-private let ignorableDenominatorShortcutPrefixes: Set<Character> = [" ", "/"]
 private let horizontalSpacing = 12
 private let gridSpacing = 8
 
@@ -164,88 +161,23 @@ struct ContentView: View {
                 }
             )
             .padding(.horizontal, CGFloat(horizontalSpacing))
-            Grid(tracks: 4, spacing: GridSpacing(integerLiteral: gridSpacing)) {
-                // n.b. GridGroup is only to work around limitations in SwiftUI's ViewBuilder
-                // closure typings, but I figured it doubled as a nice way to emphasize the rows.
-                GridGroup {
-                    let backspaced: ValidExpressionPrefix? = switch input {
-                    case .draft(let prefix, _): prefix.backspaced
-                    case .result: nil
-                    }
-                    CalculatorButton(.text(backspaced == nil ? "C" : "⌫"), .gray, contentOffset: backspaced == nil ? .zero : CGPoint(x: -2, y: 0)) {
-                        previous = nil
-                        isErrorPresented = false
-                        isRoundingErrorWarningPresented = false
-                        input = .draft(backspaced ?? .init(), nil)
-                    }
-                    .simultaneousGesture(LongPressGesture(minimumDuration: 1).onEnded { _ in
-                        previous = nil
-                        isErrorPresented = false
-                        isRoundingErrorWarningPresented = false
-                        input = .draft(.init(), nil)
-                    })
-                    CalculatorButton(.text("("), .gray, contentOffset: CGPoint(x: -3, y: -3)) {
-                        append("(", canReplaceResult: true)
-                    }
-                    CalculatorButton(.text(")"), .gray, contentOffset: CGPoint(x: 3, y: -3)) {
-                        append(")")
-                    }
-                    CalculatorButton(.image("divide"), .orange) { append("÷") }
-                }
-                GridGroup {
-                    CalculatorButton(.text("'"), .gray, action: { append(UsCustomaryUnit.feet.abbreviation) })
-                        .contextMenu {
-                            DimensionButton(.feet, .length) { append($0) }
-                            DimensionButton(.feet, .area) { append($0) }
-                            DimensionButton(.feet, .volume) { append($0) }
-                        }
-                    CalculatorButton(.text("\""), .gray, action: { append(UsCustomaryUnit.inches.abbreviation) })
-                        .contextMenu {
-                            DimensionButton(.inches, .length) { append($0) }
-                            DimensionButton(.inches, .area) { append($0) }
-                            DimensionButton(.inches, .volume) { append($0) }
-                        }
-                    CalculatorButton(.text("."), .gray) { append(".", canReplaceResult: true) }
-                    CalculatorButton(.image("multiply"), .orange) { append("×") }
-                }
-                GridGroup {
-                    CalculatorButton(.text("7"), darkGray) { append("7", canReplaceResult: true) }
-                    CalculatorButton(.text("8"), darkGray) { append("8", canReplaceResult: true) }
-                    CalculatorButton(.text("9"), darkGray) { append("9", canReplaceResult: true) }
-                    CalculatorButton(.image("minus"), .orange) { append("-") }
-                }
-                GridGroup {
-                    CalculatorButton(.text("4"), darkGray) { append("4", canReplaceResult: true) }
-                    CalculatorButton(.text("5"), darkGray) { append("5", canReplaceResult: true) }
-                    CalculatorButton(.text("6"), darkGray) { append("6", canReplaceResult: true) }
-                    CalculatorButton(.image("plus"), .orange) { append("+") }
-                }
-                GridGroup {
-                    CalculatorButton(.text("1"), darkGray) { append("1", canReplaceResult: true) }
-                    CalculatorButton(.text("2"), darkGray) { append("2", canReplaceResult: true) }
-                    CalculatorButton(.text("3"), darkGray) { append("3", canReplaceResult: true) }
-                }
-                CalculatorButton(.image("equal"), .orange) { evaluate() }.gridSpan(row: 2)
-                GridGroup {
-                    CalculatorButton(.text("␣"), .gray) { append(" ", canReplaceResult: true) }
-                    CalculatorButton(.text("0"), darkGray) { append("0", canReplaceResult: true) }
-                    CalculatorButton(.text("⁄"), .gray) { append("/", trimmingSuffix: .whitespaceAndFractionSlash) }
-                }
-                GridGroup {
-                    CalculatorButton(.text("⁄₂"), .gray, contentOffset: CGPoint(x: 4, y: 0)) {
-                        append("/2", trimmingSuffix: .whitespaceAndFractionSlash)
-                    }
-                    CalculatorButton(.text("⁄₄"), .gray, contentOffset: CGPoint(x: 4, y: 0)) {
-                        append("/4", trimmingSuffix: .whitespaceAndFractionSlash)
-                    }
-                    CalculatorButton(.text("⁄₈"), .gray, contentOffset: CGPoint(x: 4, y: 0)) {
-                        append("/8", trimmingSuffix: .whitespaceAndFractionSlash)
-                    }
-                    CalculatorButton(.text("⁄₁₆"), .gray, contentOffset: CGPoint(x: 4, y: 0)) {
-                        append("/16", trimmingSuffix: .whitespaceAndFractionSlash)
-                    }
-                }
+            let backspaced: ValidExpressionPrefix? = switch input {
+            case .draft(let prefix, _): prefix.backspaced
+            case .result: nil
             }
+            ButtonGrid(
+                backspacedInput: backspaced,
+                resetInput: {
+                    previous = nil
+                    isErrorPresented = false
+                    isRoundingErrorWarningPresented = false
+                    input = .draft($0, nil)
+                },
+                append: { string, canReplaceResult, trimmingSuffix in
+                    append(string, canReplaceResult: canReplaceResult, trimmingSuffix: trimmingSuffix)
+                },
+                evaluate: evaluate,
+            )
             // Grid applies padding to the edges too, not just between items, so compensate here.
             .padding(.horizontal, CGFloat(horizontalSpacing - gridSpacing))
         }
