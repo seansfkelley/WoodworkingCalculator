@@ -48,36 +48,23 @@ struct ResultReadout: View {
                     .buttonStyle(.glass)
                     .buttonBorderShape(.circle)
                     .popover(isPresented: $isRoundingErrorWarningPresented, arrowEdge: .top) {
-                        let actual = prettyPrintExpression(
-                            formatDecimal(
-                                inches: quantity.toReal(),
-                                of: roundingError.dimension,
-                                as: formattingOptions.unit,
-                                to: Constants.decimalDigitsOfPrecisionExtended,
-                            )
-                        )
-                        let absError = prettyPrintExpression(
-                            formatDecimal(
-                                inches: abs(roundingError.error),
-                                of: roundingError.dimension,
-                                as: formattingOptions.unit,
-                                to: Constants.decimalDigitsOfPrecisionExtended,
-                            )
-                        )
-                        let precision = prettyPrintExpression(
-                            roundingError.dimension == .length
-                                ? formatOneDimensionalRational(
-                                    inches: roundingError.oneDimensionalPrecision.rational,
-                                    as: .inches,
-                                )
-                                : formatDecimal(
-                                    inches: Double(roundingError.dimensionallyAdjustedPrecision.rational),
-                                    of: roundingError.dimension,
-                                    as: .inches,
-                                    to: Constants.decimalDigitsOfPrecision,
-                                ),
-                            includingFractions: false,
-                        )
+                        let actual = quantity.toReal().formatInches(
+                            as: formattingOptions.unit,
+                            of: roundingError.dimension,
+                            toPlaces: Constants.decimalDigitsOfPrecisionExtended
+                        ).withPrettyNumbers
+                        let absError = abs(roundingError.error).formatInches(
+                            as: formattingOptions.unit,
+                            of: roundingError.dimension,
+                            toPlaces: Constants.decimalDigitsOfPrecisionExtended
+                        ).withPrettyNumbers
+                        let precision = roundingError.dimension == .length
+                        ? roundingError.oneDimensionalPrecision.rational.formatted + "\""
+                        : Double(roundingError.dimensionallyAdjustedPrecision.rational).formatInches(
+                            as: .inches,
+                            of: roundingError.dimension,
+                            toPlaces: Constants.decimalDigitsOfPrecision
+                        ).withPrettyNumbers
                         let sign = roundingError.error.sign == .plus ? "+" : "−"
 
                         VStack(alignment: .leading, spacing: 6) {
@@ -128,7 +115,7 @@ struct ResultReadout: View {
 
     @ViewBuilder
     private func textContent(text: String) -> some View {
-        Text(appendTrailingParentheses(to: prettyPrintExpression(text)))
+        Text(appendTrailingParentheses(to: text.withPrettyNumbers))
             .frame(
                 minWidth: 0,
                 maxWidth:  .infinity,

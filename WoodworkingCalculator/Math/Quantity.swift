@@ -78,7 +78,7 @@ enum Quantity: Equatable, CustomStringConvertible {
 
     func formatted(with options: FormattingOptions) -> (String, RoundingError?) {
         guard dimension != .unitless else {
-            return (formatUnitlessDecimal(toReal(), to: options.maxUnitlessDecimalDigits), nil)
+            return (toReal().formatAsDecimal(toPlaces: options.maxUnitlessDecimalDigits), nil)
         }
 
         let (rounded, error) = toRational(precision: RationalPrecision(denominator: options.roundingUnitsTo.denominator ^^ dimension))
@@ -87,12 +87,12 @@ enum Quantity: Equatable, CustomStringConvertible {
             : RoundingError(error: error, oneDimensionalPrecision: options.roundingUnitsTo, dimension: dimension)
         return if dimension == .length {
             (
-                formatOneDimensionalRational(inches: rounded, as: options.unit),
+                rounded.formatInches(as: options.unit),
                 roundingError,
             )
         } else {
             (
-                formatDecimal(inches: Double(rounded), of: dimension, as: options.unit, to: options.maxUnitDecimalDigits),
+                Double(rounded).formatInches(as: options.unit, of: dimension, toPlaces: options.maxUnitDecimalDigits),
                 roundingError,
             )
         }

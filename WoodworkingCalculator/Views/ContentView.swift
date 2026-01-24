@@ -96,9 +96,9 @@ struct ContentView: View {
                     case .result(let quantity):
                         Section("Metric Conversions") {
                             if let meters = quantity.meters {
-                                Text("= \(meters.formatAsDecimal(toPlaces: 3)) m")
-                                Text("= \((meters * 100).formatAsDecimal(toPlaces: 2)) cm")
-                                Text("= \((meters * 1000).formatAsDecimal(toPlaces: 1)) mm")
+                                Text("= \(meters.formatAsDecimal(toPlaces: 3)) \(quantity.dimension.formatted(withUnit: "m"))".withPrettyNumbers)
+                                Text("= \((meters * 100 ^^ quantity.dimension).formatAsDecimal(toPlaces: 2)) \(quantity.dimension.formatted(withUnit: "cm"))".withPrettyNumbers)
+                                Text("= \((meters * 1000 ^^ quantity.dimension).formatAsDecimal(toPlaces: 1)) \(quantity.dimension.formatted(withUnit: "mm"))".withPrettyNumbers)
                             } else {
                                 Text("Unitless values cannot be converted.")
                             }
@@ -127,7 +127,7 @@ struct ContentView: View {
             // content below. The choice of `gridSpacing` is actually NOT significant except that it
             // seems to be the right number empirically and maybe there's something to that.
             .padding(.horizontal, CGFloat(gridSpacing))
-            Text(prettyPrintExpression(previous?.value ?? ""))
+            Text((previous?.value ?? "").withPrettyNumbers)
                 .frame(
                     minWidth: 0,
                     maxWidth:  .infinity,
@@ -333,9 +333,9 @@ struct DimensionButton: View {
             onSelect(formatted)
         } label: {
             if let systemImage {
-                Label(prettyPrintExpression(formatted), systemImage: systemImage)
+                Label(formatted.withPrettyNumbers, systemImage: systemImage)
             } else {
-                Text(prettyPrintExpression(formatted))
+                Text(formatted.withPrettyNumbers)
             }
         }
     }

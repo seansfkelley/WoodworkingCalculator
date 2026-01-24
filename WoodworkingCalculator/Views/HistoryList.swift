@@ -99,7 +99,7 @@ struct HistoryList: View {
                                         }
 
                                         Button {
-                                            UIPasteboard.general.string = prettyPrintExpression(entry.data.formattedResult)
+                                            UIPasteboard.general.string = entry.data.formattedResult.withPrettyNumbers
                                         } label: {
                                             Label("Copy", systemImage: "doc.on.doc")
                                         }
@@ -170,11 +170,11 @@ private struct HistoryListItem: View {
     var body: some View {
         HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(prettyPrintExpression(entry.input))
+                Text(entry.input.withPrettyNumbers)
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
-                Text(prettyPrintExpression(entry.formattedResult))
+                Text(entry.formattedResult.withPrettyNumbers)
                     .font(.body)
                     .foregroundStyle(.primary)
             }
@@ -202,7 +202,7 @@ private struct HistoryListItem: View {
                             .font(.body)
                         HStack(spacing: 4) {
                             VStack(spacing: 2) {
-                                Text(prettyPrintExpression(entry.formattedResult))
+                                Text(entry.formattedResult.withPrettyNumbers)
                                     .font(.title2)
                                 Text("previous")
                                     .font(.caption)
@@ -213,7 +213,7 @@ private struct HistoryListItem: View {
                             .background(.secondary.opacity(0.3), in: RoundedRectangle(cornerRadius: 8))
                             Image(systemName: "arrow.right")
                             VStack(spacing: 2) {
-                                Text(prettyPrintExpression(upToDateFormattedResult))
+                                Text(upToDateFormattedResult.withPrettyNumbers)
                                     .font(.title2)
                                 Text("current")
                                     .font(.caption)

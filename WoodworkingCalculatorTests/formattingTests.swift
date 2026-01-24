@@ -6,7 +6,7 @@ private func rational(_ num: Int, _ den: Int) -> Rational {
 }
 
 struct FormattingTests {
-    @Test<[(Rational, String, String)]>("formatOneDimensionalRational", arguments: [
+    @Test<[(Rational, String, String)]>("Rational.formatInches", arguments: [
         (rational(0, 1), "0in", "0in"),
         (rational(1, 2), "1/2in", "1/2in"),
         (rational(1, -2), "-1/2in", "-1/2in"),
@@ -17,12 +17,12 @@ struct FormattingTests {
         (rational(48, 1), "48in", "4ft"),
         (rational(49, 1), "49in", "4ft 1in"),
     ])
-    func testFormatOneDimensionalRational(input: Rational, inches: String, feet: String) {
-        #expect(formatOneDimensionalRational(inches: input, as: .inches) == inches)
-        #expect(formatOneDimensionalRational(inches: input, as: .feet) == feet)
+    func testRationalFormatInches(input: Rational, inches: String, feet: String) {
+        #expect(input.formatInches(as: .inches) == inches)
+        #expect(input.formatInches(as: .feet) == feet)
     }
 
-    @Test<[(Double, Dimension, String, String)]>("formatDecimal", arguments: [
+    @Test<[(Double, Dimension, String, String)]>("Double.formatInches", arguments: [
         (0, .unitless, "0", "0"),
         (2.718, .unitless, "2.718", "2.718"),
         (15, .unitless, "15", "15"),
@@ -35,12 +35,12 @@ struct FormattingTests {
         (72.0, .area, "72in[2]", "0.5ft[2]"),
         (864.0, .volume, "864in[3]", "0.5ft[3]"),
     ])
-    func testFormatDecimal(input: Double, dimension: Dimension, inches: String, feet: String) {
-        #expect(formatDecimal(inches: input, of: dimension, as: .inches, to: 3) == inches)
-        #expect(formatDecimal(inches: input, of: dimension, as: .feet, to: 3) == feet)
+    func testFormatInches(input: Double, dimension: Dimension, inches: String, feet: String) {
+        #expect(input.formatInches(as: .inches, of: dimension, toPlaces: 3) == inches)
+        #expect(input.formatInches(as: .feet, of: dimension, toPlaces: 3) == feet)
     }
 
-    @Test<[(String, String)]>("prettyPrintExpression", arguments: [
+    @Test<[(String, String)]>("String.withPrettyNumbers", arguments: [
         ("42", "42"),
         ("3.142", "3.142"),
         ("in", "\""),
@@ -65,7 +65,7 @@ struct FormattingTests {
         ("5ft 3in×2", "5' 3\"×2"),
         ("(1/2in+3/4in)×3", "(¹⁄₂\"+³⁄₄\")×3"),
         ("3 1/2in×4 3/8in", "3\u{2002}¹⁄₂\"×4\u{2002}³⁄₈\""),
-    ]) func testPrettyPrintExpression(input: String, expected: String) throws {
-        #expect(prettyPrintExpression(input) == expected)
+    ]) func testWithPrettyNumbers(input: String, expected: String) throws {
+        #expect(input.withPrettyNumbers == expected)
     }
 }
