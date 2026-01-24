@@ -1,20 +1,7 @@
-//
-//  ChronologicalHistoryManager.swift
-//
-//  A generic, file-backed history management subsystem optimized for frequent
-//  appends and list operations with infrequent deletions.
-//
-//  Created on January 23, 2026.
-//
-
 import Foundation
 import Observation
 import OSLog
 
-// MARK: - History Entry
-
-/// Generic wrapper for history entries
-/// The wrapper provides its own ID and timestamp, so the payload only needs to be Codable
 struct HistoryEntry<T: Codable>: Codable, Identifiable {
     let id: UUID
     let timestamp: Date
@@ -27,146 +14,84 @@ struct HistoryEntry<T: Codable>: Codable, Identifiable {
     }
 }
 
-// MARK: - Chronological History Manager
-
-/// A generic, file-backed history management system
-///
-/// Features:
-/// - Generic support for any `Codable` type
-/// - Optimized for frequent appends and list operations
-/// - JSON Lines (`.jsonl`) file format for efficient appends
-/// - In-memory cache as source of truth
-/// - Background disk I/O via stateless actor
-/// - Non-blocking initialization with background merge
-/// - Observable for SwiftUI integration
 @Observable
-final class ChronologicalHistoryManager<Entry: Codable> {
+final class ChronologicalHistoryManager<T: Codable> {
+    private(set) var entries: [HistoryEntry<T>] = []
     
-    // MARK: - Properties
-    
-    /// Internal storage in chronological order (oldest first)
-    private(set) var entries: [HistoryEntry<Entry>] = []
-
-    /// Stateless actor for disk I/O operations
-    private let diskIO: DiskIOActor
-    
-    /// Logger for error reporting
+    private let sychronizer: JsonlSynchronizer
     private let logger = Logger(subsystem: "WoodworkingCalculator", category: "ChronologicalHistoryManager")
 
-    // MARK: - Initialization
-    
-    /// Initialize with a file URL
-    /// Returns immediately with empty state. Loads existing history from disk asynchronously.
-    /// When disk load completes, merges with any new entries added in the meantime.
-    /// - Parameter fileURL: Location of the JSON-lines history file
     init(fileURL: URL) {
-        self.diskIO = DiskIOActor(fileURL: fileURL)
-        
-        // Start loading in the background
+        sychronizer = JsonlSynchronizer(fileURL: fileURL)
+
+        // Background this so we can get the show on the road.
         Task { [weak self] in
             await self?.loadAndMerge()
         }
     }
     
-    // MARK: - Public API
-    
-    /// Append a new entry with the current timestamp
-    /// Updates in-memory state immediately. Disk write happens asynchronously in the background.
-    /// - Parameter entry: The entry to append
-    func append(_ entry: Entry) {
+    func append(_ entry: T) {
         let historyEntry = HistoryEntry(data: entry)
         
-        // Update memory immediately (O(1) amortized)
         entries.append(historyEntry)
-        
-        // Persist to disk in background (fire-and-forget)
-        Task { [diskIO, logger] in
+
+        Task { [sychronizer, logger] in
             do {
-                try await diskIO.append(historyEntry)
+                try await sychronizer.append(historyEntry)
             } catch {
-                logger.error("Failed to append entry to disk: \(error.localizedDescription)")
+                logger.error("failed to append entry to disk: \(error.localizedDescription)")
             }
         }
     }
     
-    /// Delete entries by their IDs
-    /// Updates in-memory state immediately. Disk rewrite happens asynchronously in the background.
-    /// - Parameter ids: Set of IDs to delete
     func delete(ids: Set<UUID>) {
-        // Update memory immediately (O(n) for filtering)
         entries.removeAll { ids.contains($0.id) }
         
-        // Create snapshot for background persistence
         let snapshot = entries
-        
-        // Persist to disk in background (fire-and-forget)
-        Task { [diskIO, logger] in
+
+        Task { [sychronizer, logger] in
             do {
-                try await diskIO.rewrite(snapshot)
+                try await sychronizer.rewrite(snapshot)
             } catch {
-                logger.error("Failed to rewrite entries to disk: \(error.localizedDescription)")
+                logger.error("failed to rewrite entries to disk: \(error.localizedDescription)")
             }
         }
     }
     
-    // MARK: - Private Methods
-    
-    /// Load entries from disk and merge with any entries added during load
     private func loadAndMerge() async {
         do {
-            // Read from disk (entries already in chronological order)
-            let loadedEntries: [HistoryEntry<Entry>] = try await diskIO.read()
+            let loadedEntries: [HistoryEntry<T>] = try await sychronizer.read()
 
-            // Check if entries were added during load
             if entries.isEmpty {
-                // No merge needed - just set entries directly
                 entries = loadedEntries
             } else {
-                // Merge needed: loaded entries (older) + current entries (newer)
-                let mergedEntries = loadedEntries + entries
-                entries = mergedEntries
-                
-                // Persist merged state back to disk
-                try await diskIO.rewrite(mergedEntries)
+                entries = loadedEntries + entries
+                try await sychronizer.rewrite(entries)
             }
         } catch {
-            // If load fails, continue with empty state (memory is authoritative)
-            logger.error("Failed to load history from disk: \(error.localizedDescription)")
+            // That's fine, we'll just have an in-memory session only.
+            logger.error("failed to load history from disk: \(error.localizedDescription)")
         }
     }
 }
 
-// MARK: - Disk I/O Actor
-
-/// Stateless actor that handles disk I/O operations
-/// Provides three commands: read, append, and rewrite
-private actor DiskIOActor {
-    
-    // MARK: - Properties
-    
+private actor JsonlSynchronizer {
     private let fileURL: URL
-    private let logger = Logger(subsystem: "WoodworkingCalculator", category: "DiskIOActor")
+    private let logger = Logger(subsystem: "WoodworkingCalculator", category: "HistoryDiskWriter")
 
-    // MARK: - Initialization
-    
     init(fileURL: URL) {
         self.fileURL = fileURL
     }
     
-    // MARK: - Commands
-    
-    /// Command 1: Read entire file, return array of entries
     func read<T: Codable>() throws -> [HistoryEntry<T>] {
-        // Check if file exists
-        guard FileManager.default.fileExists(atPath: fileURL.path) else {
-            logger.info("History file does not exist yet, starting with empty history")
+        let data: Data
+        do {
+            data = try Data(contentsOf: fileURL)
+        } catch CocoaError.fileReadNoSuchFile {
+            logger.info("history file does not exist yet, starting with empty history")
             return []
         }
         
-        // Read file contents
-        let data = try Data(contentsOf: fileURL)
-        
-        // Parse JSON Lines format
         let lines = String(data: data, encoding: .utf8)?
             .split(separator: "\n", omittingEmptySubsequences: true) ?? []
         
@@ -175,7 +100,7 @@ private actor DiskIOActor {
         
         for (index, line) in lines.enumerated() {
             guard let lineData = line.data(using: .utf8) else {
-                logger.warning("Failed to convert line \(index) to data, skipping")
+                logger.warning("failed to convert line \(index) to data, skipping")
                 continue
             }
             
@@ -183,46 +108,39 @@ private actor DiskIOActor {
                 let entry = try decoder.decode(HistoryEntry<T>.self, from: lineData)
                 entries.append(entry)
             } catch {
-                logger.warning("Failed to decode line \(index): \(error.localizedDescription), skipping")
+                logger.warning("failed to decode line \(index): \(error.localizedDescription), skipping")
             }
         }
         
-        logger.info("Loaded \(entries.count) entries from disk")
+        logger.info("loaded \(entries.count) entries from disk")
         return entries
     }
     
-    /// Command 2: Append one entry to end of file as JSON line
     func append<T: Codable>(_ entry: HistoryEntry<T>) throws {
         let encoder = JSONEncoder()
         let data = try encoder.encode(entry)
         
-        // Ensure directory exists
         let directory = fileURL.deletingLastPathComponent()
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         
-        // Append to file with newline
         var lineData = data
-        lineData.append(contentsOf: [0x0A]) // Newline character
+        lineData.append(contentsOf: [0x0A])
         
         if FileManager.default.fileExists(atPath: fileURL.path) {
-            // Append to existing file
             let fileHandle = try FileHandle(forWritingTo: fileURL)
             try fileHandle.seekToEnd()
             try fileHandle.write(contentsOf: lineData)
             try fileHandle.close()
         } else {
-            // Create new file
             try lineData.write(to: fileURL)
         }
         
-        logger.debug("Appended entry to disk")
+        logger.debug("appended entry to disk")
     }
     
-    /// Command 3: Replace entire file with array of entries as JSON lines
     func rewrite<T: Codable>(_ entries: [HistoryEntry<T>]) throws {
         let encoder = JSONEncoder()
         
-        // Encode all entries as JSON lines
         var fileData = Data()
         for entry in entries {
             let entryData = try encoder.encode(entry)
@@ -230,48 +148,11 @@ private actor DiskIOActor {
             fileData.append(contentsOf: [0x0A]) // Newline character
         }
         
-        // Ensure directory exists
         let directory = fileURL.deletingLastPathComponent()
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         
-        // Write to file (replaces existing content)
         try fileData.write(to: fileURL, options: .atomic)
         
-        logger.info("Rewrote history file with \(entries.count) entries")
-    }
-}
-
-// MARK: - Convenience Extensions
-
-extension ChronologicalHistoryManager {
-    
-    /// Create a manager with a file in the Application Support directory
-    /// - Parameter filename: Name of the file (e.g., "history.jsonl")
-    /// - Returns: A configured history manager, or nil if the directory cannot be accessed
-    static func inApplicationSupport(filename: String) -> ChronologicalHistoryManager<Entry>? {
-        guard let appSupportURL = FileManager.default.urls(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask
-        ).first else {
-            return nil
-        }
-        
-        let fileURL = appSupportURL.appendingPathComponent(filename)
-        return ChronologicalHistoryManager(fileURL: fileURL)
-    }
-    
-    /// Create a manager with a file in the Documents directory
-    /// - Parameter filename: Name of the file (e.g., "history.jsonl")
-    /// - Returns: A configured history manager, or nil if the directory cannot be accessed
-    static func inDocuments(filename: String) -> ChronologicalHistoryManager<Entry>? {
-        guard let documentsURL = FileManager.default.urls(
-            for: .documentDirectory,
-            in: .userDomainMask
-        ).first else {
-            return nil
-        }
-        
-        let fileURL = documentsURL.appendingPathComponent(filename)
-        return ChronologicalHistoryManager(fileURL: fileURL)
+        logger.info("rewrote history file with \(entries.count) entries")
     }
 }

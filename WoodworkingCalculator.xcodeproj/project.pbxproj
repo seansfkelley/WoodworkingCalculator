@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		216BB80C2E26BDFC00D2AF17 /* Numerics in Frameworks */ = {isa = PBXBuildFile; productRef = 216BB80B2E26BDFC00D2AF17 /* Numerics */; };
 		216BB8F12E32D28200D2AF17 /* ExyteGrid in Frameworks */ = {isa = PBXBuildFile; productRef = 216BB8F02E32D28200D2AF17 /* ExyteGrid */; };
-		2199000E2F240C750024904E /* ChronologicalHistoryManager.md in Resources */ = {isa = PBXBuildFile; fileRef = 2199000D2F240C750024904E /* ChronologicalHistoryManager.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,7 +40,6 @@
 		218B780C2E15C69D00F8B129 /* Wood Calc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wood Calc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78192E15C69E00F8B129 /* Wood Calc Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wood Calc Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78232E15C69E00F8B129 /* Wood Calc UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wood Calc UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2199000D2F240C750024904E /* ChronologicalHistoryManager.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ChronologicalHistoryManager.md; sourceTree = "<group>"; };
 		219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = WoodworkingCalculator.xctestplan; sourceTree = "<group>"; };
 		21C111482E3BDAB1007EB628 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -120,7 +118,6 @@
 			isa = PBXGroup;
 			children = (
 				21C111482E3BDAB1007EB628 /* .gitignore */,
-				2199000D2F240C750024904E /* ChronologicalHistoryManager.md */,
 				216BB80D2E28144400D2AF17 /* README.md */,
 				216BB8452E2950AB00D2AF17 /* Citron */,
 				219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */,
@@ -294,7 +291,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2199000E2F240C750024904E /* ChronologicalHistoryManager.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
