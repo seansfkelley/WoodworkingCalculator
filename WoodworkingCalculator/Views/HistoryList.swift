@@ -94,7 +94,7 @@ struct HistoryList: View {
                 if historyManager.entries.isEmpty {
                     ContentUnavailableView(
                         "No History",
-                        systemImage: "block",
+                        systemImage: "clock",
                         description: Text("Calculations you perform will appear here.")
                     )
                 } else {
