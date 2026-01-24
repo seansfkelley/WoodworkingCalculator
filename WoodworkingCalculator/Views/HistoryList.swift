@@ -51,7 +51,7 @@ struct HistoryList: View {
     @Environment(\.dismiss) private var dismiss
     @State private var editMode: EditMode = .inactive
     @State private var selectedIDs: Set<UUID> = []
-    @State private var showingFormattingPopover = false
+    @State private var popoverEntryID: UUID?
 
     private var groupedSearchHistory: [(TimeInterval, [HistoryEntry<StoredCalculation>])] {
         let calendar = Calendar.current
@@ -124,7 +124,7 @@ struct HistoryList: View {
                                             if entry.data.formattedResult != upToDateFormattedResult {
                                                 Spacer()
                                                 Button {
-                                                    showingFormattingPopover = true
+                                                    popoverEntryID = entry.id
                                                 } label: {
                                                     Image(systemName: "notequal")
                                                         .font(.title2)
@@ -133,9 +133,12 @@ struct HistoryList: View {
                                                 }
                                                 .buttonStyle(.plain)
                                                 .popover(
-                                                    isPresented: $showingFormattingPopover,
+                                                    isPresented: Binding(
+                                                        get: { popoverEntryID == entry.id },
+                                                        set: { if !$0 { popoverEntryID = nil } }
+                                                    ),
                                                     attachmentAnchor: .point(.leading),
-                                                    arrowEdge: .leading,
+                                                    arrowEdge: .trailing
                                                 ) {
                                                     VStack(alignment: .leading, spacing: 6) {
                                                         Text("Settings changed since this was calculated. With current settings:")
