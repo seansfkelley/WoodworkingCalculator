@@ -5,12 +5,13 @@ private func rational(_ num: Int, _ den: Int) -> Rational {
     try! UncheckedRational(num, den).checked.get()
 }
 
+@Suite
 struct FormattingTests {
     @Test<[(Rational, String, String)]>("Rational.formatInches", arguments: [
         (rational(0, 1), "0in", "0in"),
         (rational(1, 2), "1/2in", "1/2in"),
         (rational(1, -2), "-1/2in", "-1/2in"),
-        (rational(6, 1), "6in", "6ft"),
+        (rational(6, 1), "6in", "6in"),
         (rational(12, 1), "12in", "1ft"),
         (rational(25, 2), "12 1/2in", "1ft 1/2in"),
         (rational(27, 2), "13 1/2in", "1ft 1 1/2in"),
@@ -26,9 +27,9 @@ struct FormattingTests {
         (0, .unitless, "0", "0"),
         (2.718, .unitless, "2.718", "2.718"),
         (15, .unitless, "15", "15"),
-        (0.0, .length, "0in", "0in"),
-        (0.5, .length, "0.5in", "0.5in"),
-        (-0.5, .length, "-0.5in", "-0.5in"),
+        (0.0, .length, "0in", "0ft"),
+        (0.5, .length, "0.5in", "0.042ft"),
+        (-0.5, .length, "-0.5in", "-0.042ft"),
         (12.0, .length, "12in", "1ft"),
         (12.5, .length, "12.5in", "1.042ft"),
         (15.375, .length, "15.375in", "1.281ft"),
