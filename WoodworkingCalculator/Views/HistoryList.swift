@@ -1,8 +1,46 @@
 import SwiftUI
 
+protocol Timestamped {
+    var timestamp: Date { get }
+}
 
+func groupByTimeIntervals<T: Timestamped>(items: [T]) -> [(TelescopingTimeBound, [T])] {
+    let calendar = Calendar.current
+    let lastMidnight = calendar.startOfDay(for: Date())
+    
+    let boundaries: [(Date, TelescopingTimeBound)] = [
+        (lastMidnight, .today),
+        (calendar.date(byAdding: .day, value: -1, to: lastMidnight)!, .yesterday),
+        (calendar.date(byAdding: .day, value: -7, to: lastMidnight)!, .pastWeek),
+        (calendar.date(byAdding: .month, value: -1, to: lastMidnight)!, .pastMonth),
+        (Date.distantPast, .older),
+    ]
+    
+    var result: [(TelescopingTimeBound, [T])] = []
+    var currentEntries: [T] = []
+    var remainingBoundaries = boundaries
+    
+    for item in items {
+        while !remainingBoundaries.isEmpty && item.timestamp < remainingBoundaries.first!.0 {
+            if !currentEntries.isEmpty {
+                result.append((remainingBoundaries.first!.1, currentEntries))
+                currentEntries = []
+            }
+            remainingBoundaries.removeFirst()
+        }
+        
+        currentEntries.append(item)
+    }
+    
+    if !currentEntries.isEmpty {
+        let interval = remainingBoundaries.isEmpty ? boundaries.last!.1 : remainingBoundaries[0].1
+        result.append((interval, currentEntries))
+    }
+    
+    return result
+}
 
-private enum TimeInterval: CaseIterable {
+enum TelescopingTimeBound: Equatable {
     case today
     case yesterday
     case pastWeek
@@ -28,41 +66,6 @@ struct HistoryList: View {
     @State private var editMode: EditMode = .inactive
     @State private var selectedIDs: Set<UUID> = []
 
-    private var groupedSearchHistory: [(TimeInterval, [HistoryEntry<StoredCalculation>])] {
-        let calendar = Calendar.current
-        let lastMidnight = calendar.startOfDay(for: Date())
-
-        var boundaries: [(Date, TimeInterval)] = [
-            (lastMidnight, .today),
-            (calendar.date(byAdding: .day, value: -1, to: lastMidnight)!, .yesterday),
-            (calendar.date(byAdding: .day, value: -7, to: lastMidnight)!, .pastWeek),
-            (calendar.date(byAdding: .month, value: -1, to: lastMidnight)!, .pastMonth),
-            (Date.distantPast, .older),
-        ]
-
-        var result: [(TimeInterval, [HistoryEntry<StoredCalculation>])] = []
-        var currentEntries: [HistoryEntry<StoredCalculation>] = []
-
-        for entry in historyManager.entries.reversed() {
-            while !boundaries.isEmpty && entry.timestamp < boundaries.first!.0 {
-                if !currentEntries.isEmpty {
-                    result.append((boundaries.first!.1, currentEntries))
-                    currentEntries = []
-                }
-                boundaries.removeFirst()
-            }
-
-            currentEntries.append(entry)
-        }
-
-        if !currentEntries.isEmpty {
-            let interval = boundaries.isEmpty ? .older : boundaries[0].1
-            result.append((interval, currentEntries))
-        }
-
-        return result
-    }
-
     var body: some View {
         NavigationStack {
             Group {
@@ -74,7 +77,7 @@ struct HistoryList: View {
                     )
                 } else {
                     List(selection: $selectedIDs) {
-                        ForEach(groupedSearchHistory, id: \.0) { interval, entries in
+                        ForEach(groupByTimeIntervals(items: historyManager.entries.reversed()), id: \.0) { interval, entries in
                             Section(interval.displayName) {
                                 ForEach(entries) { entry in
                                     Button {

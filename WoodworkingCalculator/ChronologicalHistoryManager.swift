@@ -2,7 +2,7 @@ import Foundation
 import Observation
 import OSLog
 
-struct HistoryEntry<T: Codable>: Codable, Identifiable {
+struct HistoryEntry<T: Codable>: Codable, Identifiable, Timestamped {
     let id: UUID
     let timestamp: Date
     let data: T
