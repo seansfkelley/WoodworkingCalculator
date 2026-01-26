@@ -60,13 +60,16 @@ final class ChronologicalHistoryManager<T: Codable> {
     
     private func loadAndMerge() async {
         do {
-            let loadedEntries: [HistoryEntry<T>] = try await sychronizer.read()
+            let allPersistedEntries: [HistoryEntry<T>] = try await sychronizer.read()
+            
+            let oneYearAgo = Calendar.current.date(byAdding: .year, value: -1, to: Date()) ?? Date.distantPast
+            let recentEntries = allPersistedEntries.filter { $0.timestamp >= oneYearAgo }
+            
+            let needsRewrite = !entries.isEmpty || recentEntries.count != allPersistedEntries.count
 
-            if entries.isEmpty {
-                entries = loadedEntries
-            } else {
-                entries = loadedEntries + entries
-                try await sychronizer.rewrite(entries)
+            entries = entries + recentEntries
+            if needsRewrite {
+                try await sychronizer.rewrite(recentEntries)
             }
         } catch {
             // That's fine, we'll just have an in-memory session only.

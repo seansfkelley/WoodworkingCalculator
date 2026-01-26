@@ -230,4 +230,39 @@ struct ChronologicalHistoryManagerTests : ~Copyable {
         #expect(persisted.count == 2)
         #expect(persisted.map(\.data) == ["disk entry", "memory entry"])
     }
+
+    @Test
+    func oldEntriesAreDeletedDuringLoad() async throws {
+        let calendar = Calendar.current
+        let now = Date()
+
+        let recentEntry = HistoryEntry(
+            data: "Recent calculation",
+            timestamp: try #require(calendar.date(byAdding: .day, value: -30, to: now))
+        )
+        let oldEntry = HistoryEntry(
+            data: "Old calculation",
+            timestamp: try #require(calendar.date(byAdding: .year, value: -2, to: now))
+        )
+        let veryOldEntry = HistoryEntry(
+            data: "Very old calculation",
+            timestamp: try #require(calendar.date(byAdding: .year, value: -5, to: now))
+        )
+
+        let encoder = JSONEncoder()
+        var fileData = Data()
+        for entry in [recentEntry, oldEntry, veryOldEntry] {
+            let entryData = try encoder.encode(entry)
+            fileData.append(entryData)
+            fileData.append(contentsOf: "\n".utf8)
+        }
+        try fileData.write(to: fileURL)
+
+        let manager = ChronologicalHistoryManager<String>(fileURL: fileURL)
+
+        try await Task.sleep(for: .milliseconds(100))
+
+        #expect(manager.entries.count == 1)
+        #expect(manager.entries[0].data == "Recent calculation")
+    }
 }
