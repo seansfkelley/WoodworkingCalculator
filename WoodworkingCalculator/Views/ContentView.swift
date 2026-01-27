@@ -294,9 +294,27 @@ struct CalculatorButton: View {
                     .offset(x: contentOffset.x, y: contentOffset.y)
             }
         }
-        .buttonStyle(.borderedProminent)
+        .buttonStyle(CalculatorButtonStyle(fill))
         .buttonBorderShape(.roundedRectangle(radius: .infinity))
-        .tint(fill)
+    }
+}
+
+struct CalculatorButtonStyle: ButtonStyle {
+    private let animation = Animation.spring(response: 0.2, dampingFraction: 0.7)
+
+    let fill: Color
+
+    init(_ fill: Color) {
+        self.fill = fill
+    }
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background((configuration.isPressed ? fill.mix(with: .white, by: 0.3) : fill).animation(animation))
+            .clipShape(RoundedRectangle(cornerRadius: .infinity))
+            .glassEffect()
+            .scaleEffect(configuration.isPressed ? 1.1 : 1.0)
+            .animation(animation, value: configuration.isPressed)
     }
 }
 
