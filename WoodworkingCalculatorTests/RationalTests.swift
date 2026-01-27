@@ -122,8 +122,7 @@ struct DoubleTests {
     @Test("toNearestRational", arguments: [
         (31.0 / 32, 4, rational(1, 1), 1.0 / 32),
         (33.0 / 32, 4, rational(1, 1), -1.0 / 32),
-        // Hmm, might want to turn the precision up here? This seems a bit weird that there's 0 error, though it _is_ less than a thou.
-        (1.0 / 65, 64, rational(1, 64), 0.001),
+        (1.0 / 65, 64, rational(1, 64), 1.0 / 64 - 1.0 / 65),
     ]) func toNearestRational(input: Double, denominator: Int, expected: Rational, expectedRemainder: Double) {
         let actual = input.toNearestRational(of: RationalPrecision(denominator: UInt(denominator)))
         #expect(actual.0 == expected)

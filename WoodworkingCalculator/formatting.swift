@@ -99,7 +99,7 @@ extension String {
                 } else {
                     String(match.1)
                 }
-                return "\(unit)\(exponent == 1 ? "" : exponent.superscript)"
+                return "\(unit)\(exponent == 0 || exponent == 1 ? "" : exponent.superscript)"
             })
             .replacing(/([0-9]) ([0-9]|$)/, with: { match in
                 "\(match.1)\u{2002}\(match.2)"
