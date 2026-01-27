@@ -44,12 +44,12 @@ struct Settings: View {
             } footer: {
                 VStack(alignment: .leading, spacing: 6) {
                     if assumeInches {
-                        Text("If no units are entered, the result is assumed to be inches. If units are entered but cancel out, the result is a unitless decimal number.")
+                        Text("If no units are entered, the result is given in inches. If units are entered but cancel out, the result is a unitless decimal number.")
                     } else {
                         Text("If no units are entered, the result is a unitless decimal number.")
                     }
                     Text("Entering units is optional. Unitless numbers adopt the unit of other numbers they are combined with.")
-                    Text("Long-press the unit buttons to enter areas or volumes.")
+                    Text("Long-press the feet or inches button to enter areas or volumes.")
                 }
             }
         }

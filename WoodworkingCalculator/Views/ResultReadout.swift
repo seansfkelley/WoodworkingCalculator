@@ -104,7 +104,6 @@ struct ResultReadout: View {
                             .fixedSize(horizontal: false, vertical: true)
                         }
                         .padding()
-                        .background(.windowBackground)
                         .presentationCompactAdaptation(.popover)
                     }
                 }
