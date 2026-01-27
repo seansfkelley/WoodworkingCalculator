@@ -17,76 +17,82 @@ struct HistoryEntry<T: Codable>: Codable, Identifiable, Timestamped {
 @Observable
 final class ChronologicalHistoryManager<T: Codable> {
     private(set) var entries: [HistoryEntry<T>] = []
-    
-    private let sychronizer: JsonlSynchronizer
-    private let logger = Logger(subsystem: "WoodworkingCalculator", category: "ChronologicalHistoryManager")
+    private let synchronizer: JsonlSynchronizer<HistoryEntry<T>>
 
     init(fileURL: URL) {
-        sychronizer = JsonlSynchronizer(fileURL: fileURL)
-
-        // Background this so we can get the show on the road.
-        Task { [weak self] in
-            await self?.loadAndMerge()
+        synchronizer = JsonlSynchronizer(fileURL: fileURL)
+        Task {
+            entries = synchronizer.loadAndMerge(self.entries)
         }
     }
     
     func append(_ entry: T) {
         let historyEntry = HistoryEntry(data: entry)
-        
         entries.append(historyEntry)
-
-        Task { [sychronizer, logger] in
-            do {
-                try await sychronizer.append(historyEntry)
-            } catch {
-                logger.error("failed to append entry to disk: \(error.localizedDescription)")
-            }
-        }
+        synchronizer.append(historyEntry)
     }
     
     func delete(ids: Set<UUID>) {
         entries.removeAll { ids.contains($0.id) }
-        
         let snapshot = entries
-
-        Task { [sychronizer, logger] in
-            do {
-                try await sychronizer.rewrite(snapshot)
-            } catch {
-                logger.error("failed to rewrite entries to disk: \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    private func loadAndMerge() async {
-        do {
-            let allPersistedEntries: [HistoryEntry<T>] = try await sychronizer.read()
-            
-            let oneYearAgo = Calendar.current.date(byAdding: .year, value: -1, to: Date()) ?? Date.distantPast
-            let recentEntries = allPersistedEntries.filter { $0.timestamp >= oneYearAgo }
-            
-            let needsRewrite = !entries.isEmpty || recentEntries.count != allPersistedEntries.count
-
-            entries = entries + recentEntries
-            if needsRewrite {
-                try await sychronizer.rewrite(recentEntries)
-            }
-        } catch {
-            // That's fine, we'll just have an in-memory session only.
-            logger.error("failed to load history from disk: \(error.localizedDescription)")
-        }
+        synchronizer.rewrite(snapshot)
     }
 }
 
-private actor JsonlSynchronizer {
+private final class JsonlSynchronizer<T: Codable & Timestamped> {
     private let fileURL: URL
-    private let logger = Logger(subsystem: "WoodworkingCalculator", category: "HistoryDiskWriter")
+    private let logger = Logger(subsystem: "WoodworkingCalculator", category: "JsonlSynchronizer")
+    private let operationQueue = DispatchQueue(label: "com.woodworkingcalculator.history.synchronizer", qos: .utility)
 
     init(fileURL: URL) {
         self.fileURL = fileURL
     }
     
-    func read<T: Codable>() throws -> [HistoryEntry<T>] {
+    func loadAndMerge(_ getCurrentEntries: @escaping @autoclosure () -> [T]) -> [T] {
+        do {
+            let allPersistedEntries: [T] = try _read()
+
+            let oneYearAgo = Calendar.current.date(byAdding: .year, value: -1, to: Date()) ?? Date.distantPast
+            let recentEntries = allPersistedEntries.filter { $0.timestamp >= oneYearAgo }
+
+            var entries = getCurrentEntries()
+            let needsRewrite = !entries.isEmpty || recentEntries.count != allPersistedEntries.count
+
+            entries = recentEntries + entries
+            if needsRewrite {
+                rewrite(entries)
+            }
+            return entries
+        } catch {
+            // That's fine, we'll just have an in-memory session only.
+            logger.error("failed to load history from disk: \(error.localizedDescription)")
+            return getCurrentEntries()
+        }
+    }
+
+    func append(_ entry: T) {
+        operationQueue.async { [weak self] in
+            guard let self else { return }
+            do {
+                try self._append(entry)
+            } catch {
+                self.logger.error("failed to append entry to disk: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func rewrite(_ entries: [T]) {
+        operationQueue.async { [weak self] in
+            guard let self else { return }
+            do {
+                try self._rewrite(entries)
+            } catch {
+                self.logger.error("failed to rewrite entries to disk: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    private func _read() throws -> [T] {
         let data: Data
         do {
             data = try Data(contentsOf: fileURL)
@@ -98,7 +104,7 @@ private actor JsonlSynchronizer {
         let lines = String(data: data, encoding: .utf8)?
             .split(separator: "\n", omittingEmptySubsequences: true) ?? []
         
-        var entries: [HistoryEntry<T>] = []
+        var entries: [T] = []
         let decoder = JSONDecoder()
         
         for (index, line) in lines.enumerated() {
@@ -108,7 +114,7 @@ private actor JsonlSynchronizer {
             }
             
             do {
-                let entry = try decoder.decode(HistoryEntry<T>.self, from: lineData)
+                let entry = try decoder.decode(T.self, from: lineData)
                 entries.append(entry)
             } catch {
                 logger.warning("failed to decode line \(index): \(error.localizedDescription), skipping")
@@ -119,7 +125,7 @@ private actor JsonlSynchronizer {
         return entries
     }
     
-    func append<T: Codable>(_ entry: HistoryEntry<T>) throws {
+    private func _append(_ entry: T) throws {
         let encoder = JSONEncoder()
         let directory = fileURL.deletingLastPathComponent()
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -138,7 +144,7 @@ private actor JsonlSynchronizer {
         logger.debug("appended entry to disk")
     }
     
-    func rewrite<T: Codable>(_ entries: [HistoryEntry<T>]) throws {
+    private func _rewrite(_ entries: [T]) throws {
         let encoder = JSONEncoder()
         
         var fileData = Data()
