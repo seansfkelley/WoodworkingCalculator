@@ -82,14 +82,13 @@ extension Double {
 extension String {
     var withPrettyNumbers: String {
         self
-            .replacing(/(in|ft|mm|cm|m)(\[([0-9]+)\])?/, with: { match in
+            .replacing(/(in|ft|mm|cm|m)(\[(-?[0-9]+)\])?/, with: { match in
                 let exponent = if let raw = match.3 {
                     Int(raw)!
                 } else {
                     1
                 }
                 let unit = if exponent == 0 {
-                    // TODO: test this case
                     ""
                 } else if match.1 == "in" && exponent == 1 {
                     "\""

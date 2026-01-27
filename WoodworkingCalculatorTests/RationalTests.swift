@@ -16,15 +16,10 @@ struct RationalTests {
         #expect(input.formatted == expected)
     }
 
-    @Test
-    func unsafe() {
-        #expect(UncheckedRational(1, 2).unsafe == rational(1, 2))
-        // I don't know how to test for uncatchable runtime errors, so uh, just don't do it?
-    }
-
     @Test("==", arguments: [
         (rational(1, 2), rational(1, 2)),
         (rational(1, 2), rational(3, 6)),
+        (rational(1, -2), rational(-1, 2)),
     ]) func equality(left: Rational, right: Rational) {
         #expect(left == right)
     }
@@ -82,13 +77,38 @@ struct RationalTests {
     ]) func arithmetic(actual: Result<Rational, EvaluationError>, expected: Rational) {
         #expect(actual == .success(expected))
     }
-    
+}
+
+struct UncheckedRationalTests {
     @Test("checked", arguments: [
         (UncheckedRational(1, 1), Result.success(rational(1, 1))),
         (UncheckedRational(1, 0), Result.failure(EvaluationError.divisionByZero)),
     ])
     func checked(input: UncheckedRational, expected: Result<Rational, EvaluationError>) {
         #expect(input.checked == expected)
+    }
+    
+    @Test
+    func unsafe() {
+        #expect(UncheckedRational(1, 2).unsafe == rational(1, 2))
+        // I don't know how to test for uncatchable runtime errors, so uh, just don't do it?
+    }
+    
+    @Test("==", arguments: [
+        (UncheckedRational(1, 2), UncheckedRational(1, 2)),
+        (UncheckedRational(1, 2), UncheckedRational(3, 6)),
+        (UncheckedRational(1, -2), UncheckedRational(-1, 2)),
+    ]) func equality(left: UncheckedRational, right: UncheckedRational) {
+        #expect(left == right)
+    }
+    
+    @Test("!=", arguments: [
+        (UncheckedRational(1, 2), UncheckedRational(1, 3)),
+        (UncheckedRational(1, 2), UncheckedRational(2, 3)),
+        (UncheckedRational(1, 0), UncheckedRational(2, 0)),
+        (UncheckedRational(1, 0), UncheckedRational(1, 0)),
+    ]) func nonEquality(left: UncheckedRational, right: UncheckedRational) {
+        #expect(left != right)
     }
 }
 
