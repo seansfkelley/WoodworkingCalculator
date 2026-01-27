@@ -72,7 +72,7 @@ struct HistoryList: View {
                 if historyManager.entries.isEmpty {
                     ContentUnavailableView(
                         "No History",
-                        systemImage: "clock",
+                        systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90",
                         description: Text("Calculations you perform will appear here.")
                     )
                 } else {

@@ -51,135 +51,121 @@ struct ContentView: View {
     }
     
     var body: some View {
-        VStack {
-            HStack {
-                Button(action: { isSettingsPresented.toggle() }) {
-                    Image(systemName: "gear")
-                        .font(.system(size: 24))
-                        .foregroundStyle(.orange)
-                        .frame(width: 32, height: 32)
-                }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
-                .sheet(isPresented: $isSettingsPresented) {
-                    Settings()
-                        .background(.windowBackground)
-                        .presentationDetents([.medium])
-                }
-                Button(action: { isHistoryPresented.toggle() }) {
-                    Image(systemName: "clock")
-                        .font(.system(size: 24))
-                        .foregroundStyle(.orange)
-                        .frame(width: 32, height: 32)
-                }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
-                .sheet(isPresented: $isHistoryPresented) {
-                    HistoryList(
-                        historyManager: history,
-                        formattingOptions: formattingOptions,
-                        onSelectEntry: {
-                            previous = .init($0)
-                            input = .result($1)
-                            appendHistoryEntryIfDifferent($0, $1)
-                        }
+        NavigationStack {
+            VStack {
+                Text((previous?.value ?? "").withPrettyNumbers)
+                    .frame(
+                        minWidth: 0,
+                        maxWidth:  .infinity,
+                        minHeight: 40,
+                        maxHeight: 40,
+                        alignment: .trailing
                     )
-                        .background(.windowBackground)
-                        .presentationDetents([.medium, .large])
-                }
-                Spacer()
-
-                Menu {
-                    // Unfortunately it does not seem possible to right-align text in a Menu, so
-                    // we live with this rather awkward jagged-edge arrangement.
-                    switch input {
-                    case .result(let quantity):
-                        Section("Metric Conversions") {
-                            if let meters = quantity.meters {
-                                Text("= \(meters.formatAsDecimal(toPlaces: 3)) \(quantity.dimension.formatted(withUnit: "m"))".withPrettyNumbers)
-                                Text("= \((meters * 100 ^^ quantity.dimension).formatAsDecimal(toPlaces: 2)) \(quantity.dimension.formatted(withUnit: "cm"))".withPrettyNumbers)
-                                Text("= \((meters * 1000 ^^ quantity.dimension).formatAsDecimal(toPlaces: 1)) \(quantity.dimension.formatted(withUnit: "mm"))".withPrettyNumbers)
-                            } else {
-                                Text("Unitless values cannot be converted.")
-                            }
-                        }
-                    case .draft(let prefix, _):
-                        // Use "mm" and not just "m" because if there is already a trailing "m",
-                        // appending a single "m" would actually create a valid unit. o_O
-                        let valid = EvaluatableCalculation.isValidPrefix(prefix.value + "mm")
-                        Section("Insert Metric Unit") {
-                            Button(action: { append("m") }) { Text("insert \"m\"") }.disabled(!valid)
-                            Button(action: { append("cm") }) { Text("insert \"cm\"") }.disabled(!valid)
-                            Button(action: { append("mm") }) { Text("insert \"mm\"") }.disabled(!valid)
+                    .font(.system(size: 40))
+                    .foregroundStyle(.secondary)
+                    .truncateWithFade(width: 0.1, startingAt: 0.1)
+                    .lineLimit(1)
+                    .truncationMode(.head)
+                    .onTapGesture {
+                        if let previous {
+                            input = .draft(previous, nil)
+                            self.previous = nil
+                            isErrorPresented = false
+                            isRoundingErrorWarningPresented = false
                         }
                     }
-                } label: {
-                    Image(systemName: "ruler")
-                        .font(.system(size: 24))
-                        .foregroundStyle(.orange)
-                        .frame(width: 32, height: 32)
-                }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
-            }
-            // I have no idea why this HStack or the buttons in it seem to have a few more pixels of
-            // horizontal padding, which we compensate for here by not padding it out as much as the
-            // content below. The choice of `gridSpacing` is actually NOT significant except that it
-            // seems to be the right number empirically and maybe there's something to that.
-            .padding(.horizontal, CGFloat(gridSpacing))
-            Text((previous?.value ?? "").withPrettyNumbers)
-                .frame(
-                    minWidth: 0,
-                    maxWidth:  .infinity,
-                    minHeight: 40,
-                    maxHeight: 40,
-                    alignment: .trailing
+                    .padding(.horizontal, CGFloat(horizontalSpacing))
+                ResultReadout(
+                    input: input,
+                    formattingOptions: formattingOptions,
+                    isErrorPresented: $isErrorPresented,
+                    isRoundingErrorWarningPresented: $isRoundingErrorWarningPresented,
+                    shakeError: $shakeError,
+                    openSettings: {
+                        isRoundingErrorWarningPresented = false
+                        isSettingsPresented = true
+                    }
                 )
-                .font(.system(size: 40))
-                .foregroundStyle(.secondary)
-                .truncateWithFade(width: 0.1, startingAt: 0.1)
-                .lineLimit(1)
-                .truncationMode(.head)
-                .onTapGesture {
-                    if let previous {
-                        input = .draft(previous, nil)
-                        self.previous = nil
+                .padding(.horizontal, CGFloat(horizontalSpacing))
+                let backspaced: ValidExpressionPrefix? = switch input {
+                case .draft(let prefix, _): prefix.backspaced
+                case .result: nil
+                }
+                ButtonGrid(
+                    backspacedInput: backspaced,
+                    resetInput: {
+                        previous = nil
                         isErrorPresented = false
                         isRoundingErrorWarningPresented = false
+                        input = .draft($0, nil)
+                    },
+                    append: { string, canReplaceResult, trimmingSuffix in
+                        append(string, canReplaceResult: canReplaceResult, trimmingSuffix: trimmingSuffix)
+                    },
+                    evaluate: evaluate,
+                )
+                // Grid applies padding to the edges too, not just between items, so compensate here.
+                .padding(.horizontal, CGFloat(horizontalSpacing - gridSpacing))
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: { isSettingsPresented.toggle() }) {
+                        Image(systemName: "gear")
                     }
                 }
-                .padding(.horizontal, CGFloat(horizontalSpacing))
-            ResultReadout(
-                input: input,
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: { isHistoryPresented.toggle() }) {
+                        Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        // Unfortunately it does not seem possible to right-align text in a Menu, so
+                        // we live with this rather awkward jagged-edge arrangement.
+                        switch input {
+                        case .result(let quantity):
+                            Section("Metric Conversions") {
+                                if let meters = quantity.meters {
+                                    Text("= \(meters.formatAsDecimal(toPlaces: 3)) \(quantity.dimension.formatted(withUnit: "m"))".withPrettyNumbers)
+                                    Text("= \((meters * 100 ^^ quantity.dimension).formatAsDecimal(toPlaces: 2)) \(quantity.dimension.formatted(withUnit: "cm"))".withPrettyNumbers)
+                                    Text("= \((meters * 1000 ^^ quantity.dimension).formatAsDecimal(toPlaces: 1)) \(quantity.dimension.formatted(withUnit: "mm"))".withPrettyNumbers)
+                                } else {
+                                    Text("Unitless values cannot be converted.")
+                                }
+                            }
+                        case .draft(let prefix, _):
+                            // Use "mm" and not just "m" because if there is already a trailing "m",
+                            // appending a single "m" would actually create a valid unit. o_O
+                            let valid = EvaluatableCalculation.isValidPrefix(prefix.value + "mm")
+                            Section("Insert Metric Unit") {
+                                Button(action: { append("m") }) { Text("insert \"m\"") }.disabled(!valid)
+                                Button(action: { append("cm") }) { Text("insert \"cm\"") }.disabled(!valid)
+                                Button(action: { append("mm") }) { Text("insert \"mm\"") }.disabled(!valid)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "ruler")
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $isSettingsPresented) {
+            Settings()
+                .background(.windowBackground)
+                .presentationDetents([.medium])
+        }
+        .sheet(isPresented: $isHistoryPresented) {
+            HistoryList(
+                historyManager: history,
                 formattingOptions: formattingOptions,
-                isErrorPresented: $isErrorPresented,
-                isRoundingErrorWarningPresented: $isRoundingErrorWarningPresented,
-                shakeError: $shakeError,
-                openSettings: {
-                    isRoundingErrorWarningPresented = false
-                    isSettingsPresented = true
+                onSelectEntry: {
+                    previous = .init($0)
+                    input = .result($1)
+                    appendHistoryEntryIfDifferent($0, $1)
                 }
             )
-            .padding(.horizontal, CGFloat(horizontalSpacing))
-            let backspaced: ValidExpressionPrefix? = switch input {
-            case .draft(let prefix, _): prefix.backspaced
-            case .result: nil
-            }
-            ButtonGrid(
-                backspacedInput: backspaced,
-                resetInput: {
-                    previous = nil
-                    isErrorPresented = false
-                    isRoundingErrorWarningPresented = false
-                    input = .draft($0, nil)
-                },
-                append: { string, canReplaceResult, trimmingSuffix in
-                    append(string, canReplaceResult: canReplaceResult, trimmingSuffix: trimmingSuffix)
-                },
-                evaluate: evaluate,
-            )
-            // Grid applies padding to the edges too, not just between items, so compensate here.
-            .padding(.horizontal, CGFloat(horizontalSpacing - gridSpacing))
+                .background(.windowBackground)
+                .presentationDetents([.medium, .large])
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             // It seems like when foregrounding/backgrounding the app, it always bounces through
