@@ -48,6 +48,8 @@ struct ValidExpressionPrefix: Equatable, CustomStringConvertible {
     var description: String { value }
 
     var backspaced: ValidExpressionPrefix {
+        // If modifying this, modify String.withPrettyNumbers/Dimension.formatted.
+        // (I could not think of a way to couple them together at compile time.)
         if let match = value.firstMatch(of: /(in|ft|mm|cm|m)(\[[0-9]+\])?$/) {
             .init(unsafe: String(value[..<match.output.0.startIndex]))
         } else {

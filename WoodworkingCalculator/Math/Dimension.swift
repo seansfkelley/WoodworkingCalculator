@@ -27,6 +27,8 @@ struct Dimension: Equatable {
         self.value = value
     }
 
+    // If modifying this, modify ValidExpressionPrefix/String.withPrettyNumbers.
+    // (I could not think of a way to couple them together at compile time.)
     func formatted(withUnit unit: String) -> String { "\(unit)[\(value)]" }
 
     static let unitless = Dimension(0)

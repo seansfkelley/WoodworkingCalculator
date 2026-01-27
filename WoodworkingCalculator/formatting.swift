@@ -82,6 +82,8 @@ extension Double {
 extension String {
     var withPrettyNumbers: String {
         self
+            // If modifying this, modify ValidExpressionPrefix/Dimension.formatted.
+            // (I could not think of a way to couple them together at compile time.)
             .replacing(/(in|ft|mm|cm|m)(\[(-?[0-9]+)\])?/, with: { match in
                 let exponent = if let raw = match.3 {
                     Int(raw)!
