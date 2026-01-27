@@ -38,15 +38,20 @@ struct ValidExpressionPrefix: Equatable, CustomStringConvertible {
         value = quantity.formatted(with: options).0
     }
 
+    // Better to use this than to non-null assert -- in the worst case, the user will get into a
+    // weird state and either kill the program or hit clear-all rather than it just crashing
+    // outright. Not great, but way less obnoxious.
+    private init (unsafe: String) {
+        value = unsafe
+    }
+
     var description: String { value }
 
     var backspaced: ValidExpressionPrefix {
         if let match = value.firstMatch(of: /(in|ft|mm|cm|m)(\[[0-9]+\])?$/) {
-            // FIXME: Don't like non-null assertion.
-            .init(String(value.prefix(value.count - match.output.0.count)))!
+            .init(unsafe: String(value[..<match.output.0.startIndex]))
         } else {
-            // FIXME: Don't like non-null assertion.
-            .init(value.count == 0 ? "" : String(value.prefix(value.count - 1)))!
+            .init(unsafe: value.count == 0 ? "" : String(value.prefix(value.count - 1)))
         }
     }
 

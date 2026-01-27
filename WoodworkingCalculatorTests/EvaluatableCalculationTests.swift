@@ -213,12 +213,16 @@ struct EvaluatableCalculationTests {
             .success(.rational(rational(72, 1), .length)),
         ),
     ]) func from(input: String, expectedEvaluatable: EvaluatableCalculation, expectedResult: Result<Quantity, EvaluationError>) throws {
-        let evaluatable = EvaluatableCalculation.from(input)
-        // FIXME: I would like to do straight equality, but I don't want to give UncheckedRational
-        // an equality definition since it does not reduce to lowest terms, etc.
-        #expect(evaluatable?.description == expectedEvaluatable.description)
+        let evaluatable = try #require(EvaluatableCalculation.from(input))
+        // Would prefer to do straight equality, but this requires a lot of machinery or test
+        // changes: there are some reals in here, like with the metric conversions, and those have
+        // to be fuzzy-equated. A fuzzy operator can be defined, but then the tests will fail
+        // because a 1/0 rational is not considered equal to ANY other rational by design. This
+        // relies on the rounding behavior of .real plus the fact that stringification doesn't care
+        // about the numerical significance of "1/0" to allow us to do an acceptable assertion.
+        #expect(evaluatable.description == expectedEvaluatable.description)
         
-        let actualResult = evaluatable!.evaluate()
+        let actualResult = evaluatable.evaluate()
 
         switch (actualResult, expectedResult) {
         case (.success(.real(let actualValue, let actualDim)), .success(.real(let expectedValue, let expectedDim))):
