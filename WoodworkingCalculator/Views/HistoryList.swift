@@ -176,11 +176,11 @@ private struct HistoryListItem: View {
         HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(entry.input.withPrettyNumbers)
-                    .font(.caption)
+                    .font(.callout)
                     .foregroundStyle(.secondary)
 
                 Text(entry.formattedResult.withPrettyNumbers)
-                    .font(.body)
+                    .font(.title3)
                     .foregroundStyle(.primary)
             }
 
