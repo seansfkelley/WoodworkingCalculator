@@ -181,7 +181,6 @@ private struct HistoryListItem: View {
                     .font(.body)
                     .foregroundStyle(.primary)
             }
-            .padding(.vertical, 4)
 
             let upToDateFormattedResult = entry.result.quantity.formatted(with: formattingOptions).0
             if entry.formattedResult != upToDateFormattedResult {
@@ -192,7 +191,7 @@ private struct HistoryListItem: View {
                     Image(systemName: "notequal")
                         .font(.title2)
                         .foregroundStyle(.secondary)
-                        .padding()
+                        .padding(.horizontal)
                 }
                 .buttonStyle(.plain)
                 .popover(
