@@ -108,10 +108,12 @@ struct HistoryList: View {
                                         }
                                     }
                                 }
+                                .listRowSeparator(.visible, edges: .all)
                             }
                         }
                     }
                     .listStyle(.plain)
+                    .listSectionSeparator(.visible)
                     .environment(\.editMode, $editMode)
                 }
             }
