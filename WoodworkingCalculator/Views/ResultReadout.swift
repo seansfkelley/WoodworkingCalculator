@@ -9,7 +9,7 @@ struct ResultReadout: View {
     let openSettings: () -> Void
 
     private var epsilon: Double {
-        pow(0.1, Double(Constants.decimalDigitsOfPrecision))
+        pow(0.1, Double(Constants.DecimalPrecision.standard))
     }
 
     var body: some View {
@@ -51,19 +51,19 @@ struct ResultReadout: View {
                         let actual = quantity.toReal().formatInches(
                             as: formattingOptions.unit,
                             of: roundingError.dimension,
-                            toPlaces: Constants.decimalDigitsOfPrecisionExtended
+                            toPlaces: Constants.DecimalPrecision.roundingError,
                         ).withPrettyNumbers
                         let absError = abs(roundingError.error).formatInches(
                             as: formattingOptions.unit,
                             of: roundingError.dimension,
-                            toPlaces: Constants.decimalDigitsOfPrecisionExtended
+                            toPlaces: Constants.DecimalPrecision.roundingError,
                         ).withPrettyNumbers
                         let precision = roundingError.dimension == .length
                         ? roundingError.oneDimensionalPrecision.rational.formatted + "\""
                         : Double(roundingError.dimensionallyAdjustedPrecision.rational).formatInches(
                             as: .inches,
                             of: roundingError.dimension,
-                            toPlaces: Constants.decimalDigitsOfPrecision
+                            toPlaces: Constants.DecimalPrecision.standard,
                         ).withPrettyNumbers
                         let sign = roundingError.error.sign == .plus ? "+" : "−"
 

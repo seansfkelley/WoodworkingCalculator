@@ -31,8 +31,8 @@ struct ContentView: View {
         .init(
             displayInchesOnly ? .inches : .feet,
             precision,
-            Constants.decimalDigitsOfPrecision,
-            Constants.decimalDigitsOfPrecisionUnitless,
+            Constants.DecimalPrecision.standard,
+            Constants.DecimalPrecision.unitless,
         )
     }
 

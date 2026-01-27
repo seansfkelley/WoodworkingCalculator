@@ -12,7 +12,9 @@ struct Constants {
         static let assumeInchesDefault = true
     }
 
-    static let decimalDigitsOfPrecision = 3
-    static let decimalDigitsOfPrecisionExtended = 6
-    static let decimalDigitsOfPrecisionUnitless = 9
+    struct DecimalPrecision {
+        static let standard = 3
+        static let roundingError = 4
+        static let unitless = 9
+    }
 }
