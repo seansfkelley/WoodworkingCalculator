@@ -1,7 +1,15 @@
 import Foundation
 
-enum EvaluationError: LocalizedError, Equatable {
+enum EvaluationError: LocalizedError, Equatable, CustomStringConvertible {
     case divisionByZero, incompatibleDimensions, negativeDimension
+
+    var description: String {
+        switch self {
+        case .divisionByZero: ".divisionByZero"
+        case .incompatibleDimensions: ".incompatibleDimensions"
+        case .negativeDimension: ".negativeDimension"
+        }
+    }
 
     var errorDescription: String? {
         switch self {

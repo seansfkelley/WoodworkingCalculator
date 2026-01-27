@@ -1,4 +1,4 @@
-enum EvaluatableCalculation: CustomStringConvertible {
+enum EvaluatableCalculation: FuzzyEquatable, Equatable, CustomStringConvertible {
     // n.b. all quantities are in inches (or fractions thereof)
     case rational(UncheckedRational, Dimension)
     case real(Double, Dimension)
@@ -46,6 +46,22 @@ enum EvaluatableCalculation: CustomStringConvertible {
              .multiply(let left, let right),
              .divide(let left, let right):
             left.allDimensionsAreUnitless && right.allDimensionsAreUnitless
+        }
+    }
+
+    static func ~== (lhs: EvaluatableCalculation, rhs: EvaluatableCalculation) -> Bool {
+        switch (lhs, rhs) {
+        case (.rational(let lRat, let lDim), .rational(let rRat, let rDim)):
+            return lRat ~== rRat && lDim ~== rDim
+        case (.real(let lVal, let lDim), .real(let rVal, let rDim)):
+            return lVal ~== rVal && lDim ~== rDim
+        case (.add(let lLeft, let lRight), .add(let rLeft, let rRight)),
+             (.subtract(let lLeft, let lRight), .subtract(let rLeft, let rRight)),
+             (.multiply(let lLeft, let lRight), .multiply(let rLeft, let rRight)),
+             (.divide(let lLeft, let lRight), .divide(let rLeft, let rRight)):
+            return lLeft ~== rLeft && lRight ~== rRight
+        default:
+            return false
         }
     }
 

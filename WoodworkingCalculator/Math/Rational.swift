@@ -1,4 +1,4 @@
-struct UncheckedRational: CustomStringConvertible {
+struct UncheckedRational: FuzzyEquatable, Equatable, CustomStringConvertible {
     let num: Int
     let den: Int
     

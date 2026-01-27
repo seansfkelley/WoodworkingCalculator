@@ -15,7 +15,7 @@ precedencegroup DimensionExponentiationPrecedence {
 // dimension) but will be if unary negation is ever pushed down to bind more tightly than dimension.
 infix operator ^^: DimensionExponentiationPrecedence
 
-struct Dimension: Equatable {
+struct Dimension: FuzzyEquatable, Equatable {
     // 0 = unassigned (will adopt whatever it is combined with)
     // 1 = unitless
     // 2 = length

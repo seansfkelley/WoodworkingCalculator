@@ -213,20 +213,12 @@ struct EvaluatableCalculationTests {
             .success(.rational(rational(72, 1), .length)),
         ),
     ]) func from(input: String, expectedEvaluatable: EvaluatableCalculation, expectedResult: Result<Quantity, EvaluationError>) throws {
-        let evaluatable = EvaluatableCalculation.from(input)
-        // FIXME: I would like to do straight equality, but I don't want to give UncheckedRational
-        // an equality definition since it does not reduce to lowest terms, etc.
-        #expect(evaluatable?.description == expectedEvaluatable.description)
-        
-        let actualResult = evaluatable!.evaluate()
+        let evaluatable = try #require(EvaluatableCalculation.from(input))
+        try #require(evaluatable ~== expectedEvaluatable)
 
-        switch (actualResult, expectedResult) {
-        case (.success(.real(let actualValue, let actualDim)), .success(.real(let expectedValue, let expectedDim))):
-            #expect(actualDim == expectedDim)
-            #expect(actualValue.isApproximatelyEqual(to: expectedValue, relativeTolerance: 0.000001))
-        default:
-            #expect(actualResult == expectedResult)
-        }
+        let actualResult = evaluatable.evaluate()
+        #expect(actualResult ~== expectedResult)
+
     }
 
     @Test("from (nil)", arguments: [
