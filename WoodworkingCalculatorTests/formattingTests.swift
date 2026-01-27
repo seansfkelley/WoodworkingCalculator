@@ -67,10 +67,12 @@ struct FormattingTests {
         ("12in", "12\""),
         ("1ft", "1'"),
         ("15 3/8in", "15\u{2002}³⁄₈\""),
+        ("1in[0]", "1"),
+        ("1in[-1]", "1in⁻¹"),
         ("144in[2]", "144in²"),
         ("25.5in[2]", "25.5in²"),
         ("1728ft[3]", "1728ft³"),
-        ("3/", "³⁄ "), // note the trailing space -- the fraction slash gets cut off without a "denominator"
+        ("3/", "³⁄ "), // note the trailing space -- the fraction slash gets visually cut off without a "denominator"
         ("12 3/", "12\u{2002}³⁄ "), // note the trailing space again
         ("12 ", "12\u{2002}"), // this space might not end up as a mixed number but we widen it for visuals anyway
         ("4ft 5", "4' 5"),

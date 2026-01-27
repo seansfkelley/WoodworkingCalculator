@@ -18,6 +18,14 @@ struct UncheckedRational: CustomStringConvertible {
     }
 
     var unsafe: Rational { Rational(num, den) }
+
+    public static func == (lhs: UncheckedRational, rhs: UncheckedRational) -> Bool {
+        // Following NaN, invalid rationals are not equal to anything else.
+        switch (lhs.checked, rhs.checked) {
+        case (.success(let left), .success(let right)): left == right
+        default: false
+        }
+    }
 }
 
 struct Rational: Equatable, Hashable, CustomStringConvertible {
