@@ -94,6 +94,7 @@ struct HistoryList: View {
                                         .contentShape(Rectangle())
                                     }
                                     .buttonStyle(.plain)
+                                    .listRowBackground(Color.clear)
                                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                         Button(role: .destructive) {
                                             historyManager.delete(ids: [entry.id])
@@ -113,7 +114,6 @@ struct HistoryList: View {
                         }
                     }
                     .listStyle(.plain)
-                    .listSectionSeparator(.visible)
                     .environment(\.editMode, $editMode)
                 }
             }
