@@ -22,27 +22,39 @@ Supports idiomatic entry of fractions (including top-heavy ones), mixed numbers 
 
 Dedicated buttons for feet ("), inches ('), fractions (/) and common fractions (half, quarter, eighth, sixteenth) make input quick.
 
-![](./screenshots/small/basic-addition-before.png)
+![](./screenshots/basic-addition-before.png)
 
 Results are always shown in fractional US customary units.
 
-![](./screenshots/small/basic-addition-after.png)
+![](./screenshots/basic-addition-after.png)
 
 But you can use feet and inches both for larger measures.
 
-![](./screenshots/small/feet-and-inches.png)
+![](./screenshots/feet-and-inches.png)
 
-Or even show the result in metric.
+And show the result in metric.
 
-![](./screenshots/small/customary-to-metric.png)
+![](./screenshots/customary-to-metric.png)
 
 You can even input metric if you need to mix systems.
 
-![](./screenshots/small/math-with-metric-before.png)
+![](./screenshots/math-with-metric-before.png)
 
 And results will be shown in US customary, indicating any rounding errors above 0.001".
 
-![](./screenshots/small/math-with-metric-after-and-approximations.png)
+![](./screenshots/math-with-metric-after-and-approximations.png)
+
+You can consult the history of calculations you've made.
+
+![](./screenshots/calculation-history.png)
+
+It understands area and volume measures as well.
+
+![](./screenshots/area-measures.png)
+
+And, of course, has a dark mode.
+
+![](./screenshots/dark-mode.png)
 
 ## Building
 
