@@ -2,6 +2,7 @@ enum EvaluatableCalculation: CustomStringConvertible {
     // n.b. all quantities are in inches (or fractions thereof)
     case rational(UncheckedRational, Dimension)
     case real(Double, Dimension)
+    indirect case negate(EvaluatableCalculation)
     indirect case add(EvaluatableCalculation, EvaluatableCalculation)
     indirect case subtract(EvaluatableCalculation, EvaluatableCalculation)
     indirect case multiply(EvaluatableCalculation, EvaluatableCalculation)
@@ -15,6 +16,8 @@ enum EvaluatableCalculation: CustomStringConvertible {
             let rounded = (value * 1_000_000).rounded() / 1_000_000
             let prefix = rounded == value ? "" : "~"
             return "\(prefix)\(rounded)\(dimension.formatted(withUnit: "in"))"
+        case .negate(let value):
+            return "-(\(value))"
         case .add(let left, let right):
             return "(\(left) + \(right))"
         case .subtract(let left, let right):
@@ -30,6 +33,7 @@ enum EvaluatableCalculation: CustomStringConvertible {
         switch self {
         case .rational(let value, let dim): value.checked.map { .rational($0, dim) }
         case .real(let value, let dim): .success(.real(value, dim))
+        case .negate(let value): Self.evaluateBinaryOperator(.rational(.init(0, 1), .unitless), (-), (-), value, (-))
         case .add(let left, let right): Self.evaluateBinaryOperator(left, (+), (+), right, (+))
         case .subtract(let left, let right): Self.evaluateBinaryOperator(left, (-), (-), right, (-))
         case .multiply(let left, let right): Self.evaluateBinaryOperator(left, (*), (*), right, (*))
@@ -41,6 +45,8 @@ enum EvaluatableCalculation: CustomStringConvertible {
         return switch self {
         case .rational(_, let dimension), .real(_, let dimension):
             dimension == .unitless
+        case .negate(let value):
+            value.allDimensionsAreUnitless
         case .add(let left, let right),
              .subtract(let left, let right),
              .multiply(let left, let right),

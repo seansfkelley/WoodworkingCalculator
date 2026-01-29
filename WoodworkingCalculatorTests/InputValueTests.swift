@@ -16,17 +16,17 @@ struct InputValueTests {
     )
 
     @Test func appendFromEmpty() throws {
-        var input: InputValue? = .draft(.init(), nil)
+        var input: InputValue = .draft(.init(), nil)
 
-        try #require(input!.appending(suffix: " ", formattingResultWith: formatOptions) == nil) // no whitespace-only strings
-        input = try #require(input!.appending(suffix: "1", formattingResultWith: formatOptions))
-        input = try #require(input!.appending(suffix: " ", formattingResultWith: formatOptions))
-        try #require(input!.appending(suffix: " ", formattingResultWith: formatOptions) == nil) // duplicative whitespace is ignored
-        input = try #require(input!.appending(suffix: "+", formattingResultWith: formatOptions))
-        try #require(input!.appending(suffix: "+", formattingResultWith: formatOptions) == nil) // invalid syntax
-        try #require(input!.appending(suffix: "/", formattingResultWith: formatOptions) == nil) // still invalid syntax
-        input = try #require(input!.appending(suffix: " ", formattingResultWith: formatOptions))
-        input = try #require(input!.appending(suffix: "1", formattingResultWith: formatOptions))
+        try #require(input.appending(suffix: " ", formattingResultWith: formatOptions) == nil) // no whitespace-only strings
+        input = try #require(input.appending(suffix: "1", formattingResultWith: formatOptions))
+        input = try #require(input.appending(suffix: " ", formattingResultWith: formatOptions))
+        try #require(input.appending(suffix: " ", formattingResultWith: formatOptions) == nil) // duplicative whitespace is ignored
+        input = try #require(input.appending(suffix: "+", formattingResultWith: formatOptions))
+        try #require(input.appending(suffix: "+", formattingResultWith: formatOptions) == nil) // invalid syntax
+        try #require(input.appending(suffix: "/", formattingResultWith: formatOptions) == nil) // still invalid syntax
+        input = try #require(input.appending(suffix: " ", formattingResultWith: formatOptions))
+        input = try #require(input.appending(suffix: "1", formattingResultWith: formatOptions))
         
         if case .draft(let prefix, _) = input {
             #expect(prefix.value == "1 + 1")
@@ -36,13 +36,13 @@ struct InputValueTests {
     }
 
     @Test func appendingToResult() throws {
-        var input: InputValue? = .result(.real(1.0, .length))
+        var input: InputValue = .result(.real(1.0, .length))
         
         // would not create a legal (prefix of an) expression without replacement
-        try #require(input!.appending(suffix: "2", formattingResultWith: formatOptions) == nil)
+        try #require(input.appending(suffix: "2", formattingResultWith: formatOptions) == nil)
         
         // okay to replace with a legal (prefix of an) expression
-        input = try #require(input!.appending(suffix: "2", formattingResultWith: formatOptions, allowingResultReplacement: true))
+        input = try #require(input.appending(suffix: "2", formattingResultWith: formatOptions, allowingResultReplacement: true))
         if case .draft(let prefix, _) = input {
             #expect(prefix.value == "2")
         } else {
@@ -51,7 +51,7 @@ struct InputValueTests {
         
         // can append "+" to result
         input = .result(.real(1.0, .length))
-        input = try #require(input!.appending(suffix: "+", formattingResultWith: formatOptions))
+        input = try #require(input.appending(suffix: "+", formattingResultWith: formatOptions))
         if case .draft(let prefix, _) = input {
             #expect(prefix.value == "1in+")
         } else {
@@ -60,17 +60,17 @@ struct InputValueTests {
         
         // no whitespace-only strings if trying to overwrite a result
         input = .result(.real(1.0, .length))
-        try #require(input!.appending(suffix: " ", formattingResultWith: formatOptions, allowingResultReplacement: true) == nil)
+        try #require(input.appending(suffix: " ", formattingResultWith: formatOptions, allowingResultReplacement: true) == nil)
     }
 
     @Test func appendDeletingSuffix() throws {
-        var input: InputValue? = .draft(ValidExpressionPrefix("1 ")!, nil)
+        var input: InputValue = .draft(ValidExpressionPrefix("1 ")!, nil)
         
         // sanity-check that this case doesn't work without trimmingSuffix
-        try #require(input!.appending(suffix: "/4", formattingResultWith: formatOptions) == nil)
+        try #require(input.appending(suffix: "/4", formattingResultWith: formatOptions) == nil)
         
         // works with trimmingSuffix
-        input = try #require(input!.appending(suffix: "/4", formattingResultWith: formatOptions, trimmingSuffix: .whitespaceAndFractionSlash))
+        input = try #require(input.appending(suffix: "/4", formattingResultWith: formatOptions, trimmingSuffix: .whitespaceAndFractionSlash))
         if case .draft(let prefix, _) = input {
             #expect(prefix.value == "1/4")
         } else {
@@ -80,10 +80,10 @@ struct InputValueTests {
         input = .draft(ValidExpressionPrefix("1/")!, nil)
         
         // sanity-check that this case doesn't work without trimmingSuffix
-        try #require(input!.appending(suffix: "/4", formattingResultWith: formatOptions) == nil)
+        try #require(input.appending(suffix: "/4", formattingResultWith: formatOptions) == nil)
         
         // works with trimmingSuffix
-        input = try #require(input!.appending(suffix: "/4", formattingResultWith: formatOptions, trimmingSuffix: .whitespaceAndFractionSlash))
+        input = try #require(input.appending(suffix: "/4", formattingResultWith: formatOptions, trimmingSuffix: .whitespaceAndFractionSlash))
         if case .draft(let prefix, _) = input {
             #expect(prefix.value == "1/4")
         } else {

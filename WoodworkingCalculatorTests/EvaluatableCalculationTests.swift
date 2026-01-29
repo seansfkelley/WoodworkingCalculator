@@ -115,22 +115,26 @@ struct EvaluatableCalculationTests {
         ),
         (
             "-1",
-            .subtract(
-                .rational(UncheckedRational(0, 1), .unitless),
-                .rational(UncheckedRational(1, 1), .unitless),
-            ),
+            .negate(.rational(UncheckedRational(1, 1), .unitless)),
             .success(.rational(rational(-1, 1), .unitless)),
         ),
         (
             "1 -- 2",
             .subtract(
                 .rational(UncheckedRational(1, 1), .unitless),
-                .subtract(
-                    .rational(UncheckedRational(0, 1), .unitless),
-                    .rational(UncheckedRational(2, 1), .unitless),
-                )
+                .negate(.rational(UncheckedRational(2, 1), .unitless)),
             ),
             .success(.rational(rational(3, 1), .unitless)),
+        ),
+        (
+            "-(1 + 1)",
+            .negate(
+                .add(
+                    .rational(UncheckedRational(1, 1), .unitless),
+                    .rational(UncheckedRational(1, 1), .unitless),
+                ),
+            ),
+            .success(.rational(rational(-2, 1), .unitless)),
         ),
         (
             "1/0",
@@ -243,6 +247,7 @@ struct EvaluatableCalculationTests {
         "()",
         ")",
         "(1+",
+        "--4",
         "1 / (1 + 1)", // slash is for fractions, not division
     ]) func fromNil(input: String) throws {
         #expect(EvaluatableCalculation.from(input) == nil)
@@ -286,6 +291,7 @@ struct EvaluatableCalculationTests {
         "--",
         "()",
         ")",
+        "1---",
         "1*", // not the correct spelling of multiplication
         "1'", // not the correct internal representation
         "1\"", // not the correct internal representation

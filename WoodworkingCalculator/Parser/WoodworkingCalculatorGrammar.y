@@ -15,15 +15,12 @@ multiplicative ::= multiplicative(left) Multiply atom(right). { .multiply(left, 
 multiplicative ::= multiplicative(left) Divide atom(right). { .divide(left, right) }
 multiplicative ::= atom(x). { x }
 
-// We define unary negation non-recursively here so that you can't write ----4 (etc.). We also
-// intentionally use a .rational as a minuend so that we (1) don't have to define a dedicated
-// .negate operation and (2) so that if the subtrahend is a rational, we keep the whole expression
-// rational instead of dropping down into floating-point.
+// We define unary negation non-recursively here so that you can't write ----4 (etc.).
 %nonterminal_type atom EvaluatableCalculation
 atom ::= quantity(x). { x }
-atom ::= Subtract quantity(x). { .subtract(.rational(UncheckedRational(0, 1), .unitless), x) }
+atom ::= Subtract quantity(x). { .negate(x) }
 atom ::= LeftParen expression(x) RightParen. { x }
-atom ::= Subtract LeftParen expression(x) RightParen. { .subtract(.rational(UncheckedRational(0, 1), .unitless), x) }
+atom ::= Subtract LeftParen expression(x) RightParen. { .negate(x) }
 
 %nonterminal_type quantity EvaluatableCalculation
 // Decimal ratio is exact, by definition of the US customary system: 1" = 25.4mm.
