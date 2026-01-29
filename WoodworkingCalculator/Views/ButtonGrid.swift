@@ -32,15 +32,15 @@ struct ButtonGrid: View {
             GridGroup {
                 CalculatorButton(.text("'"), .gray, action: { append(UsCustomaryUnit.feet.abbreviation, false, nil) })
                     .contextMenu {
-                        DimensionButton(.feet, .length) { append($0, false, nil) }
-                        DimensionButton(.feet, .area) { append($0, false, nil) }
-                        DimensionButton(.feet, .volume) { append($0, false, nil) }
+                        DimensionMenuButton(.feet, .length) { append($0, false, nil) }
+                        DimensionMenuButton(.feet, .area) { append($0, false, nil) }
+                        DimensionMenuButton(.feet, .volume) { append($0, false, nil) }
                     }
                 CalculatorButton(.text("\""), .gray, action: { append(UsCustomaryUnit.inches.abbreviation, false, nil) })
                     .contextMenu {
-                        DimensionButton(.inches, .length) { append($0, false, nil) }
-                        DimensionButton(.inches, .area) { append($0, false, nil) }
-                        DimensionButton(.inches, .volume) { append($0, false, nil) }
+                        DimensionMenuButton(.inches, .length) { append($0, false, nil) }
+                        DimensionMenuButton(.inches, .area) { append($0, false, nil) }
+                        DimensionMenuButton(.inches, .volume) { append($0, false, nil) }
                     }
                 CalculatorButton(.text("."), .gray) { append(".", true, nil) }
                 CalculatorButton(.image("multiply"), .orange) { append("×", false, nil) }
@@ -81,6 +81,100 @@ struct ButtonGrid: View {
                 CalculatorButton(.text("⁄₁₆"), .gray, contentOffset: CGPoint(x: 4, y: 0)) {
                     append("/16", false, .whitespaceAndFractionSlash)
                 }
+            }
+        }
+    }
+}
+
+private struct CalculatorButton: View {
+    enum Content {
+        case text(String)
+        case image(String)
+    }
+
+    let content: Content
+    let fill: Color
+    let contentOffset: CGPoint
+    let action: () -> Void
+
+
+    init(_ content: Content, _ fill: Color, contentOffset: CGPoint = CGPoint(), action: @escaping () -> Void) {
+        self.content = content
+        self.fill = fill
+        self.contentOffset = contentOffset
+        self.action = action
+    }
+
+    var body: some View {
+        Button(action: action) {
+            switch content {
+            case .text(let text):
+                Text(text)
+                    .font(.system(size: 40))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .offset(x: contentOffset.x, y: contentOffset.y)
+            case .image(let image):
+                Image(systemName: image)
+                    .font(.system(size: 40))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .offset(x: contentOffset.x, y: contentOffset.y)
+            }
+        }
+        .buttonStyle(CalculatorButtonStyle(fill))
+        .buttonBorderShape(.roundedRectangle(radius: .infinity))
+    }
+}
+
+private struct CalculatorButtonStyle: ButtonStyle {
+    private let animation = Animation.spring(response: 0.2, dampingFraction: 0.7)
+
+    let fill: Color
+
+    init(_ fill: Color) {
+        self.fill = fill
+    }
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background((configuration.isPressed ? fill.mix(with: .white, by: 0.3) : fill).animation(animation))
+            .clipShape(RoundedRectangle(cornerRadius: .infinity))
+            .glassEffect()
+            .scaleEffect(configuration.isPressed ? 1.1 : 1.0)
+            .animation(animation, value: configuration.isPressed)
+    }
+}
+
+private struct DimensionMenuButton: View {
+    let dimension: Dimension
+    let unit: UsCustomaryUnit
+    let onSelect: (String) -> Void
+
+    init(_ unit: UsCustomaryUnit, _ dimension: Dimension, onSelect: @escaping (String) -> Void) {
+        self.unit = unit
+        self.dimension = dimension
+        self.onSelect = onSelect
+    }
+
+    private var systemImage: String? {
+        switch dimension {
+        case .length: "line.diagonal"
+        case .area: "square"
+        case .volume: "cube"
+        default: nil
+        }
+    }
+
+    var body: some View {
+        let formatted = dimension.formatted(withUnit: unit.abbreviation)
+        Button {
+            onSelect(formatted)
+        } label: {
+            if let systemImage {
+                Label(formatted.withPrettyNumbers, systemImage: systemImage)
+            } else {
+                Text(formatted.withPrettyNumbers)
             }
         }
     }
