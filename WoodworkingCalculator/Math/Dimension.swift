@@ -16,11 +16,6 @@ precedencegroup DimensionExponentiationPrecedence {
 infix operator ^^: DimensionExponentiationPrecedence
 
 struct Dimension: Equatable {
-    // 0 = unassigned (will adopt whatever it is combined with)
-    // 1 = unitless
-    // 2 = length
-    // 3 = area
-    // etc.
     var value: UInt
 
     init(_ value: UInt) {
@@ -31,6 +26,7 @@ struct Dimension: Equatable {
     // (I could not think of a way to couple them together at compile time.)
     func formatted(withUnit unit: String) -> String { "\(unit)[\(value)]" }
 
+    // Unitless adopts the dimension of whatever it is combined with, for user input convenience.
     static let unitless = Dimension(0)
     static let length = Dimension(1)
     static let area = Dimension(2)
@@ -87,14 +83,12 @@ struct Dimension: Equatable {
             return lhs
         }
 
-        let sign = lhs.signum()
-
         var result = lhs
         for _ in 1..<rhs.value {
             result *= lhs
         }
         
-        return result * sign
+        return result
     }
     
     static func ^^ (lhs: Double, rhs: Dimension) -> Double {

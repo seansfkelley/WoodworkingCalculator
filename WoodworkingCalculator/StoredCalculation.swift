@@ -1,5 +1,8 @@
 // To preserve migration safety, this should not store anything beyond primitives or types defined here.
 struct StoredCalculation: Codable {
+    // Unsure how to enforce this without blowing up the type complexity in this file considerably,
+    // but, this this never be constructed directly -- only from a Quantity. This helps enforce the
+    // runtime-only assertion that the rational's denominator is not zero.
     enum Result: Codable {
         case real(Double, UInt)
         case rational(Int, Int, UInt)

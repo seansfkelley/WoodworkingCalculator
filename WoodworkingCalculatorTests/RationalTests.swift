@@ -8,14 +8,6 @@ private func rational(_ num: Int, _ den: Int) -> Rational {
 }
 
 struct RationalTests {
-    @Test("formatted", arguments: [
-        (rational(1, 2), "1/2"),
-        (rational(3, 1), "3"),
-        (rational(-1, -2), "1/2"),
-    ]) func formatted(input: Rational, expected: String) {
-        #expect(input.formatted == expected)
-    }
-
     @Test("==", arguments: [
         (rational(1, 2), rational(1, 2)),
         (rational(1, 2), rational(3, 6)),
@@ -44,6 +36,7 @@ struct RationalTests {
     @Test("signum", arguments: [
         (rational(1, 2), 1),
         (rational(0, 1), 0),
+        (rational(0, -1), 0),
         (rational(-1, -2), 1),
         (rational(-1, 2), -1),
         (rational(1, -2), -1),
@@ -53,10 +46,22 @@ struct RationalTests {
     
     @Test("description", arguments: [
         (rational(1, 2), "1/2"),
+        (rational(0, -1), "0/-1"),
+        (rational(-2, 1), "-2/1"),
     ]) func description(input: Rational, expected: String) {
         #expect(input.description == expected)
     }
-    
+
+    @Test("formatted", arguments: [
+        (rational(1, 2), "1/2"),
+        (rational(3, 1), "3"),
+        (rational(-1, -2), "1/2"),
+        (rational(0, -2), "0"),
+        (rational(1, -2), "-1/2"),
+    ]) func formatted(input: Rational, expected: String) {
+        #expect(input.formatted == expected)
+    }
+
     @Test("roundedTo", arguments: [
         (rational(1, 2), 4, rational(1, 2), 0.0),
         (rational(3, 32), 8, rational(1, 8), 1.0 / 32),

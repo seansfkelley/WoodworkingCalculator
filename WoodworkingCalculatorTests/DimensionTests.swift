@@ -5,23 +5,25 @@ import Testing
 struct DimensionTests {
     @Test<[(Result<Dimension, EvaluationError>, Result<Dimension, EvaluationError>)]>("Dimension operators", arguments: [
         // Addition
-        (Dimension(2) + Dimension(2), .success(Dimension(2))),
+        (Dimension.area + Dimension.area, .success(Dimension.area)),
         (Dimension.unitless + Dimension.length, .success(Dimension.length)),
         (Dimension.length + Dimension.unitless, .success(Dimension.length)),
-        (Dimension(1) + Dimension(2), .failure(.incompatibleDimensions)),
+        (Dimension.length + Dimension.area, .failure(.incompatibleDimensions)),
 
         // Subtraction
-        (Dimension(3) - Dimension(3), .success(Dimension(3))),
-        (Dimension(2) - Dimension(1), .failure(.incompatibleDimensions)),
+        (Dimension.volume - Dimension.volume, .success(Dimension.volume)),
+        (Dimension.area - Dimension.length, .failure(.incompatibleDimensions)),
         (Dimension.unitless - Dimension.length, .success(Dimension.length)),
         (Dimension.length - Dimension.unitless, .success(Dimension.length)),
 
         // Multiplication
-        (Dimension(1) * Dimension(2), .success(Dimension(3))),
+        (Dimension.length * Dimension.area, .success(Dimension.volume)),
+        (Dimension.area * Dimension.unitless, .success(Dimension.area)),
 
         // Division
-        (Dimension(2) / Dimension(1), .success(Dimension(1))),
-        (Dimension(1) / Dimension(2), .failure(.negativeDimension)),
+        (Dimension.area / Dimension.length, .success(Dimension.length)),
+        (Dimension.area / Dimension.unitless, .success(Dimension.area)),
+        (Dimension.length / Dimension.area, .failure(.negativeDimension)),
     ])
     func dimensionOperations(actual: Result<Dimension, EvaluationError>, expected: Result<Dimension, EvaluationError>) {
         #expect(actual == expected)
@@ -33,6 +35,14 @@ struct DimensionTests {
         (2 ^^ Dimension(3), 8),
     ])
     func dimensionExponentiationInt(actual: Int, expected: Int) {
+        #expect(actual == expected)
+    }
+
+    @Test("Dimension-exponentiation operator (UInt)", arguments: [
+        (5 ^^ Dimension(0), 5),
+        (2 ^^ Dimension(3), 8),
+    ])
+    func dimensionExponentiationUint(actual: UInt, expected: Int) {
         #expect(actual == expected)
     }
 
