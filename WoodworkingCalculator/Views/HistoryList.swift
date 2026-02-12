@@ -60,6 +60,7 @@ enum TelescopingTimeBound: Equatable {
 
 struct HistoryList: View {
     let historyManager: ChronologicalHistoryManager<StoredCalculation>
+    let assumeInches: Bool
     let formattingOptions: Quantity.FormattingOptions
     let onSelectEntry: (String, EvaluationResult) -> Void
     @Environment(\.dismiss) private var dismiss
@@ -82,12 +83,13 @@ struct HistoryList: View {
                                 ForEach(entries) { entry in
                                     Button {
                                         if editMode == .inactive {
-                                            onSelectEntry(entry.data.input, EvaluationResult(quantity: entry.data.result.quantity, noUnitsSpecified: entry.data.noUnitsSpecified))
+                                            onSelectEntry(entry.data.input, entry.data.result.deserialized)
                                             dismiss()
                                         }
                                     } label: {
                                         HistoryListItem(
                                             entry: entry.data,
+                                            assumeInches: assumeInches,
                                             formattingOptions: formattingOptions
                                         )
                                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -169,6 +171,7 @@ struct HistoryList: View {
 
 private struct HistoryListItem: View {
     let entry: StoredCalculation
+    let assumeInches: Bool
     let formattingOptions: Quantity.FormattingOptions
     @State private var showingPopover = false
     
@@ -184,7 +187,12 @@ private struct HistoryListItem: View {
                     .foregroundStyle(.primary)
             }
 
-            let upToDateFormattedResult = entry.result.quantity.formatted(with: formattingOptions).0
+            let upToDateFormattedResult = entry
+                .result
+                .deserialized
+                .quantity(assumingLengthIf: assumeInches)
+                .formatted(with: formattingOptions)
+                .0
             if entry.formattedResult != upToDateFormattedResult {
                 Spacer()
                 Button {

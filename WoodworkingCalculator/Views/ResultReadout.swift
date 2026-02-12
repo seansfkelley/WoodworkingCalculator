@@ -37,7 +37,7 @@ struct ResultReadout: View {
                 textContent(text: prefix.value)
             }
         case .result(let result):
-            let displayQuantity = result.assumingLength(if: assumeInches)
+            let displayQuantity = result.quantity(assumingLengthIf: assumeInches)
             let (formatted, roundingError) = displayQuantity.formatted(with: formattingOptions)
             HStack {
                 if let roundingError, abs(roundingError.error) >= epsilon {

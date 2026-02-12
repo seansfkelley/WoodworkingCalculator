@@ -127,10 +127,11 @@ struct ContentView: View {
                         switch input {
                         case .result(let result):
                             Section("Metric Conversions") {
-                                if let meters = result.assumingLength(if: assumeInches).meters {
-                                    Text("= \(meters.formatAsDecimal(toPlaces: 3)) \(result.quantity.dimension.formatted(withUnit: "m"))".withPrettyNumbers)
-                                    Text("= \((meters * 100 ^^ result.quantity.dimension).formatAsDecimal(toPlaces: 2)) \(result.quantity.dimension.formatted(withUnit: "cm"))".withPrettyNumbers)
-                                    Text("= \((meters * 1000 ^^ result.quantity.dimension).formatAsDecimal(toPlaces: 1)) \(result.quantity.dimension.formatted(withUnit: "mm"))".withPrettyNumbers)
+                                let quantity = result.quantity(assumingLengthIf: assumeInches)
+                                if let meters = quantity.meters {
+                                    Text("= \(meters.formatAsDecimal(toPlaces: 3)) \(quantity.dimension.formatted(withUnit: "m"))".withPrettyNumbers)
+                                    Text("= \((meters * 100 ^^ quantity.dimension).formatAsDecimal(toPlaces: 2)) \(quantity.dimension.formatted(withUnit: "cm"))".withPrettyNumbers)
+                                    Text("= \((meters * 1000 ^^ quantity.dimension).formatAsDecimal(toPlaces: 1)) \(quantity.dimension.formatted(withUnit: "mm"))".withPrettyNumbers)
                                 } else {
                                     Text("Unitless values cannot be converted.")
                                 }
@@ -159,6 +160,7 @@ struct ContentView: View {
         .sheet(isPresented: $isHistoryPresented) {
             HistoryList(
                 historyManager: history,
+                assumeInches: assumeInches,
                 formattingOptions: formattingOptions,
                 onSelectEntry: {
                     previous = .init($0)
@@ -219,7 +221,7 @@ struct ContentView: View {
 
         let rawString = switch input {
         case .draft(let prefix, _): prefix.value
-        case .result(let result): result.quantity.formatted(with: formattingOptions).0
+        case .result(let result): result.quantity(assumingLengthIf: assumeInches).formatted(with: formattingOptions).0
         }
 
         let missingParens = EvaluatableCalculation.countMissingTrailingParens(rawString)
@@ -242,7 +244,7 @@ struct ContentView: View {
     }
 
     private func appendHistoryEntryIfDifferent(_ input: String, _ result: EvaluationResult) {
-        let displayQuantity = result.assumingLength(if: assumeInches)
+        let displayQuantity = result.quantity(assumingLengthIf: assumeInches)
         let formattedResult = displayQuantity.formatted(with: formattingOptions).0
         if let last = history.entries.last, last.data.input == input && last.data.formattedResult == formattedResult {
             logger.info("not adding redundant history entry")
@@ -251,8 +253,7 @@ struct ContentView: View {
         history.append(
             .init(
                 input: input,
-                result: .from(quantity: displayQuantity),
-                noUnitsSpecified: result.noUnitsSpecified,
+                result: .from(result: result),
                 formattedResult: formattedResult,
             ),
         )

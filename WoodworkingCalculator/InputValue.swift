@@ -14,7 +14,7 @@ enum InputValue {
     ) -> InputValue? {
         let currentDraft = switch self {
         case .result(let result):
-            ValidExpressionPrefix(result.assumingLength(if: assumeInches), with: formatOptions)
+            ValidExpressionPrefix(result.quantity(assumingLengthIf: assumeInches), with: formatOptions)
         case .draft(let prefix, _):
             prefix
         }
