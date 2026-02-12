@@ -4,7 +4,7 @@ import Testing
 // Serialized: Citron is not thread-safe.
 @Suite(.serialized)
 struct ValidExpressionPrefixTests {
-    @Test<[(String, String)]>("backspaced", arguments: [
+    static let backspacedCases: [(String, String)] = [
         ("", ""),
         ("1", ""),
         ("12", "1"),
@@ -16,7 +16,10 @@ struct ValidExpressionPrefixTests {
         ("1+2", "1+"),
         ("12in+5ft", "12in+5"),
         ("10in[2]×3", "10in[2]×"),
-    ]) func testBackspaced(input: String, expected: String) throws {
+    ]
+
+    @Test("backspaced", arguments: backspacedCases)
+    func testBackspaced(input: String, expected: String) throws {
         guard let prefix = ValidExpressionPrefix(input) else {
             Issue.record("Invalid input: \(input)")
             return
@@ -24,7 +27,7 @@ struct ValidExpressionPrefixTests {
         #expect(prefix.backspaced.value == expected)
     }
 
-    @Test<[(String, String?, TrimmableCharacterSet?, String?)]>("append", arguments: [
+    static let appendCases: [(String, String, TrimmableCharacterSet?, String?)] = [
         // simple cases
         ("", "1", nil, "1"),
         ("1", "2", nil, "12"),
@@ -34,12 +37,30 @@ struct ValidExpressionPrefixTests {
         ("5", "in[2]", nil, "5in[2]"),
         ("12", "ft", nil, "12ft"),
 
-        // fractions and trimming
+        // trailing fractions
         ("1", "/2", .whitespaceAndFractionSlash, "1/2"),
         ("1/", "/2", .whitespaceAndFractionSlash, "1/2"),
         ("1 ", "/2", .whitespaceAndFractionSlash, "1/2"),
         // This isn't really the intended usage, but it's what it says on the tin.
         ("1 ", "2", .whitespaceAndFractionSlash, "12"),
+
+        // leading zeroes
+        ("0", "1", .redundantLeadingZeroes, "1"),
+        ("1", "/2", .redundantLeadingZeroes, "1/2"),
+        ("000", "1", .redundantLeadingZeroes, "1"),
+        ("000", "0", .redundantLeadingZeroes, "0"),
+        ("100", "1", .redundantLeadingZeroes, "1001"),
+        (".0", "0", .redundantLeadingZeroes, ".00"),
+        (".00", "0", .redundantLeadingZeroes, ".000"),
+        (".00", "1", .redundantLeadingZeroes, ".001"),
+        ("1/0", "1", .redundantLeadingZeroes, "1/1"),
+        ("2 1/10", "1", .redundantLeadingZeroes, "2 1/101"),
+        ("1ft00", "1", .redundantLeadingZeroes, "1ft1"),
+        ("0.", "1", .redundantLeadingZeroes, "0.1"),
+        ("0.0", "1", .redundantLeadingZeroes, "0.01"),
+        ("0+", "1", .redundantLeadingZeroes, "0+1"),
+        ("1 - 0.0", "1", .redundantLeadingZeroes, "1 - 0.01"),
+        ("1 + 0", "1", .redundantLeadingZeroes, "1 + 1"),
 
         // whitespace collapsing
         ("1  ", "2", nil, "1 2"),
@@ -47,7 +68,10 @@ struct ValidExpressionPrefixTests {
         // illegal results
         ("1+", "+", nil, nil),
         ("12 1", " ", nil, nil),
-    ]) func testAppend(input: String, suffix: String, trimming: TrimmableCharacterSet?, expected: String?) throws {
+    ]
+
+    @Test("append", arguments: appendCases)
+    func testAppend(input: String, suffix: String, trimming: TrimmableCharacterSet?, expected: String?) throws {
         guard let prefix = ValidExpressionPrefix(input) else {
             Issue.record("Invalid input: \(input)")
             return

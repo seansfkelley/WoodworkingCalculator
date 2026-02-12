@@ -46,26 +46,26 @@ struct ButtonGrid: View {
                 CalculatorButton(.image("multiply"), .orange) { append("×", false, nil) }
             }
             GridGroup {
-                CalculatorButton(.text("7"), darkGray) { append("7", true, nil) }
-                CalculatorButton(.text("8"), darkGray) { append("8", true, nil) }
-                CalculatorButton(.text("9"), darkGray) { append("9", true, nil) }
+                CalculatorButton(.text("7"), darkGray) { append("7", true, .redundantLeadingZeroes) }
+                CalculatorButton(.text("8"), darkGray) { append("8", true, .redundantLeadingZeroes) }
+                CalculatorButton(.text("9"), darkGray) { append("9", true, .redundantLeadingZeroes) }
                 CalculatorButton(.image("minus"), .orange) { append("-", false, nil) }
             }
             GridGroup {
-                CalculatorButton(.text("4"), darkGray) { append("4", true, nil) }
-                CalculatorButton(.text("5"), darkGray) { append("5", true, nil) }
-                CalculatorButton(.text("6"), darkGray) { append("6", true, nil) }
+                CalculatorButton(.text("4"), darkGray) { append("4", true, .redundantLeadingZeroes) }
+                CalculatorButton(.text("5"), darkGray) { append("5", true, .redundantLeadingZeroes) }
+                CalculatorButton(.text("6"), darkGray) { append("6", true, .redundantLeadingZeroes) }
                 CalculatorButton(.image("plus"), .orange) { append("+", false, nil) }
             }
             GridGroup {
-                CalculatorButton(.text("1"), darkGray) { append("1", true, nil) }
-                CalculatorButton(.text("2"), darkGray) { append("2", true, nil) }
-                CalculatorButton(.text("3"), darkGray) { append("3", true, nil) }
+                CalculatorButton(.text("1"), darkGray) { append("1", true, .redundantLeadingZeroes) }
+                CalculatorButton(.text("2"), darkGray) { append("2", true, .redundantLeadingZeroes) }
+                CalculatorButton(.text("3"), darkGray) { append("3", true, .redundantLeadingZeroes) }
             }
             CalculatorButton(.image("equal"), .orange) { evaluate() }.gridSpan(row: 2)
             GridGroup {
                 CalculatorButton(.text("␣"), .gray) { append(" ", true, nil) }
-                CalculatorButton(.text("0"), darkGray) { append("0", true, nil) }
+                CalculatorButton(.text("0"), darkGray) { append("0", true, .redundantLeadingZeroes) }
                 CalculatorButton(.text("⁄"), .gray) { append("/", false, .whitespaceAndFractionSlash) }
             }
             GridGroup {

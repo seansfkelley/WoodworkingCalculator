@@ -9,10 +9,23 @@ import Foundation
 // logic here instead.
 enum TrimmableCharacterSet {
     case whitespaceAndFractionSlash
+    case redundantLeadingZeroes
 
-    internal var set: Set<Character> {
+    func trim(_ s: String) -> String {
         switch self {
-        case .whitespaceAndFractionSlash: Set([" ", "/"])
+        case .whitespaceAndFractionSlash:
+            let trimmable = Set<Character>([" ", "/"])
+            var result = s
+            while result.count > 0 && trimmable.contains(result.last!) {
+                result.removeLast()
+            }
+            return result
+        case .redundantLeadingZeroes:
+            return if let match = try? /^(|.*[^.0-9])(0+)$/.wholeMatch(in: s) {
+                String(match.output.1)
+            } else {
+                s
+            }
         }
     }
 }
@@ -58,12 +71,7 @@ struct ValidExpressionPrefix: Equatable, CustomStringConvertible {
     }
 
     func append(_ suffix: String, trimmingSuffix trimmableCharacters: TrimmableCharacterSet? = nil) -> ValidExpressionPrefix? {
-        var string = value
-        if let trimmableSet = trimmableCharacters?.set {
-            while string.count > 0 && trimmableSet.contains(string.last!) {
-                string.removeLast()
-            }
-        }
+        let string = trimmableCharacters?.trim(value) ?? value
         return .init((string + suffix).replacing(/\ +/, with: " "))
     }
 }
