@@ -8,18 +8,48 @@ struct Settings: View {
     @AppStorage(Constants.AppStorage.assumeInchesKey)
     private var assumeInches = Constants.AppStorage.assumeInchesDefault
 
+    private static let precisionSteps: [RationalPrecision] = [
+        RationalPrecision(denominator: 1),
+        RationalPrecision(denominator: 2),
+        RationalPrecision(denominator: 4),
+        RationalPrecision(denominator: 8),
+        RationalPrecision(denominator: 16),
+        RationalPrecision(denominator: 32),
+        RationalPrecision(denominator: 64),
+    ]
+
+    private var sliderIndex: Double {
+        Double(Self.precisionSteps.firstIndex(of: precision) ?? 0)
+    }
+
+    private func indexToPrecision(_ index: Double) -> RationalPrecision {
+        let i = max(0, min(Self.precisionSteps.count - 1, Int(index.rounded())))
+        return Self.precisionSteps[i]
+    }
+
     var body: some View {
         Form {
             Section {
-                Picker(selection: $precision, label: Text("Precision")) {
-                    Text("1\"").tag(RationalPrecision(denominator: 1))
-                    Text("1/2\"").tag(RationalPrecision(denominator: 2))
-                    Text("1/4\"").tag(RationalPrecision(denominator: 4))
-                    Text("1/8\"").tag(RationalPrecision(denominator: 8))
-                    Text("1/16\"").tag(RationalPrecision(denominator: 16))
-                    Text("1/32\"").tag(RationalPrecision(denominator: 32))
-                    Text("1/64\"").tag(RationalPrecision(denominator: 64))
+                LabeledContent("Precision") {
+                    Text("\(precision.rational.formatted)\"")
                 }
+                Slider(
+                    value: Binding(
+                        get: { sliderIndex },
+                        set: { precision = indexToPrecision($0) }
+                    ),
+                    in: 0...Double(Self.precisionSteps.count - 1),
+                    step: 1.0,
+                    label: { Text("Precision") },
+                    tick: { value in
+                        switch Int(value.rounded()) {
+                        case 0: SliderTick(value, label: { Text("1\"") })
+                        case 3: SliderTick(value, label: { Text("1/8\"") })
+                        case 6: SliderTick(value, label: { Text("1/64\"") })
+                        default: SliderTick(value, label: { Text("0") })
+                        }
+                    }
+                )
             } footer: {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Results with units will be rounded to the nearest \(precision.rational.formatted)\". Areas and volumes are rounded to the corresponding square or cube.")
