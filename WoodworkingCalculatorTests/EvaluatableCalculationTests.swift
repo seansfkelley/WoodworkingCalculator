@@ -225,8 +225,8 @@ struct EvaluatableCalculationTests {
         // relies on the rounding behavior of .real plus the fact that stringification doesn't care
         // about the numerical significance of "1/0" to allow us to do an acceptable assertion.
         #expect(evaluatable.description == expectedEvaluatable.description)
-        
-        let actualResult = evaluatable.evaluate()
+
+        let actualResult = evaluatable.evaluate().map(\.quantity)
 
         switch (actualResult, expectedResult) {
         case (.success(.real(let actualValue, let actualDim)), .success(.real(let expectedValue, let expectedDim))):
@@ -314,25 +314,25 @@ struct EvaluatableCalculationTests {
         #expect(EvaluatableCalculation.countMissingTrailingParens(input) == expected)
     }
 
-    @Test("allDimensionsAreUnitless (true)", arguments: [
+    @Test("noUnitsSpecified (true)", arguments: [
         "1",
         "3.5 + 1/2",
         "1 + 2 × 3 ÷ 4",
         "((1 + 1) × (2 - 1))",
-    ]) func allDimensionsAreUnitlessTrue(input: String) throws {
-        let evaluatable = try #require(EvaluatableCalculation.from(input))
-        #expect(evaluatable.allDimensionsAreUnitless == true)
+    ]) func noUnitsSpecifiedTrue(input: String) throws {
+        let result = try #require(EvaluatableCalculation.from(input)?.evaluate().get())
+        #expect(result.noUnitsSpecified == true)
     }
 
-    @Test("allDimensionsAreUnitless (false)", arguments: [
+    @Test("noUnitsSpecified (false)", arguments: [
         "1ft",
         "1ft + 1in",
         "1ft 3in × 3.2",
         "3ft[2]",
         "1/2in[3]",
         "1in ÷ 1in", // the result is unitless, but the input is not!
-    ]) func allDimensionsAreUnitlessFalse(input: String) throws {
-        let evaluatable = try #require(EvaluatableCalculation.from(input))
-        #expect(evaluatable.allDimensionsAreUnitless == false)
+    ]) func noUnitsSpecifiedFalse(input: String) throws {
+        let result = try #require(EvaluatableCalculation.from(input)?.evaluate().get())
+        #expect(result.noUnitsSpecified == false)
     }
 }

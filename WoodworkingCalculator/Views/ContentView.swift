@@ -231,11 +231,7 @@ struct ContentView: View {
         }
 
         switch calculation.evaluate() {
-        case .success(let quantity):
-            let result = EvaluationResult(
-                quantity: quantity,
-                noUnitsSpecified: quantity.dimension == .unitless && calculation.allDimensionsAreUnitless
-            )
+        case .success(let result):
             input = .result(result)
             previous = .init(cleanedInputString)
             appendHistoryEntryIfDifferent(cleanedInputString, result)

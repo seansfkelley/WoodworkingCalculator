@@ -1,3 +1,13 @@
+struct EvaluationResult {
+    let quantity: Quantity
+    let noUnitsSpecified: Bool
+
+    func assumingLength(if condition: Bool) -> Quantity {
+        condition && noUnitsSpecified ? quantity.withDimension(.length) : quantity
+    }
+}
+
+
 enum EvaluatableCalculation: CustomStringConvertible {
     // n.b. all quantities are in inches (or fractions thereof)
     case rational(UncheckedRational, Dimension)
@@ -29,29 +39,22 @@ enum EvaluatableCalculation: CustomStringConvertible {
         }
     }
     
-    func evaluate() -> Result<Quantity, EvaluationError> {
+    func evaluate() -> Result<EvaluationResult, EvaluationError> {
         switch self {
-        case .rational(let value, let dim): value.checked.map { .rational($0, dim) }
-        case .real(let value, let dim): .success(.real(value, dim))
-        case .negate(let value): Self.evaluateBinaryOperator(.rational(.init(0, 1), .unitless), (-), (-), value, (-))
-        case .add(let left, let right): Self.evaluateBinaryOperator(left, (+), (+), right, (+))
-        case .subtract(let left, let right): Self.evaluateBinaryOperator(left, (-), (-), right, (-))
-        case .multiply(let left, let right): Self.evaluateBinaryOperator(left, (*), (*), right, (*))
-        case .divide(let left, let right):  Self.evaluateBinaryOperator(left, (/), (/), right, (/))
-        }
-    }
-
-    var allDimensionsAreUnitless: Bool {
-        return switch self {
-        case .rational(_, let dimension), .real(_, let dimension):
-            dimension == .unitless
+        case .rational(let value, let dim):
+            value.checked.map { EvaluationResult(quantity: .rational($0, dim), noUnitsSpecified: dim == .unitless) }
+        case .real(let value, let dim):
+            .success(EvaluationResult(quantity: .real(value, dim), noUnitsSpecified: dim == .unitless))
         case .negate(let value):
-            value.allDimensionsAreUnitless
-        case .add(let left, let right),
-             .subtract(let left, let right),
-             .multiply(let left, let right),
-             .divide(let left, let right):
-            left.allDimensionsAreUnitless && right.allDimensionsAreUnitless
+            Self.evaluateBinaryOperator(.rational(.init(0, 1), .unitless), (-), (-), value, (-))
+        case .add(let left, let right):
+            Self.evaluateBinaryOperator(left, (+), (+), right, (+))
+        case .subtract(let left, let right):
+            Self.evaluateBinaryOperator(left, (-), (-), right, (-))
+        case .multiply(let left, let right):
+            Self.evaluateBinaryOperator(left, (*), (*), right, (*))
+        case .divide(let left, let right):
+            Self.evaluateBinaryOperator(left, (/), (/), right, (/))
         }
     }
 
@@ -65,37 +68,39 @@ enum EvaluatableCalculation: CustomStringConvertible {
         _ doubleOp: (Double, Double) -> Double,
         _ right: EvaluatableCalculation,
         _ combineDimensions: (Dimension, Dimension) -> Result<Dimension, EvaluationError>,
-    ) -> Result<Quantity, EvaluationError> {
-        let l: Quantity
-        let r: Quantity
+    ) -> Result<EvaluationResult, EvaluationError> {
+        let l: EvaluationResult
+        let r: EvaluationResult
 
         switch left.evaluate() {
-        case .success(let quantity): l = quantity
+        case .success(let result): l = result
         case .failure(let error): return .failure(error)
         }
 
         switch right.evaluate() {
-        case .success(let quantity): r = quantity
+        case .success(let result): r = result
         case .failure(let error): return .failure(error)
         }
 
-        return switch (l, r) {
+        let noUnitsSpecified = l.noUnitsSpecified && r.noUnitsSpecified
+
+        return switch (l.quantity, r.quantity) {
         case (.rational(let leftRational, let leftDim), .rational(let rightRational, let rightDim)):
             combineDimensions(leftDim, rightDim).flatMap { dimension in
-                rationalOp(leftRational, rightRational).map { .rational($0, dimension) }
+                rationalOp(leftRational, rightRational).map { EvaluationResult(quantity: .rational($0, dimension), noUnitsSpecified: noUnitsSpecified) }
             }
 
         // Fallthroughs don't work here, unfortunately, due to changes in the type of the binding
         // pattern, so eat the cost of repetition.
-            
+
         case (.real(let leftReal, let leftDim), .real(let rightReal, let rightDim)):
-            combineDimensions(leftDim, rightDim).map { .real(doubleOp(leftReal, rightReal), $0) }
+            combineDimensions(leftDim, rightDim).map { EvaluationResult(quantity: .real(doubleOp(leftReal, rightReal), $0), noUnitsSpecified: noUnitsSpecified) }
 
         case (.rational(let leftRational, let leftDim), .real(let rightReal, let rightDim)):
-            combineDimensions(leftDim, rightDim).map { .real(doubleOp(Double(leftRational), rightReal), $0) }
+            combineDimensions(leftDim, rightDim).map { EvaluationResult(quantity: .real(doubleOp(Double(leftRational), rightReal), $0), noUnitsSpecified: noUnitsSpecified) }
 
         case (.real(let leftReal, let leftDim), .rational(let rightRational, let rightDim)):
-            combineDimensions(leftDim, rightDim).map { .real(doubleOp(leftReal, Double(rightRational)), $0) }
+            combineDimensions(leftDim, rightDim).map { EvaluationResult(quantity: .real(doubleOp(leftReal, Double(rightRational)), $0), noUnitsSpecified: noUnitsSpecified) }
         }
     }
     
