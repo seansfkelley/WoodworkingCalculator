@@ -200,8 +200,10 @@ struct ContentView: View {
                 }
             }
         }
-        .onChange(of: formattingOptions) {
-            // This is a little hacky in that there is no type-level guaranteed that this result
+        .onChange(of: isSettingsPresented) { _, isShowing in
+            guard !isShowing else { return }
+
+            // This is a little hacky in that there is no type-level guarantee that this result
             // came from previous, but I mean, we know how all this stuff works so it's fine.
             if case .result(let quantity) = input, let previous {
                 appendHistoryEntryIfDifferent(previous.value, quantity)
