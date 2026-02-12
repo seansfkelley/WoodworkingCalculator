@@ -144,3 +144,15 @@ private func appendTrailingParentheses(to string: String) -> AttributedString {
 
     return attributedString
 }
+
+#Preview {
+    ResultReadout(
+        input: .draft(ValidExpressionPrefix("12 3/16in")!, nil),
+        formattingOptions: .init(.inches, RationalPrecision(denominator: 16), 6, 6),
+        isErrorPresented: .constant(false),
+        isRoundingErrorWarningPresented: .constant(false),
+        shakeError: .constant(false),
+        openSettings: {}
+    )
+    .padding()
+}

@@ -102,7 +102,7 @@ extension String {
                 return "\(unit)\(exponent == 0 || exponent == 1 ? "" : exponent.superscript)"
             })
             .replacing(/([0-9]) ([0-9]|$)/, with: { match in
-                "\(match.1)\u{2002}\(match.2)"
+                "\(match.1)\u{2004}\(match.2)"
             })
             .replacing(/([0-9]+)\/([0-9]*)/, with: { match in
                 "\(Int(match.1)!.superscript)\u{2044}\(Int(match.2).map(\.subscript) ?? " ")"
