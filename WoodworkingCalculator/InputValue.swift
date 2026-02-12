@@ -3,17 +3,18 @@ import SwiftUI
 
 enum InputValue {
     case draft(ValidExpressionPrefix, EvaluationError?)
-    case result(Quantity)
+    case result(EvaluationResult)
 
     func appending(
         suffix: String,
         formattingResultWith formatOptions: Quantity.FormattingOptions,
+        assumeInches: Bool,
         allowingResultReplacement canReplaceResult: Bool = false,
         trimmingSuffix: TrimmableCharacterSet? = nil,
     ) -> InputValue? {
         let currentDraft = switch self {
-        case .result(let quantity):
-            ValidExpressionPrefix(quantity, with: formatOptions)
+        case .result(let result):
+            ValidExpressionPrefix(result.assumingLength(if: assumeInches), with: formatOptions)
         case .draft(let prefix, _):
             prefix
         }

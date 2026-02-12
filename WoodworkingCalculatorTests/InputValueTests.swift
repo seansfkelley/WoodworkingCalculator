@@ -36,7 +36,7 @@ struct InputValueTests {
     }
 
     @Test func appendingToResult() throws {
-        var input: InputValue = .result(.real(1.0, .length))
+        var input: InputValue = .result(EvaluationResult(quantity: .real(1.0, .length), noUnitsSpecified: false))
         
         // would not create a legal (prefix of an) expression without replacement
         try #require(input.appending(suffix: "2", formattingResultWith: formatOptions) == nil)
@@ -50,7 +50,7 @@ struct InputValueTests {
         }
         
         // can append "+" to result
-        input = .result(.real(1.0, .length))
+        input = .result(EvaluationResult(quantity: .real(1.0, .length), noUnitsSpecified: false))
         input = try #require(input.appending(suffix: "+", formattingResultWith: formatOptions))
         if case .draft(let prefix, _) = input {
             #expect(prefix.value == "1in+")
@@ -59,7 +59,7 @@ struct InputValueTests {
         }
         
         // no whitespace-only strings if trying to overwrite a result
-        input = .result(.real(1.0, .length))
+        input = .result(EvaluationResult(quantity: .real(1.0, .length), noUnitsSpecified: false))
         try #require(input.appending(suffix: " ", formattingResultWith: formatOptions, allowingResultReplacement: true) == nil)
     }
 

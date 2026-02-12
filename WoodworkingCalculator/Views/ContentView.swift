@@ -40,6 +40,7 @@ struct ContentView: View {
         if let newInput = input.appending(
             suffix: string,
             formattingResultWith: formattingOptions,
+            assumeInches: assumeInches,
             allowingResultReplacement: canReplaceResult,
             trimmingSuffix: trimmingSuffix,
         ) {
@@ -77,6 +78,7 @@ struct ContentView: View {
                     .padding(.horizontal, CGFloat(horizontalSpacing))
                 ResultReadout(
                     input: input,
+                    assumeInches: assumeInches,
                     formattingOptions: formattingOptions,
                     isErrorPresented: $isErrorPresented,
                     isRoundingErrorWarningPresented: $isRoundingErrorWarningPresented,
@@ -123,12 +125,12 @@ struct ContentView: View {
                         // Unfortunately it does not seem possible to right-align text in a Menu, so
                         // we live with this rather awkward jagged-edge arrangement.
                         switch input {
-                        case .result(let quantity):
+                        case .result(let result):
                             Section("Metric Conversions") {
-                                if let meters = quantity.meters {
-                                    Text("= \(meters.formatAsDecimal(toPlaces: 3)) \(quantity.dimension.formatted(withUnit: "m"))".withPrettyNumbers)
-                                    Text("= \((meters * 100 ^^ quantity.dimension).formatAsDecimal(toPlaces: 2)) \(quantity.dimension.formatted(withUnit: "cm"))".withPrettyNumbers)
-                                    Text("= \((meters * 1000 ^^ quantity.dimension).formatAsDecimal(toPlaces: 1)) \(quantity.dimension.formatted(withUnit: "mm"))".withPrettyNumbers)
+                                if let meters = result.assumingLength(if: assumeInches).meters {
+                                    Text("= \(meters.formatAsDecimal(toPlaces: 3)) \(result.quantity.dimension.formatted(withUnit: "m"))".withPrettyNumbers)
+                                    Text("= \((meters * 100 ^^ result.quantity.dimension).formatAsDecimal(toPlaces: 2)) \(result.quantity.dimension.formatted(withUnit: "cm"))".withPrettyNumbers)
+                                    Text("= \((meters * 1000 ^^ result.quantity.dimension).formatAsDecimal(toPlaces: 1)) \(result.quantity.dimension.formatted(withUnit: "mm"))".withPrettyNumbers)
                                 } else {
                                     Text("Unitless values cannot be converted.")
                                 }
@@ -205,8 +207,8 @@ struct ContentView: View {
 
             // This is a little hacky in that there is no type-level guarantee that this result
             // came from previous, but I mean, we know how all this stuff works so it's fine.
-            if case .result(let quantity) = input, let previous {
-                appendHistoryEntryIfDifferent(previous.value, quantity)
+            if case .result(let result) = input, let previous {
+                appendHistoryEntryIfDifferent(previous.value, result)
             }
         }
     }
@@ -217,7 +219,7 @@ struct ContentView: View {
 
         let rawString = switch input {
         case .draft(let prefix, _): prefix.value
-        case .result(let quantity): quantity.formatted(with: formattingOptions).0
+        case .result(let result): result.quantity.formatted(with: formattingOptions).0
         }
 
         let missingParens = EvaluatableCalculation.countMissingTrailingParens(rawString)
@@ -230,22 +232,22 @@ struct ContentView: View {
 
         switch calculation.evaluate() {
         case .success(let quantity):
-            let dimensionedQuantity = if assumeInches && quantity.dimension == .unitless && calculation.allDimensionsAreUnitless {
-                quantity.withDimension(.length)
-            } else {
-                quantity
-            }
-            input = .result(dimensionedQuantity)
+            let result = EvaluationResult(
+                quantity: quantity,
+                noUnitsSpecified: quantity.dimension == .unitless && calculation.allDimensionsAreUnitless
+            )
+            input = .result(result)
             previous = .init(cleanedInputString)
-            appendHistoryEntryIfDifferent(cleanedInputString, dimensionedQuantity)
+            appendHistoryEntryIfDifferent(cleanedInputString, result)
         case .failure(let error):
             input = .draft(.init(rawString)!, error)
             shakeError = true
         }
     }
 
-    private func appendHistoryEntryIfDifferent(_ input: String, _ result: Quantity) {
-        let formattedResult = result.formatted(with: formattingOptions).0
+    private func appendHistoryEntryIfDifferent(_ input: String, _ result: EvaluationResult) {
+        let displayQuantity = result.assumingLength(if: assumeInches)
+        let formattedResult = displayQuantity.formatted(with: formattingOptions).0
         if let last = history.entries.last, last.data.input == input && last.data.formattedResult == formattedResult {
             logger.info("not adding redundant history entry")
             return
@@ -253,8 +255,9 @@ struct ContentView: View {
         history.append(
             .init(
                 input: input,
-                result: .from(quantity: result),
-                formattedResult: result.formatted(with: formattingOptions).0,
+                result: .from(quantity: displayQuantity),
+                noUnitsSpecified: result.noUnitsSpecified,
+                formattedResult: formattedResult,
             ),
         )
     }

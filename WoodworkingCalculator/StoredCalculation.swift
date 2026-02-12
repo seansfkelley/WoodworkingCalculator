@@ -4,13 +4,13 @@ struct StoredCalculation: Codable {
     // but, this this never be constructed directly -- only from a Quantity. This helps enforce the
     // runtime-only assertion that the rational's denominator is not zero.
     enum Result: Codable {
-        case real(Double, UInt)
-        case rational(Int, Int, UInt)
+        case real(Double, dimension: UInt)
+        case rational(Int, Int, dimension: UInt)
 
         static func from(quantity: Quantity) -> Result {
             switch quantity {
-            case .real(let value, let dimension): .real(value, dimension.value)
-            case .rational(let rational, let dimension): .rational(rational.num, rational.den, dimension.value)
+            case .real(let value, let dimension): .real(value, dimension: dimension.value)
+            case .rational(let rational, let dimension): .rational(rational.num, rational.den, dimension: dimension.value)
             }
         }
 
@@ -24,5 +24,6 @@ struct StoredCalculation: Codable {
 
     let input: String
     let result: Result
+    let noUnitsSpecified: Bool
     let formattedResult: String
 }

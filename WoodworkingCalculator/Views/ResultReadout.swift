@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ResultReadout: View {
     let input: InputValue
+    let assumeInches: Bool
     let formattingOptions: Quantity.FormattingOptions
     @Binding var isErrorPresented: Bool
     @Binding var isRoundingErrorWarningPresented: Bool
@@ -35,8 +36,9 @@ struct ResultReadout: View {
                 }
                 textContent(text: prefix.value)
             }
-        case .result(let quantity):
-            let (formatted, roundingError) = quantity.formatted(with: formattingOptions)
+        case .result(let result):
+            let displayQuantity = result.assumingLength(if: assumeInches)
+            let (formatted, roundingError) = displayQuantity.formatted(with: formattingOptions)
             HStack {
                 if let roundingError, abs(roundingError.error) >= epsilon {
                     Button(action: { isRoundingErrorWarningPresented.toggle() }) {
@@ -48,7 +50,7 @@ struct ResultReadout: View {
                     .buttonStyle(.glass)
                     .buttonBorderShape(.circle)
                     .popover(isPresented: $isRoundingErrorWarningPresented, arrowEdge: .top) {
-                        let actual = quantity.toReal().formatInches(
+                        let actual = displayQuantity.toReal().formatInches(
                             as: formattingOptions.unit,
                             of: roundingError.dimension,
                             toPlaces: Constants.DecimalPrecision.roundingError,
@@ -148,6 +150,7 @@ private func appendTrailingParentheses(to string: String) -> AttributedString {
 #Preview {
     ResultReadout(
         input: .draft(ValidExpressionPrefix("12 3/16in")!, nil),
+        assumeInches: false,
         formattingOptions: .init(.inches, RationalPrecision(denominator: 16), 6, 6),
         isErrorPresented: .constant(false),
         isRoundingErrorWarningPresented: .constant(false),

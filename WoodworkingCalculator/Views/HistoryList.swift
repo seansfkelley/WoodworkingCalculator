@@ -61,7 +61,7 @@ enum TelescopingTimeBound: Equatable {
 struct HistoryList: View {
     let historyManager: ChronologicalHistoryManager<StoredCalculation>
     let formattingOptions: Quantity.FormattingOptions
-    let onSelectEntry: (String, Quantity) -> Void
+    let onSelectEntry: (String, EvaluationResult) -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var editMode: EditMode = .inactive
     @State private var selectedIDs: Set<UUID> = []
@@ -82,7 +82,7 @@ struct HistoryList: View {
                                 ForEach(entries) { entry in
                                     Button {
                                         if editMode == .inactive {
-                                            onSelectEntry(entry.data.input, entry.data.result.quantity)
+                                            onSelectEntry(entry.data.input, EvaluationResult(quantity: entry.data.result.quantity, noUnitsSpecified: entry.data.noUnitsSpecified))
                                             dismiss()
                                         }
                                     } label: {
