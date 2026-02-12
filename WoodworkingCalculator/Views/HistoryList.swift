@@ -204,14 +204,12 @@ private struct HistoryListItem: View {
                         .padding(.horizontal)
                 }
                 .buttonStyle(.plain)
-                .popover(
-                    isPresented: $showingPopover,
-                    attachmentAnchor: .point(.bottom),
-                    arrowEdge: .top
-                ) {
-                    VStack(alignment: .leading, spacing: 6) {
+                .popover(isPresented: $showingPopover) {
+                    VStack(alignment: .center, spacing: 8) {
                         Text("Settings changed since this was calculated.")
                             .font(.body)
+                            .frame(maxWidth: 200)
+                            .multilineTextAlignment(.center)
                         HStack(spacing: 4) {
                             VStack(spacing: 2) {
                                 Text(entry.formattedResult.withPrettyNumbers)
@@ -237,7 +235,7 @@ private struct HistoryListItem: View {
                         }
                     }
                     .fixedSize(horizontal: false, vertical: true)
-                    .padding()
+                    .padding(20)
                     .presentationCompactAdaptation(.popover)
                 }
             }
