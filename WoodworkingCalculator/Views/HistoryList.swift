@@ -201,9 +201,11 @@ private struct HistoryListItem: View {
                     Image(systemName: "notequal")
                         .font(.title2)
                         .foregroundStyle(.secondary)
-                        .padding(.horizontal)
+                        .padding(4)
                 }
-                .buttonStyle(.plain)
+                .buttonBorderShape(.circle)
+                .buttonStyle(.bordered)
+                .tint(.secondary)
                 .popover(isPresented: $showingPopover) {
                     VStack(alignment: .center, spacing: 8) {
                         Text("Settings changed since this was calculated.")
@@ -241,4 +243,44 @@ private struct HistoryListItem: View {
             }
         }
     }
+}
+
+#Preview("With entries") {
+    let manager = ChronologicalHistoryManager<StoredCalculation>(
+        fileURL: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    )
+    let options = Quantity.FormattingOptions(.inches, RationalPrecision(denominator: 16), Constants.DecimalPrecision.standard, Constants.DecimalPrecision.unitless)
+    let entries: [(String, Bool, Quantity, String)] = [
+        ("3/4 + 1/4", true, .rational(UncheckedRational(1, 1).unsafe, .length), "1in"),
+        ("2ft + 6in", false, .rational(UncheckedRational(30, 1).unsafe, .length), "2ft 6in"),
+        // formattedResult stored with feet, but current options use inches — triggers the ≠ button
+        ("18in", false, .rational(UncheckedRational(18, 1).unsafe, .length), "1ft 6in"),
+        ("3 × 4", true, .rational(UncheckedRational(12, 1).unsafe, .unitless), "12"),
+        ("1.5in × 2in", false, .real(3.0, .area), "3in[2]"),
+    ]
+    for (input, noUnitsSpecified, quantity, formatted) in entries {
+        manager.append(StoredCalculation(
+            input: input,
+            result: .from(result: EvaluationResult(actualQuantity: quantity, noUnitsSpecified: noUnitsSpecified)),
+            formattedResult: formatted
+        ))
+    }
+    return HistoryList(
+        historyManager: manager,
+        assumeInches: true,
+        formattingOptions: options,
+        onSelectEntry: { _, _ in print("tapped entry") }
+    )
+}
+
+#Preview("Empty") {
+    let manager = ChronologicalHistoryManager<StoredCalculation>(
+        fileURL: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    )
+    return HistoryList(
+        historyManager: manager,
+        assumeInches: true,
+        formattingOptions: Quantity.FormattingOptions(.inches, RationalPrecision(denominator: 16), Constants.DecimalPrecision.standard, Constants.DecimalPrecision.unitless),
+        onSelectEntry: { _, _ in print("tapped entry") }
+    )
 }
