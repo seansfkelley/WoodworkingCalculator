@@ -105,6 +105,7 @@ struct ContentView: View {
                     append: { string, canReplaceResult, trimmingSuffix in
                         append(string, canReplaceResult: canReplaceResult, trimmingSuffix: trimmingSuffix)
                     },
+                    invert: invert,
                     evaluate: evaluate,
                 )
                 .padding(.horizontal, horizontalSpacing)
@@ -212,6 +213,12 @@ struct ContentView: View {
             if case .result(let result) = input, let previous {
                 appendHistoryEntryIfDifferent(previous.value, result)
             }
+        }
+    }
+
+    private func invert() {
+        if let inverted = input.inverted(formattingResultWith: formattingOptions, assumeInches: assumeInches) {
+            input = inverted
         }
     }
 

@@ -7,6 +7,7 @@ struct ButtonGrid: View {
     let backspacedInput: ValidExpressionPrefix?
     let resetInput: (ValidExpressionPrefix) -> Void
     let append: (String, Bool, TrimmableCharacterSet?) -> Void
+    let invert: () -> Void
     let evaluate: () -> Void
 
     var body: some View {
@@ -25,7 +26,7 @@ struct ButtonGrid: View {
                     append(")", false, nil)
                 }
                 CalculatorButton(.image("plus.forwardslash.minus"), .gray) {
-                    
+                    invert()
                 }
             }
             HStack(spacing: spacing) {

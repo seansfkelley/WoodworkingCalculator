@@ -226,7 +226,7 @@ struct EvaluatableCalculationTests {
         // about the numerical significance of "1/0" to allow us to do an acceptable assertion.
         #expect(evaluatable.description == expectedEvaluatable.description)
 
-        let actualResult = evaluatable.evaluate().map(\.quantity)
+        let actualResult = evaluatable.evaluate().map(\.actualQuantity)
 
         switch (actualResult, expectedResult) {
         case (.success(.real(let actualValue, let actualDim)), .success(.real(let expectedValue, let expectedDim))):
@@ -320,7 +320,7 @@ struct EvaluatableCalculationTests {
         "1 + 2 × 3 ÷ 4",
         "((1 + 1) × (2 - 1))",
     ]) func noUnitsSpecifiedTrue(input: String) throws {
-        let result = try #require(EvaluatableCalculation.from(input)?.evaluate().get())
+        let result = try #require(try EvaluatableCalculation.from(input)?.evaluate().get())
         #expect(result.noUnitsSpecified == true)
     }
 
@@ -332,7 +332,7 @@ struct EvaluatableCalculationTests {
         "1/2in[3]",
         "1in ÷ 1in", // the result is unitless, but the input is not!
     ]) func noUnitsSpecifiedFalse(input: String) throws {
-        let result = try #require(EvaluatableCalculation.from(input)?.evaluate().get())
+        let result = try #require(try EvaluatableCalculation.from(input)?.evaluate().get())
         #expect(result.noUnitsSpecified == false)
     }
 }
