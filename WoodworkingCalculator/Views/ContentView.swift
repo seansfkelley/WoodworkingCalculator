@@ -2,11 +2,11 @@ import SwiftUI
 import OSLog
 
 private let logger = Logger(subsystem: "WoodworkingCalculator", category: "ContentView")
-private let horizontalSpacing = 12
-private let gridSpacing = 8
+private let horizontalSpacing: CGFloat = 12
+private let gridSpacing: CGFloat = 8
 
 struct ContentView: View {
-    private var history = ChronologicalHistoryManager<StoredCalculation>(fileURL: .applicationSupportDirectory.appendingPathComponent("history.json"))
+    private var history = ChronologicalHistoryManager<StoredCalculation>(fileURL: .applicationSupportDirectory.appendingPathComponent("history.jsonl"))
 
     @State private var previous: ValidExpressionPrefix?
     @State private var isSettingsPresented = false
@@ -75,7 +75,7 @@ struct ContentView: View {
                             isRoundingErrorWarningPresented = false
                         }
                     }
-                    .padding(.horizontal, CGFloat(horizontalSpacing))
+                    .padding(.horizontal, horizontalSpacing)
                 ResultReadout(
                     input: input,
                     assumeInches: assumeInches,
@@ -88,12 +88,13 @@ struct ContentView: View {
                         isSettingsPresented = true
                     }
                 )
-                .padding(.horizontal, CGFloat(horizontalSpacing))
+                .padding(.horizontal, horizontalSpacing)
                 let backspaced: ValidExpressionPrefix? = switch input {
                 case .draft(let prefix, _): prefix.backspaced
                 case .result: nil
                 }
                 ButtonGrid(
+                    spacing: gridSpacing,
                     backspacedInput: backspaced,
                     resetInput: {
                         previous = nil
@@ -106,8 +107,7 @@ struct ContentView: View {
                     },
                     evaluate: evaluate,
                 )
-                // Grid applies padding to the edges too, not just between items, so compensate here.
-                .padding(.horizontal, CGFloat(horizontalSpacing - gridSpacing))
+                .padding(.horizontal, horizontalSpacing)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
