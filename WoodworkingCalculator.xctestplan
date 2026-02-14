@@ -24,7 +24,7 @@
       }
     },
     {
-      "parallelizable" : true,
+      "parallelizable" : false,
       "target" : {
         "containerPath" : "container:WoodworkingCalculator.xcodeproj",
         "identifier" : "218B78182E15C69E00F8B129",
