@@ -19,6 +19,7 @@ struct ButtonGrid: View {
                 .simultaneousGesture(LongPressGesture(minimumDuration: 1).onEnded { _ in
                     resetInput(.init())
                 })
+                .accessibilityIdentifier("clear/backspace")
                 CalculatorButton(.text("("), .gray, contentOffset: CGPoint(x: -3, y: -3)) {
                     append("(", true, nil)
                 }
@@ -28,6 +29,7 @@ struct ButtonGrid: View {
                 CalculatorButton(.image("plus.forwardslash.minus"), .gray) {
                     invert()
                 }
+                .accessibilityIdentifier("invert")
             }
             HStack(spacing: spacing) {
                 CalculatorButton(.text("'"), .gray, action: { append(UsCustomaryUnit.feet.abbreviation, false, nil) })
@@ -65,8 +67,10 @@ struct ButtonGrid: View {
             }
             HStack(spacing: spacing) {
                 CalculatorButton(.text("␣"), .gray) { append(" ", true, nil) }
+                    .accessibilityIdentifier("space")
                 CalculatorButton(.text("0"), darkGray) { append("0", true, .redundantLeadingZeroes) }
                 CalculatorButton(.text("⁄"), .gray) { append("/", false, .whitespaceAndFractionSlash) }
+                    .accessibilityIdentifier("slash")
                 CalculatorButton(.image("equal"), .orange) { evaluate() }
             }
         }

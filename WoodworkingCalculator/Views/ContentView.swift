@@ -115,11 +115,13 @@ struct ContentView: View {
                     Button(action: { isSettingsPresented.toggle() }) {
                         Image(systemName: "gear")
                     }
+                    .accessibilityIdentifier("settings")
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     Button(action: { isHistoryPresented.toggle() }) {
                         Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
                     }
+                    .accessibilityIdentifier("history")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
@@ -142,14 +144,21 @@ struct ContentView: View {
                             // appending a single "m" would actually create a valid unit. o_O
                             let valid = EvaluatableCalculation.isValidPrefix(prefix.value + "mm")
                             Section("Insert Metric Unit") {
-                                Button(action: { append("m") }) { Text("insert \"m\"") }.disabled(!valid)
-                                Button(action: { append("cm") }) { Text("insert \"cm\"") }.disabled(!valid)
-                                Button(action: { append("mm") }) { Text("insert \"mm\"") }.disabled(!valid)
+                                Button(action: { append("m") }) { Text("insert \"m\"") }
+                                    .disabled(!valid)
+                                    .accessibilityIdentifier("m")
+                                Button(action: { append("cm") }) { Text("insert \"cm\"") }
+                                    .disabled(!valid)
+                                    .accessibilityIdentifier("cm")
+                                Button(action: { append("mm") }) { Text("insert \"mm\"") }
+                                    .disabled(!valid)
+                                    .accessibilityIdentifier("mm")
                             }
                         }
                     } label: {
                         Image(systemName: "ruler")
                     }
+                    .accessibilityIdentifier("metric")
                 }
             }
         }

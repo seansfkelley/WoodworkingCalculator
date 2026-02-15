@@ -26,6 +26,7 @@ struct ResultReadout: View {
                             .padding(.leading, 8)
                             .offset(x: shakeError ? 20 : 0)
                     }
+                    .accessibilityIdentifier("error")
                     .popover(isPresented: $isErrorPresented, arrowEdge: .top) {
                         Text(error.localizedDescription)
                             .font(.system(.body))
@@ -47,6 +48,7 @@ struct ResultReadout: View {
                             .foregroundStyle(.orange)
                             .padding(.bottom, 4)
                     }
+                    .accessibilityIdentifier("roundingError")
                     .buttonStyle(.glass)
                     .buttonBorderShape(.circle)
                     .popover(isPresented: $isRoundingErrorWarningPresented, arrowEdge: .top) {

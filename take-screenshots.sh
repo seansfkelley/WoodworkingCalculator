@@ -4,9 +4,22 @@ set -euo pipefail
 
 # Configuration
 SCHEME="WoodworkingCalculator"
-DESTINATION="platform=iOS Simulator,name=iPhone 17 Pro"
+SIMULATOR_NAME="iPhone 17 Pro"
+SIMULATOR_OS="26.2"
 DERIVED_DATA_DIR="$(mktemp -d)"
 OUTPUT_DIR="screenshots"
+
+BUNDLE_ID="woodworking.calculator"
+
+DESTINATION="platform=iOS Simulator,name=${SIMULATOR_NAME},OS=${SIMULATOR_OS}"
+DEVICE_UDID=$(xcrun simctl list devices --json \
+    | jq -r --arg name "$SIMULATOR_NAME" --arg os "com.apple.CoreSimulator.SimRuntime.iOS-${SIMULATOR_OS//./-}" \
+    '.devices[$os][] | select(.name == $name) | .udid' \
+    | head -1)
+
+echo "Booting simulator and uninstalling app to reset state..."
+xcrun simctl boot "$DEVICE_UDID" 2>/dev/null || true
+xcrun simctl uninstall "$DEVICE_UDID" "$BUNDLE_ID"
 
 echo "Building and running screenshot tests..."
 
@@ -36,7 +49,7 @@ attachments=$(jq -r '.[] | .attachments[] | [.exportedFileName, .suggestedHumanR
     "$EXPORT_STAGING/manifest.json")
 
 while IFS=$'\t' read -r exported_name human_name; do
-    human_name="${human_name//_[0-9]+_[0-9A-Fa-f-]+.png/.png}"
+    human_name=$(sed -E 's/_[0-9]+_[0-9A-Fa-f-]+\.png$/.png/' <<< "$human_name")
     dst="$OUTPUT_DIR/${human_name}"
     echo "Saving $human_name -> $dst"
     cp "$EXPORT_STAGING/$exported_name" "$dst"

@@ -50,6 +50,7 @@ struct Settings: View {
                         }
                     }
                 )
+                .accessibilityIdentifier("precision")
             } footer: {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Results with units will be rounded to the nearest \(precision.rational.formatted)\". Areas and volumes are rounded to the corresponding square or cube.")
@@ -62,6 +63,7 @@ struct Settings: View {
                     Text("Inches").tag(true)
                     Text("Feet and Inches").tag(false)
                 }
+                .accessibilityIdentifier("format")
             } footer: {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Results for lengths will display as \(displayInchesOnly ? "inches only" : "feet and inches"). Area and volume results will be decimal \(displayInchesOnly ? "inches" : "feet").")
@@ -71,6 +73,7 @@ struct Settings: View {
 
             Section {
                 Toggle("Assume Inches", isOn: $assumeInches)
+                    .accessibilityIdentifier("assumeInches")
             } footer: {
                 VStack(alignment: .leading, spacing: 6) {
                     if assumeInches {
