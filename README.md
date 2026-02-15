@@ -7,7 +7,6 @@ Specifically, it:
 - Understands fractions.
   - Type fractions in. Get fractions as output.
   - Configurable fractional precision.
-  - Shortcuts for commonly-used fractions.
   - Accepts decimal, but will round the result to the nearest fraction.
 - Understands feet-and-inches notation.
   - Use the ' and " keys when necessary.
