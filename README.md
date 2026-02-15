@@ -21,39 +21,39 @@ Supports idiomatic entry of fractions (including top-heavy ones), mixed numbers 
 
 Dedicated buttons for feet ("), inches ('), fractions (/) and common fractions (half, quarter, eighth, sixteenth) make input quick.
 
-<img src="./screenshots/basic-addition-before.png" height="400px">
+<img src="./screenshots/01-number-formats.png" height="400px">
 
 Results are always shown in fractional US customary units.
 
-<img src="./screenshots/basic-addition-after.png" height="400px">
+<img src="./screenshots/02-basic-results.png" height="400px">
 
 But you can use feet and inches both for larger measures.
 
-<img src="./screenshots/feet-and-inches.png" height="400px">
+<img src="./screenshots/03-result-format.png" height="400px">
 
 And show the result in metric.
 
-<img src="./screenshots/customary-to-metric.png" height="400px">
+<img src="./screenshots/04-metric-results.png" height="400px">
 
 You can even input metric if you need to mix systems.
 
-<img src="./screenshots/math-with-metric-before.png" height="400px">
+<img src="./screenshots/05-mixed-input.png" height="400px">
 
-And results will be shown in US customary, indicating any rounding errors above 0.001".
+And results will be shown in US customary, indicating any rounding errors to four decimal places.
 
-<img src="./screenshots/math-with-metric-after-and-approximations.png" height="400px">
+<img src="./screenshots/06-rounding-error.png" height="400px">
 
 You can consult the history of calculations you've made.
 
-<img src="./screenshots/calculation-history.png" height="400px">
+<img src="./screenshots/07-history.png" height="400px">
 
 It understands area and volume measures as well.
 
-<img src="./screenshots/area-measures.png" height="400px">
+<img src="./screenshots/08-square-inch-result.png" height="400px">
 
 And, of course, has a dark mode.
 
-<img src="./screenshots/dark-mode.png" height="400px">
+<img src="./screenshots/09-dark-mode.png" height="400px">
 
 ## Building
 
@@ -61,8 +61,14 @@ There is a separate Xcode build target for [Citron](https://github.com/roop/citr
 
 (If you delete the generated `.swift` file, you will need to run a build twice in a row, since I don't know how to Xcode and can't figure out how to tell it to add the file to the same build that's currently running instead of waiting for it to notice on disk for the next build. Then I wouldn't have to commit it.)
 
+## Screenshots
+
+Use `./take-screenshots.sh` to run the UI "test" that generates the App Store listing screenshots and extract them to this repo.
+
+Use `./composite-screenshots.sh` to composite those screenshots onto the background images for the listing.
+
 ## Testing
 
-Citron is not thread-safe. I don't want to colocate every test in a file that might use Citron, so as it stands, you ~~may~~ will almost certainly get spurious string-index-out-of-bounds failures if you run all tests at once.
+Citron is not thread-safe, so all tests are run in serial between files (per project configuration) and within files (using `@Suite(.serialized)` usually).
 
-Every test suite that uses Citron should be marked as `.serialized` so that at least that file/suite can be run in isolation without stepping on its own feet.
+Reentrancy errors with Citron manifest as string-index-out-of-bounds exceptions, so if you hit one of those, check Citron first.

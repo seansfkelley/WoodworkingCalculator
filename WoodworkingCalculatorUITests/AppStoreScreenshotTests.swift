@@ -63,6 +63,9 @@ final class AppStoreScreenshotTests: XCTestCase {
         tap("(", "3", "2", "\"", "minus", "4", "metric", "cm", ")", "divide", "2")
         saveScreenshot(named: "05-mixed-input")
 
+        tap("settings")
+        tap("format", "Inches")
+        tap(topMiddle)
         tap("equal")
         tap("roundingError")
         saveScreenshot(named: "06-rounding-error")
@@ -71,8 +74,6 @@ final class AppStoreScreenshotTests: XCTestCase {
         tap("history")
         saveScreenshot(named: "07-history")
 
-        tap(topMiddle)
-        tap("settings", "format", "Inches")
         tap(topMiddle)
         tap("1", "'", "space", "3", "space", "3", "slash", "1", "6", "\"", "multiply", "1", "0", "\"")
         tap("equal")
