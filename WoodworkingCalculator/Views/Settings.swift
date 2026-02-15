@@ -7,6 +7,8 @@ struct Settings: View {
     private var precision = Constants.AppStorage.precisionDefault
     @AppStorage(Constants.AppStorage.assumeInchesKey)
     private var assumeInches = Constants.AppStorage.assumeInchesDefault
+    @AppStorage(Constants.AppStorage.themeKey)
+    private var theme = Constants.AppStorage.themeDefault
 
     private static let precisionSteps: [RationalPrecision] = [
         RationalPrecision(denominator: 1),
@@ -84,6 +86,15 @@ struct Settings: View {
                     Text("Entering units is optional. Unitless numbers adopt the unit of other numbers they are combined with.")
                     Text("Long-press the feet or inches button to enter areas or volumes.")
                 }
+            }
+
+            Section {
+                Picker(selection: $theme, label: Text("Theme")) {
+                    Text("Light").tag(Constants.Theme.light)
+                    Text("Dark").tag(Constants.Theme.dark)
+                    Text("Match System").tag(Constants.Theme.system)
+                }
+                .accessibilityIdentifier("theme")
             }
         }
         .padding(.bottom)

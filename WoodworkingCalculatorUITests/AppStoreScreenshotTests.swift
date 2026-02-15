@@ -41,7 +41,9 @@ final class AppStoreScreenshotTests: XCTestCase {
 
         launch()
 
-        tap("settings", "format", "Inches")
+        tap("settings")
+        tap("format", "Inches")
+        tap("theme", "Light")
         tap(topMiddle)
         tap("1", "3", "slash", "1", "6", "plus", "1", "space", "1", "slash", "4", "plus", "1", ".", "5", "'")
         saveScreenshot(named: "01-number-formats")
@@ -70,8 +72,19 @@ final class AppStoreScreenshotTests: XCTestCase {
         saveScreenshot(named: "07-history")
 
         tap(topMiddle)
+        tap("settings", "format", "Inches")
+        tap(topMiddle)
         tap("1", "'", "space", "3", "space", "3", "slash", "1", "6", "\"", "multiply", "1", "0", "\"")
         tap("equal")
         saveScreenshot(named: "08-square-inch-result")
+
+        tap("settings")
+        // We don't care about the format but it's required to be able to locate the theme selector
+        // for some reason -- perhaps because interacting with the sheet using an element that's
+        // already in the viewport causes the other elements in the sheet to be registered?
+        tap("format", "Inches")
+        tap("theme", "Dark")
+        tap(topMiddle)
+        saveScreenshot(named: "09-dark-mode")
     }
 }

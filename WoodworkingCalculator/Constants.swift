@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 struct Constants {
     struct AppStorage {
@@ -10,6 +11,21 @@ struct Constants {
 
         static let assumeInchesKey = "assumeInches"
         static let assumeInchesDefault = true
+
+        static let themeKey = "theme"
+        static let themeDefault: Theme = .system
+    }
+
+    enum Theme: String {
+        case light, dark, system
+
+        var colorScheme: ColorScheme? {
+            switch self {
+            case .dark: .dark
+            case .light: .light
+            case .system: nil
+            }
+        }
     }
 
     struct DecimalPrecision {

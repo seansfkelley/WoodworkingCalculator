@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct WoodworkingCalculatorApp: App {
+    @AppStorage(Constants.AppStorage.themeKey)
+    private var theme = Constants.AppStorage.themeDefault
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(theme.colorScheme)
         }
     }
 }

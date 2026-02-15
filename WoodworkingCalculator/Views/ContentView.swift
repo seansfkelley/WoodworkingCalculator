@@ -26,6 +26,10 @@ struct ContentView: View {
     private var precision = Constants.AppStorage.precisionDefault
     @AppStorage(Constants.AppStorage.assumeInchesKey)
     private var assumeInches = Constants.AppStorage.assumeInchesDefault
+    @AppStorage(Constants.AppStorage.themeKey)
+    private var theme = Constants.AppStorage.themeDefault
+
+    @Environment(\.colorScheme) private var systemColorScheme
 
     private var formattingOptions: Quantity.FormattingOptions {
         .init(
@@ -166,6 +170,11 @@ struct ContentView: View {
             Settings()
                 .background(.windowBackground)
                 .presentationDetents([.medium])
+                // Sheets keep the color scheme they had when they were presented unless you
+                // explicitly set it anew, I guess because they don't automatically inherit. Because
+                // "match system" is implemented as nil, we need to track the current system theme
+                // @Environment so we can force an immediate change if it's different.
+                .preferredColorScheme(theme.colorScheme ?? systemColorScheme)
         }
         .sheet(isPresented: $isHistoryPresented) {
             HistoryList(
