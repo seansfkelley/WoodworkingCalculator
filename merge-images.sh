@@ -1,9 +1,16 @@
 #!/bin/zsh
 
+set -euo pipefail
+
+# Required by App Store Connect
 BG_WIDTH=1242
 BG_HEIGHT=2688
-OVERLAY_WIDTH=1168
-OVERLAY_HEIGHT=2531
+
+# iPhone 17 Pro dimensions
+OVERLAY_WIDTH=1206
+OVERLAY_HEIGHT=2622
+
+# to taste
 HORIZONTAL_MARGIN=100
 VERTICAL_OFFSET=500
 

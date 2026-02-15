@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2105DE992F4231C00074B76A /* take-screenshots.sh in Resources */ = {isa = PBXBuildFile; fileRef = 2105DE982F4231C00074B76A /* take-screenshots.sh */; };
 		216BB80C2E26BDFC00D2AF17 /* Numerics in Frameworks */ = {isa = PBXBuildFile; productRef = 216BB80B2E26BDFC00D2AF17 /* Numerics */; };
 		21DF4F142F41911000D407AC /* merge-images.sh in Resources */ = {isa = PBXBuildFile; fileRef = 21DF4F132F41911000D407AC /* merge-images.sh */; };
 /* End PBXBuildFile section */
@@ -36,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2105DE982F4231C00074B76A /* take-screenshots.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "take-screenshots.sh"; sourceTree = "<group>"; };
 		216BB80D2E28144400D2AF17 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		218B780C2E15C69D00F8B129 /* Wood Calc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wood Calc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78192E15C69E00F8B129 /* Wood Calc Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wood Calc Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -119,6 +121,7 @@
 			children = (
 				21C111482E3BDAB1007EB628 /* .gitignore */,
 				21DF4F132F41911000D407AC /* merge-images.sh */,
+				2105DE982F4231C00074B76A /* take-screenshots.sh */,
 				216BB80D2E28144400D2AF17 /* README.md */,
 				216BB8452E2950AB00D2AF17 /* Citron */,
 				219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */,
@@ -291,6 +294,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				21DF4F142F41911000D407AC /* merge-images.sh in Resources */,
+				2105DE992F4231C00074B76A /* take-screenshots.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
