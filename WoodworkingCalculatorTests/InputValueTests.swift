@@ -93,7 +93,7 @@ struct InputValueTests {
         let positive = InputValue.result(EvaluationResult(actualQuantity: .rational(rational(3, 1), .length), noUnitsSpecified: false))
         let inverted = try #require(positive.inverted())
         if case .draft(let prefix, _) = inverted {
-            #expect(prefix.value.hasPrefix("-"))
+            #expect(prefix.value == "-3in")
         } else {
             Issue.record("Expected draft case")
         }
@@ -101,7 +101,7 @@ struct InputValueTests {
         // inverting again should remove the minus sign
         let reinverted = try #require(inverted.inverted())
         if case .draft(let prefix, _) = reinverted {
-            #expect(!prefix.value.hasPrefix("-"))
+            #expect(prefix.value == "3in")
         } else {
             Issue.record("Expected draft case")
         }

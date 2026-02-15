@@ -17,12 +17,12 @@ struct QuantityTests {
 
     @Test func lengthFormattedWithRoundingError() throws {
         let quantity = Quantity.real(0.501, .length)
-        let (formatted, roundingError) = quantity.formatted(with: .init(.inches, eighths, 3, 9))
+        let (formatted, err) = quantity.formatted(with: .init(.inches, eighths, 3, 9))
         #expect(formatted == "1/2in")
-        try #require(roundingError != nil)
-        #expect(roundingError!.error.isApproximatelyEqual(to: -0.001))
-        #expect(roundingError!.oneDimensionalPrecision == eighths)
-        #expect(roundingError!.dimension == .length)
+        let roundingError = try #require(err)
+        #expect(roundingError.error.isApproximatelyEqual(to: -0.001))
+        #expect(roundingError.oneDimensionalPrecision == eighths)
+        #expect(roundingError.dimension == .length)
     }
 
     @Test func areaFormattedAsDecimal() throws {
@@ -41,12 +41,12 @@ struct QuantityTests {
 
     @Test func dimensionalPrecisionAdjustment() throws {
         let quantity = Quantity.real(0.501, .area)
-        let (_, roundingError) = quantity.formatted(with: .init(.inches, eighths, 3, 9))
+        let (_, err) = quantity.formatted(with: .init(.inches, eighths, 3, 9))
 
-        try #require(roundingError != nil)
-        #expect(roundingError!.dimensionallyAdjustedPrecision.denominator == 64)
-        #expect(roundingError!.oneDimensionalPrecision == eighths)
-        #expect(roundingError!.dimension == .area)
+        let roundingError = try #require(err)
+        #expect(roundingError.dimensionallyAdjustedPrecision.denominator == 64)
+        #expect(roundingError.oneDimensionalPrecision == eighths)
+        #expect(roundingError.dimension == .area)
     }
 
     @Test func metersReturnsNilForUnitless() {
