@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+cd "$(dirname "$0")"
+
 # Configuration
 SCHEME="WoodworkingCalculator"
 SIMULATOR_NAME="iPhone 17 Pro"
