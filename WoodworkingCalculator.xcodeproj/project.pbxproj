@@ -47,7 +47,6 @@
 		2125D4292F43963E00BA755E /* Exceptions for "images" folder in "Wood Calc" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				backgrounds/01.png,
 				"screenshots/01-number-formats.png",
 				"screenshots/02-basic-results.png",
 				"screenshots/03-result-format.png",

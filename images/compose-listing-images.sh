@@ -14,7 +14,7 @@ OVERLAY_HEIGHT=2622
 
 # to taste
 HORIZONTAL_MARGIN=100
-VERTICAL_OFFSET=650 # based on spacing of the text in the background image
+VERTICAL_OFFSET=750 # empirical, based on spacing of the text in the background image
 CORNER_RADIUS=140 # empirical
 SHADOW_OFFSET=0
 SHADOW_BLUR=15
@@ -23,9 +23,9 @@ OUTPUT_DIRECTORY="composed"
 
 BACKGROUNDS=(
     "backgrounds/01.png"
-    "backgrounds/01.png"
-    "backgrounds/01.png"
-    "backgrounds/01.png"
+    "backgrounds/02.png"
+    "backgrounds/03.png"
+    "backgrounds/04.png"
 )
 
 OVERLAYS=(
