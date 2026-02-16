@@ -2,9 +2,11 @@
 
 set -euo pipefail
 
+cd "$(dirname "$0")"
+
 # Required by App Store Connect
-BG_WIDTH=1242
-BG_HEIGHT=2688
+BG_WIDTH=1284
+BG_HEIGHT=2778
 
 # iPhone 17 Pro dimensions
 OVERLAY_WIDTH=1206
@@ -15,15 +17,17 @@ HORIZONTAL_MARGIN=100
 VERTICAL_OFFSET=500
 
 BACKGROUNDS=(
-    "bg1.png"
-    "bg2.png"
-    "bg3.png"
+    "backgrounds/01.png"
+    "backgrounds/01.png"
+    "backgrounds/01.png"
+    "backgrounds/01.png"
 )
 
 OVERLAYS=(
-    "overlay1.png"
-    "overlay2.png"
-    "overlay3.png"
+    "screenshots/02-basic-results.png"
+    "screenshots/03-result-format.png"
+    "screenshots/06-rounding-error.png"
+    "screenshots/08-square-inch-result.png"
 )
 
 OUTPUT_DIRECTORY="merged"

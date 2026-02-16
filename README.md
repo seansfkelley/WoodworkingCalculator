@@ -21,39 +21,39 @@ Supports idiomatic entry of fractions (including top-heavy ones), mixed numbers 
 
 Dedicated buttons for feet ("), inches ('), fractions (/) and common fractions (half, quarter, eighth, sixteenth) make input quick.
 
-<img src="./screenshots/01-number-formats.png" height="400px">
+<img src="./images/screenshots/01-number-formats.png" height="400px">
 
 Results are always shown in fractional US customary units.
 
-<img src="./screenshots/02-basic-results.png" height="400px">
+<img src="./images/screenshots/02-basic-results.png" height="400px">
 
 But you can use feet and inches both for larger measures.
 
-<img src="./screenshots/03-result-format.png" height="400px">
+<img src="./images/screenshots/03-result-format.png" height="400px">
 
 And show the result in metric.
 
-<img src="./screenshots/04-metric-results.png" height="400px">
+<img src="./images/screenshots/04-metric-results.png" height="400px">
 
 You can even input metric if you need to mix systems.
 
-<img src="./screenshots/05-mixed-input.png" height="400px">
+<img src="./images/screenshots/05-mixed-input.png" height="400px">
 
 And results will be shown in US customary, indicating any rounding errors to four decimal places.
 
-<img src="./screenshots/06-rounding-error.png" height="400px">
+<img src="./images/screenshots/06-rounding-error.png" height="400px">
 
 You can consult the history of calculations you've made.
 
-<img src="./screenshots/07-history.png" height="400px">
+<img src="./images/screenshots/07-history.png" height="400px">
 
 It understands area and volume measures as well.
 
-<img src="./screenshots/08-square-inch-result.png" height="400px">
+<img src="./images/screenshots/08-square-inch-result.png" height="400px">
 
 And, of course, has a dark mode.
 
-<img src="./screenshots/09-dark-mode.png" height="400px">
+<img src="./images/screenshots/09-dark-mode.png" height="400px">
 
 ## Building
 

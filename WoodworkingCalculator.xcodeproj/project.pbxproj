@@ -7,9 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2105DE992F4231C00074B76A /* take-screenshots.sh in Resources */ = {isa = PBXBuildFile; fileRef = 2105DE982F4231C00074B76A /* take-screenshots.sh */; };
 		216BB80C2E26BDFC00D2AF17 /* Numerics in Frameworks */ = {isa = PBXBuildFile; productRef = 216BB80B2E26BDFC00D2AF17 /* Numerics */; };
-		21DF4F142F41911000D407AC /* composite-screenshots.sh in Resources */ = {isa = PBXBuildFile; fileRef = 21DF4F132F41911000D407AC /* composite-screenshots.sh */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,17 +35,33 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2105DE982F4231C00074B76A /* take-screenshots.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "take-screenshots.sh"; sourceTree = "<group>"; };
 		216BB80D2E28144400D2AF17 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		218B780C2E15C69D00F8B129 /* Wood Calc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wood Calc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78192E15C69E00F8B129 /* Wood Calc Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wood Calc Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78232E15C69E00F8B129 /* Wood Calc UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wood Calc UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = WoodworkingCalculator.xctestplan; sourceTree = "<group>"; };
 		21C111482E3BDAB1007EB628 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		21DF4F132F41911000D407AC /* composite-screenshots.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "composite-screenshots.sh"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2125D4292F43963E00BA755E /* Exceptions for "images" folder in "Wood Calc" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				backgrounds/01.png,
+				"composite-screenshots.sh",
+				"screenshots/01-number-formats.png",
+				"screenshots/02-basic-results.png",
+				"screenshots/03-result-format.png",
+				"screenshots/04-metric-results.png",
+				"screenshots/05-mixed-input.png",
+				"screenshots/06-rounding-error.png",
+				"screenshots/07-history.png",
+				"screenshots/08-square-inch-result.png",
+				"screenshots/09-dark-mode.png",
+				"take-screenshots.sh",
+			);
+			target = 218B780B2E15C69D00F8B129 /* Wood Calc */;
+		};
 		218B78742E1611BF00F8B129 /* Exceptions for "WoodworkingCalculator" folder in "Wood Calc" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -58,6 +72,14 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		2125D4282F43963700BA755E /* images */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2125D4292F43963E00BA755E /* Exceptions for "images" folder in "Wood Calc" target */,
+			);
+			path = images;
+			sourceTree = "<group>";
+		};
 		216BB8452E2950AB00D2AF17 /* Citron */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Citron;
@@ -120,9 +142,8 @@
 			isa = PBXGroup;
 			children = (
 				21C111482E3BDAB1007EB628 /* .gitignore */,
-				21DF4F132F41911000D407AC /* composite-screenshots.sh */,
-				2105DE982F4231C00074B76A /* take-screenshots.sh */,
 				216BB80D2E28144400D2AF17 /* README.md */,
+				2125D4282F43963700BA755E /* images */,
 				216BB8452E2950AB00D2AF17 /* Citron */,
 				219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */,
 				218B780E2E15C69D00F8B129 /* WoodworkingCalculator */,
@@ -293,8 +314,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				21DF4F142F41911000D407AC /* composite-screenshots.sh in Resources */,
-				2105DE992F4231C00074B76A /* take-screenshots.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -45,7 +45,7 @@ final class AppStoreScreenshotTests: XCTestCase {
         tap("format", "Inches")
         tap("theme", "Light")
         tap(topMiddle)
-        tap("1", "3", "slash", "1", "6", "plus", "1", "space", "1", "slash", "4", "plus", "1", ".", "5", "'")
+        tap("1", "3", "slash", "1", "6", "plus", "1", "space", "1", "slash", "4", "\"", "plus", "1", ".", "5", "'")
         saveScreenshot(named: "01-number-formats")
 
         tap("equal")
