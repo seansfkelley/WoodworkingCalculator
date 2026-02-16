@@ -14,7 +14,7 @@ OVERLAY_HEIGHT=2622
 
 # to taste
 HORIZONTAL_MARGIN=100
-VERTICAL_OFFSET=500
+VERTICAL_OFFSET=650
 
 BACKGROUNDS=(
     "backgrounds/01.png"
@@ -43,13 +43,13 @@ if [ "${#BACKGROUNDS[@]}" -ne "${#OVERLAYS[@]}" ]; then
     exit 1
 fi
 
-for i in "${!BACKGROUNDS[@]}"; do
+for i in {1..${#BACKGROUNDS[@]}}; do
     bg="${BACKGROUNDS[$i]}"
     overlay="${OVERLAYS[$i]}"
 
-    bg_base="${$(basename "$bg")%.*}"
-    overlay_base="${$(basename "$overlay")%.*}"
-    output="${OUTPUT_DIRECTORY}/$((i + 1))_${bg_base}_${overlay_base}.png"
+    bg_base="$(basename "${bg%.*}")"
+    overlay_base="$(basename "${overlay%.*}")"
+    output="${OUTPUT_DIRECTORY}/${i}_${bg_base}_${overlay_base}.png"
 
     echo "Merging $overlay onto $bg -> $output"
 
