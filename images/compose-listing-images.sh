@@ -19,6 +19,7 @@ CORNER_RADIUS=140 # empirical
 SHADOW_OFFSET=0
 SHADOW_BLUR=15
 
+DYNAMIC_ISLAND="dynamic-island.png"
 OUTPUT_DIRECTORY="composed"
 
 BACKGROUNDS=(
@@ -59,6 +60,7 @@ for i in {1..${#BACKGROUNDS[@]}}; do
     # Scale overlay and clip corners to a rounded rectangle
     transformed_overlay="$(mktemp /tmp/overlay_XXXXXX.png)"
     magick "$overlay" \
+        "$DYNAMIC_ISLAND" -composite \
         -resize "${SCALED_OVERLAY_WIDTH}x${SCALED_OVERLAY_HEIGHT}!" \
         -alpha set \
         \( +clone -alpha transparent \
