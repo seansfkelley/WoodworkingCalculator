@@ -48,7 +48,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				backgrounds/01.png,
-				"composite-screenshots.sh",
 				"screenshots/01-number-formats.png",
 				"screenshots/02-basic-results.png",
 				"screenshots/03-result-format.png",
