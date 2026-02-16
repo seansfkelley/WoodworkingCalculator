@@ -27,12 +27,14 @@ BACKGROUNDS=(
     "backgrounds/02.png"
     "backgrounds/03.png"
     "backgrounds/04.png"
+    "backgrounds/05.png"
 )
 
 OVERLAYS=(
     "screenshots/02-basic-results.png"
     "screenshots/03-result-format.png"
     "screenshots/06-rounding-error.png"
+    "screenshots/07-history.png"
     "screenshots/08-square-inch-result.png"
 )
 
