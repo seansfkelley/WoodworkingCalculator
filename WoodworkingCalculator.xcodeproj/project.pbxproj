@@ -35,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2125D47B2F43A8C500BA755E /* PRIVACY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRIVACY.md; sourceTree = "<group>"; };
 		216BB80D2E28144400D2AF17 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		218B780C2E15C69D00F8B129 /* Wood Calc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wood Calc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		218B78192E15C69E00F8B129 /* Wood Calc Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wood Calc Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -141,6 +142,7 @@
 			children = (
 				21C111482E3BDAB1007EB628 /* .gitignore */,
 				216BB80D2E28144400D2AF17 /* README.md */,
+				2125D47B2F43A8C500BA755E /* PRIVACY.md */,
 				2125D4282F43963700BA755E /* images */,
 				216BB8452E2950AB00D2AF17 /* Citron */,
 				219FB5802E1703D0003C50CA /* WoodworkingCalculator.xctestplan */,
