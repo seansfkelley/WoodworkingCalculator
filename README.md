@@ -19,7 +19,7 @@ Specifically, it:
 
 Supports idiomatic entry of fractions (including top-heavy ones), mixed numbers and decimals, all with and without units.
 
-Dedicated buttons for feet ("), inches ('), fractions (/) and common fractions (half, quarter, eighth, sixteenth) make input quick.
+Dedicated buttons for feet ("), inches ('), fractions (/) make input quick.
 
 <img src="./images/screenshots/01-number-formats.png" height="400px">
 
@@ -63,9 +63,11 @@ There is a separate Xcode build target for [Citron](https://github.com/roop/citr
 
 ## Screenshots
 
-Use `./take-screenshots.sh` to run the UI "test" that generates the App Store listing screenshots and extract them to this repo.
+Use `images/take-screenshots.sh` to run the UI "test" that generates the App Store listing screenshots and extract them to this repo.
 
-Use `./composite-screenshots.sh` to composite those screenshots onto the background images for the listing.
+Use `images/compose-listing-images.sh` to composite those screenshots onto the background images for the listing.
+
+The background images are multiple layers in the `images/pixlr-background-source.pxz` file, for use with [Pixlr](https://pixlr.com/editor/).
 
 ## Testing
 
