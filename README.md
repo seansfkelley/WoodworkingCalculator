@@ -1,6 +1,8 @@
-# WoodworkingCalculator
+# Woodworking Calculator
 
-A four-function calculator tailored for the US customary system as it's used in woodworking.
+A four-function calculator tailored for the US customary system as it's used in woodworking for iOS.
+
+[Get it on the App Store.](https://apps.apple.com/us/app/woodworking-calculator/id6758412492)
 
 Specifically, it:
 
