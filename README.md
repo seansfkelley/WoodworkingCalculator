@@ -1,8 +1,13 @@
-# Woodworking Calculator
+# <picture><source media="(prefers-color-scheme: dark)" srcset="./WoodworkingCalculator/Assets.xcassets/AppIcon.appiconset/dark-mode.png"><img src="./WoodworkingCalculator/Assets.xcassets/AppIcon.appiconset/light-mode.png" height="32px" align="texttop" style="border-radius: 20%"></picture> Woodworking Calculator
 
 A four-function calculator tailored for the US customary system as it's used in woodworking for iOS.
 
-[Get it on the App Store.](https://apps.apple.com/us/app/woodworking-calculator/id6758412492)
+<a href="https://apps.apple.com/us/app/woodworking-calculator/id6758412492">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./images/app-store-badge/dark.svg">
+    <img src="./images/app-store-badge/light.svg" height="40px">
+  </picture>
+</a>
 
 Specifically, it:
 
